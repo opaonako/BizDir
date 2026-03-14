@@ -303,91 +303,165 @@
     let currentPage = 1, currentCategory = '', currentSearch = '', searchTimer = null;
 
     async function loadCategories() {
+  const scroll = document.getElementById('catScroll');
+
+  // Show cached categories instantly
+  const cached = localStorage.getItem('bizdir_categories');
+  if (cached) {
+    const { categories } = JSON.parse(cached);
+    renderCategories(categories, scroll);
+  }
+
+  // Fetch fresh in background
   try {
     const res = await fetch('/api/categories');
     const data = await res.json();
     if (!data.success || !data.categories) return;
-    const scroll = document.getElementById('catScroll');
+    localStorage.setItem('bizdir_categories', JSON.stringify({ categories: data.categories }));
+    if (!cached) renderCategories(data.categories, scroll);
+  } catch(e) { console.error('Categories failed', e); }
+}
 
-    // Wire up the All button
-    const allBtn = scroll.querySelector('[data-slug=""]');
-    if (allBtn) {
-      allBtn.addEventListener('click', () => setCategory('', allBtn));
-    }
+function renderCategories(categories, scroll) {
+  // Remove existing chips except All
+  scroll.querySelectorAll('.cat-chip:not([data-slug=""])').forEach(c => c.remove());
 
-    data.categories.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.className = 'cat-chip';
-      btn.dataset.slug = cat.slug;
-      btn.textContent = (cat.icon ? cat.icon + ' ' : '') + cat.name;
-      btn.addEventListener('click', () => setCategory(cat.name, btn));
-      scroll.appendChild(btn);
-    });
-  } catch(e) {
-    console.error('Categories failed', e);
-  }
+  const allBtn = scroll.querySelector('[data-slug=""]');
+  if (allBtn) allBtn.addEventListener('click', () => setCategory('', allBtn));
+
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-chip';
+    btn.dataset.slug = cat.slug;
+    btn.textContent = (cat.icon ? cat.icon + ' ' : '') + cat.name;
+    btn.addEventListener('click', () => setCategory(cat.name, btn));
+    scroll.appendChild(btn);
+  });
 }
 
     async function loadListings() {
-      const grid = document.getElementById('grid');
-      const countEl = document.getElementById('resultsCount');
-      countEl.textContent = 'Loading…';
+  const grid = document.getElementById('grid');
+  const countEl = document.getElementById('resultsCount');
 
-    const params = new URLSearchParams({ page: currentPage, limit: 12 });
-if (currentCategory) params.set('category', currentCategory);
-if (currentSearch) params.set('search', currentSearch);
+  const params = new URLSearchParams({ page: currentPage, limit: 12 });
+  if (currentCategory) params.set('category', currentCategory);
+  if (currentSearch) params.set('search', currentSearch);
+  const cacheKey = 'bizdir_listings_' + params.toString();
 
-      try {
-        const res = await fetch('/api/listings?' + params);
-        const data = await res.json();
+  // Show cached listings instantly
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    const cacheData = JSON.parse(cached);
+    // Only use cache if less than 5 minutes old
+    if (Date.now() - cacheData.time < 5 * 60 * 1000) {
+      renderListings(cacheData.data, countEl, grid);
+      // Still fetch fresh in background silently
+      fetchListings(params, cacheKey, countEl, grid, true);
+      return;
+    }
+  }
 
-        if (!data.success) {
-          grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Something went wrong</h3><p>${esc(data.error || 'Could not load listings.')}</p></div>`;
-          countEl.textContent = '';
-          return;
-        }
-        
+  // No cache — show skeleton and fetch
+  showSkeleton(grid);
+  countEl.textContent = 'Loading…';
+  fetchListings(params, cacheKey, countEl, grid, false);
+}
 
-        const { businesses, total, totalPages } = data;
-        countEl.innerHTML = total > 0 ? `Showing <strong>${businesses.length}</strong> of <strong>${total}</strong> businesses` : '&nbsp;';
+async function fetchListings(params, cacheKey, countEl, grid, silent) {
+  try {
+    const res = await fetch('/api/listings?' + params);
+    const data = await res.json();
 
-        if (!businesses.length) {
-          grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No businesses found</h3><p>Try a different search or category.</p></div>`;
-          renderPagination(0, 0); return;
-        }
+    if (!data.success) {
+      if (!silent) {
+        grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Something went wrong</h3><p>${esc(data.error || 'Could not load listings.')}</p></div>`;
+        countEl.textContent = '';
+      }
+      return;
+    }
 
-        const CAT_COLORS = ['#e84c1e','#2563eb','#16a34a','#9333ea','#ea580c','#0891b2','#0d9488'];
-        function catColor(cat) {
-          let h = 0; for (let c of String(cat)) h = (h*31 + c.charCodeAt(0)) & 0xffffffff;
-          return CAT_COLORS[Math.abs(h) % CAT_COLORS.length];
-        }
+    // Save to localStorage
+    localStorage.setItem(cacheKey, JSON.stringify({ data, time: Date.now() }));
 
-        grid.innerHTML = businesses.map((b, i) => `
-          <a class="card" href="/pages/business?id=${esc(b.id)}" style="animation-delay:${i*0.05}s">
-            <div class="card-banner" style="background:${catColor(b.category)}"></div>
-            <div class="card-body">
-              <div class="card-top">
-                <div class="card-logo">${b.logoUrl ? `<img src="${esc(b.logoUrl)}" alt="${esc(b.name)}" onerror="this.parentElement.textContent='${esc(b.name.charAt(0))}'">` : esc(b.name.charAt(0).toUpperCase())}</div>
-                <div class="card-meta">
-                  <div class="card-name">${esc(b.name)}</div>
-                  <div class="card-category">${esc(b.category)}</div>
-                </div>
-              </div>
-              <p class="card-desc">${esc(b.description)}</p>
-              <div class="card-footer">
-                <span class="card-location"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(b.location)}</span>
-                <span class="card-arrow">→</span>
-              </div>
-            </div>
-          </a>`).join('');
-// Prefetch on hover
-document.querySelectorAll('.card').forEach(card => {
-  card.addEventListener('mouseenter', () => {
-    const href = card.getAttribute('href');
-    const id = new URLSearchParams(href.split('?')[1]).get('id');
-    if (id) fetch(`/api/listings?id=${id}`); // warm the cache
-  }, { once: true });
-});
+    // Only update UI if not silent or content changed
+    if (!silent) renderListings(data, countEl, grid);
+
+  } catch(e) {
+    console.error(e);
+    if (!silent) {
+      grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Could not connect</h3><p>Please check your connection and try again.</p></div>`;
+      countEl.textContent = '';
+    }
+  }
+}
+
+function renderListings(data, countEl, grid) {
+  const { businesses, total, totalPages } = data;
+
+  countEl.innerHTML = total > 0
+    ? `Showing <strong>${businesses.length}</strong> of <strong>${total}</strong> businesses`
+    : '&nbsp;';
+
+  if (!businesses.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No businesses found</h3><p>Try a different search or category.</p></div>`;
+    renderPagination(0, 0); return;
+  }
+
+  const CAT_COLORS = ['#e84c1e','#2563eb','#16a34a','#9333ea','#ea580c','#0891b2','#0d9488'];
+  function catColor(cat) {
+    let h = 0; for (let c of String(cat)) h = (h*31 + c.charCodeAt(0)) & 0xffffffff;
+    return CAT_COLORS[Math.abs(h) % CAT_COLORS.length];
+  }
+
+  grid.innerHTML = businesses.map((b, i) => `
+    <a class="card" href="/pages/business?id=${esc(b.id)}" style="animation-delay:${i*0.05}s">
+      <div class="card-banner" style="background:${catColor(b.category)}"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-logo">${b.logoUrl
+            ? `<img src="${esc(b.logoUrl)}" alt="${esc(b.name)}" onerror="this.parentElement.textContent='${esc(b.name.charAt(0))}'"/>`
+            : esc(b.name.charAt(0).toUpperCase())}</div>
+          <div class="card-meta">
+            <div class="card-name">${esc(b.name)}</div>
+            <div class="card-category">${esc(b.category)}</div>
+          </div>
+        </div>
+        <p class="card-desc">${esc(b.description)}</p>
+        <div class="card-footer">
+          <span class="card-location">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${esc(b.location)}
+          </span>
+          <span class="card-arrow">→</span>
+        </div>
+      </div>
+    </a>`).join('');
+
+  renderPagination(currentPage, totalPages);
+
+  // Prefetch on hover
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      const href = card.getAttribute('href');
+      const id = new URLSearchParams(href.split('?')[1]).get('id');
+      if (id) fetch(`/api/listings?id=${id}`);
+    }, { once: true });
+  });
+}
+
+function showSkeleton(grid) {
+  grid.innerHTML = [1,2,3].map(() => `
+    <div class="skeleton">
+      <div class="skel-banner"></div>
+      <div class="skel-body">
+        <div class="skel-line" style="height:48px;width:48px;border-radius:10px;display:inline-block;margin-bottom:12px"></div>
+        <div class="skel-line" style="height:14px;width:60%"></div>
+        <div class="skel-line" style="height:10px;width:40%"></div>
+        <div class="skel-line" style="height:10px;width:90%;margin-top:16px"></div>
+        <div class="skel-line" style="height:10px;width:65%"></div>
+      </div>
+    </div>`).join('');
+}
         renderPagination(currentPage, totalPages);
       } catch(e) {
         console.error(e);
