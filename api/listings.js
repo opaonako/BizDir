@@ -1,7 +1,7 @@
 const { callAppsScript, ok, err } = require("./_utils");
 
 const cache = new Map();
-const CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+const CACHE_TTL = 10 * 60 * 1000; // 2 minutes
 
 module.exports = async (req, res) => {
   if (req.method === "GET") {

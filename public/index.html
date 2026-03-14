@@ -346,6 +346,7 @@ if (currentSearch) params.set('search', currentSearch);
           countEl.textContent = '';
           return;
         }
+        
 
         const { businesses, total, totalPages } = data;
         countEl.innerHTML = total > 0 ? `Showing <strong>${businesses.length}</strong> of <strong>${total}</strong> businesses` : '&nbsp;';
@@ -379,7 +380,14 @@ if (currentSearch) params.set('search', currentSearch);
               </div>
             </div>
           </a>`).join('');
-
+// Prefetch on hover
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('mouseenter', () => {
+    const href = card.getAttribute('href');
+    const id = new URLSearchParams(href.split('?')[1]).get('id');
+    if (id) fetch(`/api/listings?id=${id}`); // warm the cache
+  }, { once: true });
+});
         renderPagination(currentPage, totalPages);
       } catch(e) {
         console.error(e);
