@@ -1,0 +1,11 @@
+{
+  "name": "bizdir",
+  "version": "1.0.0",
+  "description": "Business directory web app",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
