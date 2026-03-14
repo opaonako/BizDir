@@ -270,7 +270,7 @@
 
   <section class="categories">
     <div class="cat-scroll" id="catScroll">
-      <button class="cat-chip active" data-slug="">&#10003; All</button>
+      <button class="cat-chip active" data-slug="" onclick="setCategory('', this)">&#10003; All</button>
     </div>
   </section>
 
@@ -324,8 +324,8 @@
       countEl.textContent = 'Loading…';
 
       const params = new URLSearchParams({ page: currentPage, limit: 12 });
-      if (currentCategory) params.set('category', currentCategory);
-      if (currentSearch) params.set('search', currentSearch);
+if (currentCategory) params.set('category', currentCategory);
+if (currentSearch) params.set('search', currentSearch);
 
       try {
         const res = await fetch('/api/listings?' + params);
@@ -389,11 +389,13 @@
 
     function goPage(p) { currentPage = p; window.scrollTo({top:0,behavior:'smooth'}); loadListings(); }
 
-    function setCategory(slug, btn) {
-      currentCategory = slug; currentPage = 1;
-      document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active'); loadListings();
-    }
+  function setCategory(slug, btn) {
+  currentCategory = slug;
+  currentPage = 1;
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  loadListings();
+}
 
     document.getElementById('searchInput').addEventListener('input', e => {
       clearTimeout(searchTimer);
