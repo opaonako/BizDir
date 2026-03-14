@@ -312,7 +312,7 @@
           btn.className = 'cat-chip';
           btn.dataset.slug = cat.slug;
           btn.textContent = (cat.icon ? cat.icon + ' ' : '') + cat.name;
-          btn.addEventListener('click', () => setCategory(cat.slug, btn));
+          btn.addEventListener('click', () => setCategory(cat.name, btn));
           scroll.appendChild(btn);
         });
       } catch(e) { console.error('Categories failed', e); }
