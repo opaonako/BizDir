@@ -303,30 +303,39 @@
     let currentPage = 1, currentCategory = '', currentSearch = '', searchTimer = null;
 
     async function loadCategories() {
-      try {
-        const res = await fetch('/api/categories');
-        const data = await res.json();
-        if (!data.success) return;
-        const scroll = document.getElementById('catScroll');
-        data.categories.forEach(cat => {
-          const btn = document.createElement('button');
-          btn.className = 'cat-chip';
-          btn.dataset.slug = cat.slug;
-          btn.textContent = (cat.icon ? cat.icon + ' ' : '') + cat.name;
-          btn.addEventListener('click', () => setCategory(cat.name, btn));
-          scroll.appendChild(btn);
-        });
-      } catch(e) { console.error('Categories failed', e); }
+  try {
+    const res = await fetch('/api/categories');
+    const data = await res.json();
+    if (!data.success || !data.categories) return;
+    const scroll = document.getElementById('catScroll');
+
+    // Wire up the All button
+    const allBtn = scroll.querySelector('[data-slug=""]');
+    if (allBtn) {
+      allBtn.addEventListener('click', () => setCategory('', allBtn));
     }
+
+    data.categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'cat-chip';
+      btn.dataset.slug = cat.slug;
+      btn.textContent = (cat.icon ? cat.icon + ' ' : '') + cat.name;
+      btn.addEventListener('click', () => setCategory(cat.name, btn));
+      scroll.appendChild(btn);
+    });
+  } catch(e) {
+    console.error('Categories failed', e);
+  }
+}
 
     async function loadListings() {
       const grid = document.getElementById('grid');
       const countEl = document.getElementById('resultsCount');
       countEl.textContent = 'Loading…';
 
-      const params = new URLSearchParams({ page: currentPage, limit: 12 });
-      if (currentCategory) params.set('category', currentCategory);
-      if (currentSearch) params.set('search', currentSearch);
+    const params = new URLSearchParams({ page: currentPage, limit: 12 });
+if (currentCategory) params.set('category', currentCategory);
+if (currentSearch) params.set('search', currentSearch);
 
       try {
         const res = await fetch('/api/listings?' + params);
@@ -390,11 +399,13 @@
 
     function goPage(p) { currentPage = p; window.scrollTo({top:0,behavior:'smooth'}); loadListings(); }
 
-    function setCategory(slug, btn) {
-      currentCategory = slug; currentPage = 1;
-      document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active'); loadListings();
-    }
+    function setCategory(name, btn) {
+  currentCategory = name; // empty string = show all
+  currentPage = 1;
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  loadListings();
+}
 
     document.getElementById('searchInput').addEventListener('input', e => {
       clearTimeout(searchTimer);
