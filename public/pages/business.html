@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business — BizDir</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #0f0f0f;
+      --ink-2:     #3a3a3a;
+      --ink-3:     #888;
+      --paper:     #faf9f6;
+      --surface:   #f0ede6;
+      --accent:    #e84c1e;
+      --accent-2:  #f7c948;
+      --border:    #e2ddd6;
+      --card-bg:   #ffffff;
+      --green:     #16a34a;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--paper); border-bottom: 1px solid var(--border);
+      padding: 0 2rem; display: flex; align-items: center;
+      justify-content: space-between; height: 60px;
+    }
+    .nav-logo {
+      font-family: var(--font-head); font-weight: 800; font-size: 1.3rem;
+      letter-spacing: -0.03em; color: var(--ink); text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-logo span { background: var(--accent); color: #fff; padding: 1px 7px 2px; border-radius: 4px; }
+    .nav-back {
+      font-size: 0.875rem; color: var(--ink-2); text-decoration: none;
+      font-weight: 500; display: flex; align-items: center; gap: 6px;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--accent); }
+
+    /* HERO BANNER */
+    .hero-banner {
+      height: 200px;
+      background: var(--ink);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-pattern {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle at 20% 50%, rgba(232,76,30,0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(247,201,72,0.2) 0%, transparent 40%);
+    }
+
+    /* PROFILE SECTION */
+    .profile-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .profile-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-top: -60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .profile-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-logo {
+      width: 80px; height: 80px;
+      border-radius: 16px;
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 700; color: var(--ink-2);
+      flex-shrink: 0; overflow: hidden;
+      border: 3px solid var(--card-bg);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    .profile-logo img { width: 100%; height: 100%; object-fit: cover; }
+
+    .profile-info { flex: 1; min-width: 0; }
+
+    .profile-category {
+      font-size: 0.75rem; color: var(--accent); font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;
+    }
+
+    .profile-name {
+      font-family: var(--font-head); font-size: 1.8rem; font-weight: 800;
+      letter-spacing: -0.03em; color: var(--ink); margin-bottom: 6px;
+      line-height: 1.1;
+    }
+
+    .profile-location {
+      font-size: 0.875rem; color: var(--ink-3);
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    /* STATUS BADGE */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 500;
+    }
+    .badge-open { background: #dcfce7; color: #15803d; }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* ACTION BUTTONS */
+    .actions {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 22px; border-radius: 10px;
+      font-family: var(--font-body); font-size: 0.9rem; font-weight: 500;
+      cursor: pointer; text-decoration: none; border: none;
+      transition: all 0.18s;
+    }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #c93d12; transform: translateY(-1px); }
+
+    .btn-affiliate {
+      background: var(--accent-2); color: var(--ink); font-weight: 600;
+    }
+    .btn-affiliate:hover { background: #f0b800; transform: translateY(-1px); }
+
+    .btn-outline {
+      background: transparent; color: var(--ink-2);
+      border: 1.5px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--ink); background: var(--surface); }
+
+    .btn-icon {
+      width: 18px; height: 18px; flex-shrink: 0;
+    }
+
+    /* CONTENT GRID */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 1.5rem;
+      max-width: 860px;
+      margin: 1.5rem auto 4rem;
+      padding: 0 2rem;
+    }
+
+    /* MAIN CONTENT */
+    .section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 1rem; font-weight: 700;
+      color: var(--ink); margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .description {
+      font-size: 0.95rem; color: var(--ink-2);
+      line-height: 1.8; font-weight: 300;
+    }
+
+    /* CONTACT INFO */
+    .contact-list { list-style: none; }
+    .contact-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .contact-item:last-child { border-bottom: none; }
+    .contact-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--surface); display: flex;
+      align-items: center; justify-content: center;
+      flex-shrink: 0; color: var(--ink-2);
+    }
+    .contact-label { font-size: 0.75rem; color: var(--ink-3); margin-bottom: 1px; }
+    .contact-value { color: var(--ink); font-weight: 500; }
+    .contact-value a { color: var(--accent); text-decoration: none; }
+    .contact-value a:hover { text-decoration: underline; }
+
+    /* AFFILIATE BOX */
+    .affiliate-box {
+      background: var(--ink);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+    .affiliate-box h3 {
+      font-family: var(--font-head);
+      font-size: 1rem; font-weight: 700;
+      color: #fff; margin-bottom: 0.4rem;
+    }
+    .affiliate-box p {
+      font-size: 0.82rem; color: #aaa;
+      font-weight: 300; margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+    .btn-affiliate-full {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; width: 100%; padding: 13px;
+      background: var(--accent-2); color: var(--ink);
+      border: none; border-radius: 10px;
+      font-family: var(--font-head); font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.18s;
+    }
+    .btn-affiliate-full:hover { background: #f0b800; transform: translateY(-1px); }
+
+    /* SHARE BOX */
+    .share-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .share-title {
+      font-size: 0.8rem; font-weight: 500; color: var(--ink-3);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 0.75rem;
+    }
+    .share-btns { display: flex; gap: 8px; }
+    .share-btn {
+      flex: 1; padding: 8px; border-radius: 8px;
+      border: 1.5px solid var(--border); background: var(--card-bg);
+      font-family: var(--font-body); font-size: 0.8rem; font-weight: 500;
+      color: var(--ink-2); cursor: pointer; text-align: center;
+      transition: all 0.18s; text-decoration: none;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .share-btn:hover { border-color: var(--accent); color: var(--accent); background: #fde8e2; }
+
+    /* RELATED */
+    .related-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .related-card {
+      background: var(--paper); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px; text-decoration: none;
+      color: inherit; transition: all 0.18s; display: block;
+    }
+    .related-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .related-name {
+      font-family: var(--font-head); font-size: 0.85rem;
+      font-weight: 700; color: var(--ink); margin-bottom: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .related-cat { font-size: 0.75rem; color: var(--ink-3); }
+
+    /* SKELETON */
+    .skeleton-line {
+      background: var(--surface); border-radius: 4px;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+    /* NOT FOUND */
+    .not-found {
+      text-align: center; padding: 5rem 2rem;
+    }
+    .not-found h2 {
+      font-family: var(--font-head); font-size: 1.5rem;
+      font-weight: 800; margin-bottom: 0.5rem;
+    }
+    .not-found p { color: var(--ink-3); margin-bottom: 1.5rem; }
+
+    @media (max-width: 700px) {
+      .content-grid { grid-template-columns: 1fr; }
+      .profile-name { font-size: 1.4rem; }
+      .hero-banner { height: 140px; }
+      .content-grid { padding: 0 1.25rem; }
+      .profile-wrap { padding: 0 1.25rem; }
+      nav { padding: 0 1.25rem; }
+      .related-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo"><span>Biz</span>Dir</a>
+    <a href="/" class="nav-back">← Back to directory</a>
+  </nav>
+
+  <div id="app">
+    <!-- Hero Banner Skeleton -->
+    <div class="hero-banner">
+      <div class="hero-banner-pattern"></div>
+    </div>
+
+    <div class="profile-wrap">
+      <div class="profile-card" id="profileCard">
+        <div class="profile-top">
+          <div class="profile-logo skeleton-line" style="width:80px;height:80px;border-radius:16px"></div>
+          <div style="flex:1">
+            <div class="skeleton-line" style="height:12px;width:80px;margin-bottom:8px"></div>
+            <div class="skeleton-line" style="height:24px;width:60%;margin-bottom:8px"></div>
+            <div class="skeleton-line" style="height:12px;width:40%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-grid" id="contentGrid" style="display:none">
+      <div id="mainCol"></div>
+      <div id="sideCol"></div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const bizId = params.get('id');
+
+    if (!bizId) showNotFound();
+    else loadBusiness();
+
+    async function loadBusiness() {
+      try {
+        const res = await fetch(`/api/listings?id=${bizId}`);
+        const data = await res.json();
+
+        if (!data.success || !data.business) { showNotFound(); return; }
+
+        const b = data.business;
+
+        // Update page title
+        document.title = `${b.name} — BizDir`;
+
+        // Update meta description
+        const meta = document.createElement('meta');
+        meta.name = 'description';
+        meta.content = b.description;
+        document.head.appendChild(meta);
+
+        renderProfile(b);
+        loadRelated(b.category, b.id);
+
+      } catch (e) {
+        console.error(e);
+        showNotFound();
+      }
+    }
+
+    function renderProfile(b) {
+      const CAT_COLORS = ['#e84c1e','#2563eb','#16a34a','#9333ea','#ea580c','#0891b2','#0d9488'];
+      function catColor(cat) {
+        let h = 0; for (let c of String(cat)) h = (h*31 + c.charCodeAt(0)) & 0xffffffff;
+        return CAT_COLORS[Math.abs(h) % CAT_COLORS.length];
+      }
+
+      // Hero banner color
+      document.querySelector('.hero-banner').style.background = catColor(b.category);
+
+      // Profile card
+      document.getElementById('profileCard').innerHTML = `
+        <div class="profile-top">
+          <div class="profile-logo">
+            ${b.logoUrl
+              ? `<img src="${esc(b.logoUrl)}" alt="${esc(b.name)}" onerror="this.parentElement.textContent='${esc(b.name.charAt(0))}'"/>`
+              : esc(b.name.charAt(0).toUpperCase())}
+          </div>
+          <div class="profile-info">
+            <div class="profile-category">${esc(b.category)}</div>
+            <h1 class="profile-name">${esc(b.name)}</h1>
+            <div class="profile-location">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              ${esc(b.location)}
+            </div>
+          </div>
+          <span class="badge badge-open"><span class="badge-dot"></span>Open</span>
+        </div>
+        <div class="actions">
+          ${b.phone ? `<a href="tel:${esc(b.phone)}" class="btn btn-primary">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.8 19.79 19.79 0 01.22 2.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            Call now
+          </a>` : ''}
+          ${b.website ? `<a href="${esc(b.website)}" target="_blank" rel="noopener" class="btn btn-outline">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+            Website
+          </a>` : ''}
+        </div>
+      `;
+
+      // Main column
+      document.getElementById('mainCol').innerHTML = `
+        <div class="section">
+          <div class="section-title">About this business</div>
+          <p class="description">${esc(b.description)}</p>
+        </div>
+        <div class="section">
+          <div class="section-title">Contact & location</div>
+          <ul class="contact-list">
+            ${b.phone ? `<li class="contact-item">
+              <div class="contact-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.8 19.79 19.79 0 01.22 2.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              </div>
+              <div>
+                <div class="contact-label">Phone</div>
+                <div class="contact-value"><a href="tel:${esc(b.phone)}">${esc(b.phone)}</a></div>
+              </div>
+            </li>` : ''}
+            ${b.location ? `<li class="contact-item">
+              <div class="contact-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <div class="contact-label">Location</div>
+                <div class="contact-value">${esc(b.location)}</div>
+              </div>
+            </li>` : ''}
+            ${b.website ? `<li class="contact-item">
+              <div class="contact-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+              </div>
+              <div>
+                <div class="contact-label">Website</div>
+                <div class="contact-value"><a href="${esc(b.website)}" target="_blank" rel="noopener">${esc(b.website)}</a></div>
+              </div>
+            </li>` : ''}
+          </ul>
+        </div>
+        <div id="relatedSection"></div>
+      `;
+
+      // Side column
+      document.getElementById('sideCol').innerHTML = `
+        ${b.affiliateUrl ? `
+        <div class="affiliate-box">
+          <h3>Special offer available</h3>
+          <p>Visit this business through our link and get exclusive deals.</p>
+          <a href="${esc(b.affiliateUrl)}" target="_blank" rel="noopener sponsored" class="btn-affiliate-full" onclick="trackAffiliate('${esc(b.id)}', '${esc(b.name)}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Visit & get deal
+          </a>
+        </div>` : ''}
+        <div class="share-box">
+          <div class="share-title">Share this business</div>
+          <div class="share-btns">
+            <button class="share-btn" onclick="copyLink()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy link
+            </button>
+            <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener">
+              Facebook
+            </a>
+          </div>
+        </div>
+        <div class="section" style="margin-bottom:0">
+          <div class="section-title">Listed on BizDir</div>
+          <p style="font-size:0.82rem;color:var(--ink-3);line-height:1.6;font-weight:300">
+            This business is verified and listed on BizDir — your local business directory.
+          </p>
+          <a href="/" style="display:inline-block;margin-top:0.75rem;font-size:0.82rem;color:var(--accent);text-decoration:none;font-weight:500">Browse more businesses →</a>
+        </div>
+      `;
+
+      // Show content
+      document.getElementById('contentGrid').style.display = 'grid';
+    }
+
+    async function loadRelated(category, excludeId) {
+      try {
+        const res = await fetch(`/api/listings?category=${encodeURIComponent(category)}&limit=4`);
+        const data = await res.json();
+        if (!data.success) return;
+
+        const related = (data.businesses || []).filter(b => b.id !== excludeId).slice(0, 4);
+        if (!related.length) return;
+
+        document.getElementById('relatedSection').innerHTML = `
+          <div class="section">
+            <div class="section-title">More in ${esc(category)}</div>
+            <div class="related-grid">
+              ${related.map(b => `
+                <a class="related-card" href="/pages/business.html?id=${esc(b.id)}">
+                  <div class="related-name">${esc(b.name)}</div>
+                  <div class="related-cat">${esc(b.location)}</div>
+                </a>`).join('')}
+            </div>
+          </div>
+        `;
+      } catch(e) { console.error('Related failed', e); }
+    }
+
+    function showNotFound() {
+      document.getElementById('app').innerHTML = `
+        <div class="not-found">
+          <div style="font-size:3rem;margin-bottom:1rem">🔍</div>
+          <h2>Business not found</h2>
+          <p>This listing may have been removed or the link is incorrect.</p>
+          <a href="/" class="btn btn-primary" style="display:inline-flex;margin-top:1rem">← Back to directory</a>
+        </div>
+      `;
+    }
+
+    function trackAffiliate(id, name) {
+      console.log('Affiliate click:', id, name);
+      // Add your analytics tracking here if needed
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        const btn = event.target.closest('.share-btn');
+        const original = btn.innerHTML;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.innerHTML = original, 2000);
+      });
+    }
+
+    function esc(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+</body>
+</html>
