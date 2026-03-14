@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BizDir — Discover Local Businesses</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #0f0f0f;
+      --ink-2:     #3a3a3a;
+      --ink-3:     #888;
+      --paper:     #faf9f6;
+      --surface:   #f0ede6;
+      --accent:    #e84c1e;
+      --accent-2:  #f7c948;
+      --border:    #e2ddd6;
+      --card-bg:   #ffffff;
+      --radius:    14px;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--paper); border-bottom: 1px solid var(--border);
+      padding: 0 2rem; display: flex; align-items: center;
+      justify-content: space-between; height: 60px;
+    }
+    .nav-logo {
+      font-family: var(--font-head); font-weight: 800; font-size: 1.3rem;
+      letter-spacing: -0.03em; color: var(--ink); text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-logo span {
+      background: var(--accent); color: #fff;
+      padding: 1px 7px 2px; border-radius: 4px; font-size: 1.1rem;
+    }
+    .nav-links { display: flex; align-items: center; gap: 1rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.875rem; font-weight: 500; color: var(--ink-2);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border-radius: 8px; font-family: var(--font-body);
+      font-size: 0.875rem; font-weight: 500; cursor: pointer;
+      text-decoration: none; border: none; transition: all 0.18s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #c93d12; transform: translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      padding: 5rem 2rem 3rem; max-width: 860px;
+      margin: 0 auto; text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--accent);
+      background: #fde8e2; padding: 4px 12px;
+      border-radius: 20px; margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: var(--font-head); font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800; line-height: 1.08; letter-spacing: -0.03em;
+      color: var(--ink); margin-bottom: 1.2rem;
+    }
+    .hero h1 em { font-style: normal; color: var(--accent); }
+    .hero p {
+      font-size: 1.05rem; color: var(--ink-2); font-weight: 300;
+      line-height: 1.7; max-width: 520px; margin: 0 auto 2.5rem;
+    }
+
+    /* SEARCH */
+    .search-wrap {
+      max-width: 600px; margin: 0 auto 1rem; position: relative;
+    }
+    .search-wrap input {
+      width: 100%; padding: 16px 56px 16px 20px;
+      border: 2px solid var(--border); border-radius: 12px;
+      font-family: var(--font-body); font-size: 1rem;
+      background: var(--card-bg); color: var(--ink);
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-wrap input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(232,76,30,0.1);
+    }
+    .search-wrap input::placeholder { color: var(--ink-3); }
+    .search-icon {
+      position: absolute; right: 18px; top: 50%;
+      transform: translateY(-50%); color: var(--ink-3); pointer-events: none;
+    }
+
+    /* CATEGORIES */
+    .categories { max-width: 1140px; margin: 0 auto; padding: 0 2rem 2.5rem; }
+    .cat-scroll {
+      display: flex; gap: 8px; overflow-x: auto;
+      padding-bottom: 4px; scrollbar-width: none;
+    }
+    .cat-scroll::-webkit-scrollbar { display: none; }
+    .cat-chip {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 30px; border: 1.5px solid var(--border);
+      background: var(--card-bg); font-family: var(--font-body);
+      font-size: 0.82rem; font-weight: 500; color: var(--ink-2);
+      cursor: pointer; transition: all 0.18s; white-space: nowrap;
+    }
+    .cat-chip:hover, .cat-chip.active {
+      border-color: var(--accent); background: var(--accent); color: #fff;
+    }
+
+    /* MAIN */
+    .main { max-width: 1140px; margin: 0 auto; padding: 0 2rem 4rem; }
+    .results-bar {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 1.5rem;
+    }
+    .results-count { font-size: 0.875rem; color: var(--ink-3); }
+    .results-count strong { color: var(--ink); font-weight: 600; }
+
+    /* GRID */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+
+    /* CARD */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column; animation: fadeUp 0.4s both;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.09);
+      border-color: #ccc;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card-banner { height: 10px; }
+    .card-body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
+    .card-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 0.75rem; }
+    .card-logo {
+      width: 48px; height: 48px; border-radius: 10px;
+      background: var(--surface); display: flex; align-items: center;
+      justify-content: center; font-size: 1.4rem; font-weight: 700;
+      flex-shrink: 0; overflow: hidden; color: var(--ink-2);
+    }
+    .card-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .card-meta { flex: 1; min-width: 0; }
+    .card-name {
+      font-family: var(--font-head); font-size: 1rem; font-weight: 700;
+      color: var(--ink); margin-bottom: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .card-category {
+      font-size: 0.75rem; color: var(--accent); font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .card-desc {
+      font-size: 0.875rem; color: var(--ink-2); line-height: 1.6;
+      font-weight: 300; flex: 1; display: -webkit-box;
+      -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-footer {
+      margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-location {
+      font-size: 0.8rem; color: var(--ink-3);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .card-arrow {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--surface); display: flex; align-items: center;
+      justify-content: center; font-size: 0.75rem; color: var(--ink-2);
+      transition: background 0.18s, color 0.18s;
+    }
+    .card:hover .card-arrow { background: var(--accent); color: #fff; }
+
+    /* SKELETON */
+    .skeleton {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .skel-banner { height: 10px; background: var(--surface); }
+    .skel-body { padding: 1.25rem; }
+    .skel-line { background: var(--surface); border-radius: 4px; margin-bottom: 10px; }
+
+    /* EMPTY */
+    .empty { grid-column: 1/-1; text-align: center; padding: 5rem 2rem; }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty h3 { font-family: var(--font-head); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .empty p { color: var(--ink-3); font-size: 0.9rem; }
+
+    /* PAGINATION */
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 3rem; }
+    .page-btn {
+      width: 38px; height: 38px; border-radius: 8px;
+      border: 1.5px solid var(--border); background: var(--card-bg);
+      font-family: var(--font-body); font-size: 0.875rem; font-weight: 500;
+      color: var(--ink-2); cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: all 0.18s;
+    }
+    .page-btn:hover, .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* CTA */
+    .cta-banner { max-width: 1140px; margin: 0 auto 3rem; padding: 0 2rem; }
+    .cta-inner {
+      background: var(--ink); border-radius: 16px;
+      padding: 2.5rem 3rem; display: flex; align-items: center;
+      justify-content: space-between; gap: 2rem; flex-wrap: wrap;
+    }
+    .cta-inner h2 {
+      font-family: var(--font-head); font-size: 1.5rem; font-weight: 800;
+      color: #fff; letter-spacing: -0.02em; margin-bottom: 0.3rem;
+    }
+    .cta-inner p { color: #aaa; font-size: 0.9rem; font-weight: 300; }
+    .btn-light { background: var(--accent-2); color: var(--ink); font-weight: 600; padding: 10px 24px; white-space: nowrap; }
+    .btn-light:hover { background: #f0b800; transform: translateY(-1px); }
+
+    footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; text-align: center; font-size: 0.8rem; color: var(--ink-3); }
+
+    @media (max-width: 640px) {
+      .hero { padding: 3rem 1.25rem 2rem; }
+      .hero h1 { font-size: 2rem; }
+      .cta-inner { padding: 1.75rem; flex-direction: column; text-align: center; }
+      nav { padding: 0 1.25rem; }
+      .main, .categories, .cta-banner { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo"><span>Biz</span>Dir</a>
+    <ul class="nav-links">
+      <li><a href="/">Browse</a></li>
+      <li><a href="/pages/login.html">Login</a></li>
+      <li><a href="/pages/signup.html" class="btn btn-primary">List your business</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-eyebrow">&#9679; Local business directory</div>
+    <h1>Find the best<br><em>local businesses</em><br>near you</h1>
+    <p>Browse verified local businesses. From food to services — everything your community has to offer.</p>
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search businesses, categories, locations…" autocomplete="off">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+  </section>
+
+  <section class="categories">
+    <div class="cat-scroll" id="catScroll">
+      <button class="cat-chip active" data-slug="">&#10003; All</button>
+    </div>
+  </section>
+
+  <main class="main">
+    <div class="results-bar">
+      <span class="results-count" id="resultsCount">Loading…</span>
+    </div>
+    <div class="grid" id="grid">
+      <div class="skeleton"><div class="skel-banner"></div><div class="skel-body"><div class="skel-line" style="height:48px;width:48px;border-radius:10px;display:inline-block;margin-bottom:12px"></div><div class="skel-line" style="height:14px;width:60%"></div><div class="skel-line" style="height:10px;width:40%"></div><div class="skel-line" style="height:10px;width:90%;margin-top:16px"></div><div class="skel-line" style="height:10px;width:70%"></div></div></div>
+      <div class="skeleton"><div class="skel-banner"></div><div class="skel-body"><div class="skel-line" style="height:48px;width:48px;border-radius:10px;display:inline-block;margin-bottom:12px"></div><div class="skel-line" style="height:14px;width:55%"></div><div class="skel-line" style="height:10px;width:35%"></div><div class="skel-line" style="height:10px;width:85%;margin-top:16px"></div><div class="skel-line" style="height:10px;width:65%"></div></div></div>
+      <div class="skeleton"><div class="skel-banner"></div><div class="skel-body"><div class="skel-line" style="height:48px;width:48px;border-radius:10px;display:inline-block;margin-bottom:12px"></div><div class="skel-line" style="height:14px;width:65%"></div><div class="skel-line" style="height:10px;width:45%"></div><div class="skel-line" style="height:10px;width:80%;margin-top:16px"></div><div class="skel-line" style="height:10px;width:75%"></div></div></div>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+
+  <section class="cta-banner">
+    <div class="cta-inner">
+      <div>
+        <h2>Own a local business?</h2>
+        <p>Get discovered by thousands of customers. List your business for free today.</p>
+      </div>
+      <a href="/pages/signup.html" class="btn btn-light">Get listed free →</a>
+    </div>
+  </section>
+
+  <footer>&copy; 2025 BizDir. All rights reserved.</footer>
+
+  <script>
+    let currentPage = 1, currentCategory = '', currentSearch = '', searchTimer = null;
+
+    async function loadCategories() {
+      try {
+        const res = await fetch('/api/categories');
+        const data = await res.json();
+        if (!data.success) return;
+        const scroll = document.getElementById('catScroll');
+        data.categories.forEach(cat => {
+          const btn = document.createElement('button');
+          btn.className = 'cat-chip';
+          btn.dataset.slug = cat.slug;
+          btn.textContent = (cat.icon ? cat.icon + ' ' : '') + cat.name;
+          btn.addEventListener('click', () => setCategory(cat.slug, btn));
+          scroll.appendChild(btn);
+        });
+      } catch(e) { console.error('Categories failed', e); }
+    }
+
+    async function loadListings() {
+      const grid = document.getElementById('grid');
+      const countEl = document.getElementById('resultsCount');
+      countEl.textContent = 'Loading…';
+
+      const params = new URLSearchParams({ page: currentPage, limit: 12 });
+      if (currentCategory) params.set('category', currentCategory);
+      if (currentSearch) params.set('search', currentSearch);
+
+      try {
+        const res = await fetch('/api/listings?' + params);
+        const data = await res.json();
+
+        if (!data.success) {
+          grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Something went wrong</h3><p>${esc(data.error || 'Could not load listings.')}</p></div>`;
+          countEl.textContent = '';
+          return;
+        }
+
+        const { businesses, total, totalPages } = data;
+        countEl.innerHTML = total > 0 ? `Showing <strong>${businesses.length}</strong> of <strong>${total}</strong> businesses` : '&nbsp;';
+
+        if (!businesses.length) {
+          grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No businesses found</h3><p>Try a different search or category.</p></div>`;
+          renderPagination(0, 0); return;
+        }
+
+        const CAT_COLORS = ['#e84c1e','#2563eb','#16a34a','#9333ea','#ea580c','#0891b2','#0d9488'];
+        function catColor(cat) {
+          let h = 0; for (let c of String(cat)) h = (h*31 + c.charCodeAt(0)) & 0xffffffff;
+          return CAT_COLORS[Math.abs(h) % CAT_COLORS.length];
+        }
+
+        grid.innerHTML = businesses.map((b, i) => `
+          <a class="card" href="/pages/business.html?id=${esc(b.id)}" style="animation-delay:${i*0.05}s">
+            <div class="card-banner" style="background:${catColor(b.category)}"></div>
+            <div class="card-body">
+              <div class="card-top">
+                <div class="card-logo">${b.logoUrl ? `<img src="${esc(b.logoUrl)}" alt="${esc(b.name)}" onerror="this.parentElement.textContent='${esc(b.name.charAt(0))}'">` : esc(b.name.charAt(0).toUpperCase())}</div>
+                <div class="card-meta">
+                  <div class="card-name">${esc(b.name)}</div>
+                  <div class="card-category">${esc(b.category)}</div>
+                </div>
+              </div>
+              <p class="card-desc">${esc(b.description)}</p>
+              <div class="card-footer">
+                <span class="card-location"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(b.location)}</span>
+                <span class="card-arrow">→</span>
+              </div>
+            </div>
+          </a>`).join('');
+
+        renderPagination(currentPage, totalPages);
+      } catch(e) {
+        console.error(e);
+        grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Could not connect</h3><p>Please check your connection and try again.</p></div>`;
+        countEl.textContent = '';
+      }
+    }
+
+    function renderPagination(page, total) {
+      const el = document.getElementById('pagination');
+      if (total <= 1) { el.innerHTML = ''; return; }
+      let html = `<button class="page-btn" onclick="goPage(${page-1})" ${page<=1?'disabled':''}>←</button>`;
+      for (let i = 1; i <= total; i++) html += `<button class="page-btn ${i===page?'active':''}" onclick="goPage(${i})">${i}</button>`;
+      html += `<button class="page-btn" onclick="goPage(${page+1})" ${page>=total?'disabled':''}>→</button>`;
+      el.innerHTML = html;
+    }
+
+    function goPage(p) { currentPage = p; window.scrollTo({top:0,behavior:'smooth'}); loadListings(); }
+
+    function setCategory(slug, btn) {
+      currentCategory = slug; currentPage = 1;
+      document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active'); loadListings();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', e => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => { currentSearch = e.target.value.trim(); currentPage = 1; loadListings(); }, 400);
+    });
+
+    function esc(s) { return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    loadCategories();
+    loadListings();
+  </script>
+</body>
+</html>
