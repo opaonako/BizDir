@@ -6,6 +6,7 @@
   <title>BizDir — Discover Local Businesses</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -253,8 +254,8 @@
     <a href="/" class="nav-logo"><span>Biz</span>Dir</a>
     <ul class="nav-links">
       <li><a href="/">Browse</a></li>
-      <li><a href="/pages/login.html">Login</a></li>
-      <li><a href="/pages/signup.html" class="btn btn-primary">List your business</a></li>
+      <li><a href="/pages/login">Login</a></li>
+      <li><a href="/pages/signup" class="btn btn-primary">List your business</a></li>
     </ul>
   </nav>
 
@@ -270,7 +271,7 @@
 
   <section class="categories">
     <div class="cat-scroll" id="catScroll">
-      <button class="cat-chip active" data-slug="" onclick="setCategory('', this)">&#10003; All</button>
+      <button class="cat-chip active" data-slug="">&#10003; All</button>
     </div>
   </section>
 
@@ -292,7 +293,7 @@
         <h2>Own a local business?</h2>
         <p>Get discovered by thousands of customers. List your business for free today.</p>
       </div>
-      <a href="/pages/signup.html" class="btn btn-light">Get listed free →</a>
+      <a href="/pages/signup" class="btn btn-light">Get listed free →</a>
     </div>
   </section>
 
@@ -312,7 +313,7 @@
           btn.className = 'cat-chip';
           btn.dataset.slug = cat.slug;
           btn.textContent = (cat.icon ? cat.icon + ' ' : '') + cat.name;
-          btn.addEventListener('click', () => setCategory(cat.name, btn));
+          btn.addEventListener('click', () => setCategory(cat.slug, btn));
           scroll.appendChild(btn);
         });
       } catch(e) { console.error('Categories failed', e); }
@@ -324,8 +325,8 @@
       countEl.textContent = 'Loading…';
 
       const params = new URLSearchParams({ page: currentPage, limit: 12 });
-if (currentCategory) params.set('category', currentCategory);
-if (currentSearch) params.set('search', currentSearch);
+      if (currentCategory) params.set('category', currentCategory);
+      if (currentSearch) params.set('search', currentSearch);
 
       try {
         const res = await fetch('/api/listings?' + params);
@@ -352,7 +353,7 @@ if (currentSearch) params.set('search', currentSearch);
         }
 
         grid.innerHTML = businesses.map((b, i) => `
-          <a class="card" href="/pages/business.html?id=${esc(b.id)}" style="animation-delay:${i*0.05}s">
+          <a class="card" href="/pages/business?id=${esc(b.id)}" style="animation-delay:${i*0.05}s">
             <div class="card-banner" style="background:${catColor(b.category)}"></div>
             <div class="card-body">
               <div class="card-top">
@@ -389,13 +390,11 @@ if (currentSearch) params.set('search', currentSearch);
 
     function goPage(p) { currentPage = p; window.scrollTo({top:0,behavior:'smooth'}); loadListings(); }
 
-  function setCategory(slug, btn) {
-  currentCategory = slug;
-  currentPage = 1;
-  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active');
-  loadListings();
-}
+    function setCategory(slug, btn) {
+      currentCategory = slug; currentPage = 1;
+      document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active'); loadListings();
+    }
 
     document.getElementById('searchInput').addEventListener('input', e => {
       clearTimeout(searchTimer);
