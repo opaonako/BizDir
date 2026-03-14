@@ -462,13 +462,7 @@ function showSkeleton(grid) {
       </div>
     </div>`).join('');
 }
-        renderPagination(currentPage, totalPages);
-      } catch(e) {
-        console.error(e);
-        grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Could not connect</h3><p>Please check your connection and try again.</p></div>`;
-        countEl.textContent = '';
-      }
-    }
+     
 
     function renderPagination(page, total) {
       const el = document.getElementById('pagination');
