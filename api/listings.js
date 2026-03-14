@@ -5,39 +5,53 @@ const CACHE_TTL = 2 * 60 * 1000; // 2 minutes
 
 module.exports = async (req, res) => {
   if (req.method === "GET") {
-    const { id, category, search, page = "1", limit = "12" } = req.query;
+  const { id, category, search, page = "1", limit = "12" } = req.query;
 
-    // Build cache key from query params
-    const cacheKey = `${category||""}_${search||""}_${page}_${limit}`;
-    const cached = cache.get(cacheKey);
-    if (cached && Date.now() - cached.time < CACHE_TTL) {
-      return res.status(200).json(cached.data);
-    }
-
+  // Single business lookup — bypass cache
+  if (id) {
     try {
-      const data = await callAppsScript("getListings", {
-        id: id || "",
-        category: category || "",
-        search: search || "",
-        page,
-        limit,
-      });
-
-      const response = {
+      const data = await callAppsScript("getListings", { id });
+      return res.status(200).json({
         success: true,
-        businesses: data.businesses || [],
-        total: data.total || 0,
-        page: Number(page),
-        totalPages: data.totalPages || 1,
-      };
-
-      cache.set(cacheKey, { data: response, time: Date.now() });
-      return res.status(200).json(response);
+        business: data.business || null,
+      });
     } catch (e) {
-      console.error("listings GET error:", e.message);
-      return err(res, "Failed to fetch listings", 500);
+      console.error("single listing error:", e.message);
+      return err(res, "Business not found", 404);
     }
   }
+
+  // Multiple listings with cache
+  const cacheKey = `${category||""}_${search||""}_${page}_${limit}`;
+  const cached = cache.get(cacheKey);
+  if (cached && Date.now() - cached.time < CACHE_TTL) {
+    return res.status(200).json(cached.data);
+  }
+
+  try {
+    const data = await callAppsScript("getListings", {
+      id: "",
+      category: category || "",
+      search: search || "",
+      page,
+      limit,
+    });
+
+    const response = {
+      success: true,
+      businesses: data.businesses || [],
+      total: data.total || 0,
+      page: Number(page),
+      totalPages: data.totalPages || 1,
+    };
+
+    cache.set(cacheKey, { data: response, time: Date.now() });
+    return res.status(200).json(response);
+  } catch (e) {
+    console.error("listings GET error:", e.message);
+    return err(res, "Failed to fetch listings", 500);
+  }
+}
 
   if (req.method === "POST") {
     const body = req.body;
