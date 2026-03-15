@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Caller — BizDir</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0f0f0f; --ink-2: #3a3a3a; --ink-3: #888;
+      --paper: #faf9f6; --surface: #f0ede6; --accent: #e84c1e;
+      --border: #e2ddd6; --card-bg: #ffffff;
+      --green: #16a34a; --green-bg: #dcfce7;
+      --yellow: #854d0e; --yellow-bg: #fef9c3;
+      --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; }
+    nav { background: var(--ink); padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.03em; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .nav-logo span { background: var(--accent); padding: 1px 7px 2px; border-radius: 4px; }
+    .nav-badge { background: #16a34a; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: 6px; }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .nav-link { font-size: 0.85rem; color: #aaa; text-decoration: none; }
+    .nav-link:hover { color: #fff; }
+
+    .page { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.3rem; }
+    .page-header p { color: var(--ink-3); font-size: 0.9rem; }
+
+    /* STATS */
+    .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
+    .stat-value { font-family: var(--font-head); font-size: 1.6rem; font-weight: 800; }
+    .stat-value.pending { color: #d97706; }
+    .stat-value.calling { color: #2563eb; }
+    .stat-value.verified { color: var(--green); }
+    .stat-value.no_answer { color: var(--ink-3); }
+    .stat-value.total { color: var(--accent); }
+    .stat-label { font-size: 0.75rem; color: var(--ink-3); margin-top: 2px; }
+
+    /* ADD LEAD */
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .card-title { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    .form-group label { display: block; font-size: 0.78rem; font-weight: 500; color: var(--ink-2); margin-bottom: 5px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font-body); font-size: 0.875rem; color: var(--ink); background: var(--paper); outline: none; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); background: #fff; }
+
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 8px; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; text-decoration: none; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #c93d12; }
+    .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-call { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
+    .btn-call:hover { background: #bbf7d0; }
+    .btn-call:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-outline { background: transparent; color: var(--ink-2); border: 1.5px solid var(--border); }
+    .btn-outline:hover { border-color: var(--ink); }
+    .btn-sm { padding: 6px 12px; font-size: 0.78rem; }
+
+    /* IMPORT */
+    .import-area { border: 2px dashed var(--border); border-radius: 10px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.18s; margin-top: 1rem; }
+    .import-area:hover { border-color: var(--accent); background: #fde8e2; }
+    .import-area p { font-size: 0.875rem; color: var(--ink-3); }
+
+    /* LEADS TABLE */
+    .leads-table { width: 100%; border-collapse: collapse; }
+    .leads-table th { font-size: 0.75rem; font-weight: 500; color: var(--ink-3); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.05em; }
+    .leads-table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.875rem; vertical-align: middle; }
+    .leads-table tr:last-child td { border-bottom: none; }
+    .leads-table tr:hover td { background: var(--surface); }
+
+    .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 500; }
+    .status-badge.pending { background: var(--yellow-bg); color: var(--yellow); }
+    .status-badge.calling { background: #dbeafe; color: #1e40af; }
+    .status-badge.verified { background: var(--green-bg); color: var(--green); }
+    .status-badge.no_answer { background: var(--surface); color: var(--ink-3); }
+    .status-badge.rejected { background: #fee2e2; color: #991b1b; }
+
+    /* CALL LOG */
+    .call-log { background: var(--ink); border-radius: 12px; padding: 1.25rem; font-family: monospace; font-size: 0.8rem; color: #aaa; height: 200px; overflow-y: auto; margin-top: 1rem; }
+    .call-log .log-entry { margin-bottom: 4px; }
+    .call-log .log-time { color: #555; }
+    .call-log .log-info { color: #4ade80; }
+    .call-log .log-error { color: #f87171; }
+    .call-log .log-ai { color: #60a5fa; }
+
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; display: none; }
+    .alert.success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; display: block; }
+    .alert.error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; display: block; }
+
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 4px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty { text-align: center; padding: 3rem; color: var(--ink-3); }
+    .empty h3 { font-family: var(--font-head); font-size: 1rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; }
+
+    @media (max-width: 768px) {
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+      .form-grid { grid-template-columns: 1fr; }
+      .page { padding: 1.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="nav-logo"><span>Biz</span>Dir <span class="nav-badge">AI Caller</span></a>
+    <div class="nav-right">
+      <a href="/pages/admin" class="nav-link">Admin</a>
+      <a href="/" class="nav-link">View site</a>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="page-header">
+      <h1>AI Caller</h1>
+      <p>Automatically call and verify businesses from your lead list.</p>
+    </div>
+
+    <div class="alert" id="alert"></div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat"><div class="stat-value total" id="statTotal">0</div><div class="stat-label">Total leads</div></div>
+      <div class="stat"><div class="stat-value pending" id="statPending">0</div><div class="stat-label">Pending</div></div>
+      <div class="stat"><div class="stat-value calling" id="statCalling">0</div><div class="stat-label">Calling</div></div>
+      <div class="stat"><div class="stat-value verified" id="statVerified">0</div><div class="stat-label">Verified</div></div>
+      <div class="stat"><div class="stat-value no_answer" id="statNoAnswer">0</div><div class="stat-label">No answer</div></div>
+    </div>
+
+    <!-- ADD SINGLE LEAD -->
+    <div class="card">
+      <div class="card-title">
+        Add lead manually
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('csvFile').click()">Import CSV</button>
+          <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="importCSV(this)">
+          <button class="btn btn-primary btn-sm" onclick="callAllPending()" id="callAllBtn">Call all pending</button>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Business name</label>
+          <input type="text" id="leadName" placeholder="Juan's Coffee Shop">
+        </div>
+        <div class="form-group">
+          <label>Phone number</label>
+          <input type="tel" id="leadPhone" placeholder="+1 555 123 4567 or +63 917 123 4567">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="leadCategory">
+            <option value="">Select category</option>
+            <option value="Food & Dining">Food & Dining</option>
+            <option value="Retail & Shopping">Retail & Shopping</option>
+            <option value="Health & Wellness">Health & Wellness</option>
+            <option value="Services">Services</option>
+            <option value="Education">Education</option>
+            <option value="Entertainment">Entertainment</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <input type="text" id="leadAddress" placeholder="123 Main St, City">
+        </div>
+        <div class="form-group">
+          <label>Website (optional)</label>
+          <input type="url" id="leadWebsite" placeholder="https://...">
+        </div>
+        <div class="form-group" style="display:flex;align-items:flex-end">
+          <button class="btn btn-primary" style="width:100%" onclick="addLead()">Add to queue</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADS LIST -->
+    <div class="card">
+      <div class="card-title">
+        Call queue
+        <button class="btn btn-outline btn-sm" onclick="loadLeads()">Refresh</button>
+      </div>
+      <div id="leadsContainer">
+        <div class="empty"><h3>Loading leads...</h3></div>
+      </div>
+    </div>
+
+    <!-- CALL LOG -->
+    <div class="card">
+      <div class="card-title">Live call log</div>
+      <div class="call-log" id="callLog">
+        <div class="log-entry"><span class="log-time">--:--:--</span> <span class="log-info">AI Caller ready. Add leads and click "Call all pending" to start.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let leads = [];
+    let activeCalls = new Set();
+
+    // ── Auth check ───────────────────────────────────────
+    const token = localStorage.getItem('bizdir_token');
+    if (!token) window.location.href = '/pages/login';
+
+    // ── Load leads ───────────────────────────────────────
+    async function loadLeads() {
+      try {
+        const res = await fetch('/api/leads');
+        const data = await res.json();
+        if (!data.success) return;
+        leads = data.leads || [];
+        renderLeads(leads);
+        updateStats(leads);
+      } catch(e) {
+        console.error('Failed to load leads', e);
+      }
+    }
+
+    function renderLeads(leads) {
+      const container = document.getElementById('leadsContainer');
+      if (!leads.length) {
+        container.innerHTML = `<div class="empty"><h3>No leads yet</h3><p>Add leads manually or import a CSV file.</p></div>`;
+        return;
+      }
+
+      container.innerHTML = `<table class="leads-table">
+        <thead>
+          <tr>
+            <th>Business</th>
+            <th>Phone</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${leads.map(l => `
+            <tr id="lead-${esc(l.id)}">
+              <td>
+                <div style="font-weight:500">${esc(l.businessName || '—')}</div>
+                <div style="font-size:0.78rem;color:var(--ink-3)">${esc(l.address || '')}</div>
+              </td>
+              <td>${esc(l.phone || '—')}</td>
+              <td>${esc(l.category || '—')}</td>
+              <td><span class="status-badge ${l.status}">${l.status || 'pending'}</span></td>
+              <td>
+                <button class="btn btn-call btn-sm"
+                  onclick="callLead('${esc(l.id)}', '${esc(l.phone)}', '${esc(l.businessName)}', '${esc(l.address)}', '${esc(l.category)}')"
+                  ${l.status === 'calling' || l.status === 'verified' ? 'disabled' : ''}
+                  id="callBtn-${esc(l.id)}">
+                  ${l.status === 'calling' ? '<span class="spinner"></span>Calling...' : 'Call now'}
+                </button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+    }
+
+    function updateStats(leads) {
+      const counts = { total: leads.length, pending: 0, calling: 0, verified: 0, no_answer: 0 };
+      leads.forEach(l => { if (counts[l.status] !== undefined) counts[l.status]++; });
+      document.getElementById('statTotal').textContent = counts.total;
+      document.getElementById('statPending').textContent = counts.pending;
+      document.getElementById('statCalling').textContent = counts.calling;
+      document.getElementById('statVerified').textContent = counts.verified;
+      document.getElementById('statNoAnswer').textContent = counts.no_answer;
+    }
+
+    // ── Add lead ─────────────────────────────────────────
+    async function addLead() {
+      const name = document.getElementById('leadName').value.trim();
+      const phone = document.getElementById('leadPhone').value.trim();
+      const category = document.getElementById('leadCategory').value;
+      const address = document.getElementById('leadAddress').value.trim();
+      const website = document.getElementById('leadWebsite').value.trim();
+
+      if (!phone) { showAlert('Phone number is required', 'error'); return; }
+
+      try {
+        const res = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, businessName: name, address, category, website, source: 'manual' }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert('Lead added to queue!', 'success');
+          document.getElementById('leadName').value = '';
+          document.getElementById('leadPhone').value = '';
+          document.getElementById('leadAddress').value = '';
+          document.getElementById('leadWebsite').value = '';
+          loadLeads();
+          log('info', `Lead added: ${name} (${phone})`);
+        }
+      } catch(e) {
+        showAlert('Failed to add lead', 'error');
+      }
+    }
+
+    // ── Call single lead ──────────────────────────────────
+    async function callLead(id, phone, name, address, category) {
+      const btn = document.getElementById(`callBtn-${id}`);
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Calling...';
+      activeCalls.add(id);
+
+      log('info', `Initiating call to ${name} at ${phone}...`);
+
+      try {
+        const res = await fetch('/api/voice/call', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ leadId: id, phone, businessName: name, address, category }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          log('ai', `Call connected to ${name}. AI agent active.`);
+          // Poll for status updates
+          pollLeadStatus(id, 60);
+        } else {
+          log('error', `Call failed: ${data.error}`);
+          btn.disabled = false;
+          btn.textContent = 'Retry';
+        }
+      } catch(e) {
+        log('error', `Error: ${e.message}`);
+        btn.disabled = false;
+        btn.textContent = 'Retry';
+      }
+    }
+
+    // ── Poll lead status ──────────────────────────────────
+    function pollLeadStatus(id, maxAttempts) {
+      let attempts = 0;
+      const interval = setInterval(async () => {
+        attempts++;
+        if (attempts >= maxAttempts) { clearInterval(interval); return; }
+
+        const res = await fetch('/api/leads').catch(() => null);
+        if (!res) return;
+        const data = await res.json().catch(() => null);
+        if (!data?.leads) return;
+
+        const lead = data.leads.find(l => l.id === id);
+        if (!lead) return;
+
+        if (lead.status === 'verified') {
+          log('info', `✓ ${lead.businessName} verified! Saved to BizDir.`);
+          clearInterval(interval);
+          loadLeads();
+        } else if (lead.status === 'no_answer') {
+          log('info', `No answer from ${lead.businessName}.`);
+          clearInterval(interval);
+          loadLeads();
+        }
+      }, 5000);
+    }
+
+    // ── Call all pending ──────────────────────────────────
+    async function callAllPending() {
+      const pending = leads.filter(l => l.status === 'pending');
+      if (!pending.length) { showAlert('No pending leads to call', 'error'); return; }
+
+      const btn = document.getElementById('callAllBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span>Calling ${pending.length} leads...`;
+
+      log('info', `Starting batch calls for ${pending.length} leads...`);
+
+      // Call one at a time with 5 second delay between calls
+      for (const lead of pending) {
+        await callLead(lead.id, lead.phone, lead.businessName, lead.address, lead.category);
+        await new Promise(r => setTimeout(r, 5000));
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Call all pending';
+    }
+
+    // ── Import CSV ────────────────────────────────────────
+    async function importCSV(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const text = await file.text();
+      const lines = text.split('\n').filter(l => l.trim());
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+      let added = 0;
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+        const row = {};
+        headers.forEach((h, idx) => row[h] = values[idx] || '');
+
+        const phone = row.phone || row.telephone || row.mobile || row.number;
+        if (!phone) continue;
+
+        await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone,
+            businessName: row.name || row.business || row.businessname || '',
+            address: row.address || row.location || '',
+            category: row.category || '',
+            website: row.website || row.url || '',
+            source: 'csv',
+          }),
+        });
+        added++;
+      }
+
+      showAlert(`Imported ${added} leads from CSV!`, 'success');
+      log('info', `CSV import complete: ${added} leads added`);
+      loadLeads();
+      input.value = '';
+    }
+
+    // ── Helpers ───────────────────────────────────────────
+    function log(type, message) {
+      const el = document.getElementById('callLog');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = 'log-entry';
+      div.innerHTML = `<span class="log-time">${time}</span> <span class="log-${type}">${message}</span>`;
+      el.appendChild(div);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function showAlert(msg, type) {
+      const el = document.getElementById('alert');
+      el.textContent = msg; el.className = 'alert ' + type;
+      setTimeout(() => { el.className = 'alert'; }, 4000);
+    }
+
+    function esc(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── Init ──────────────────────────────────────────────
+    loadLeads();
+    setInterval(loadLeads, 30000); // Auto refresh every 30 seconds
+  </script>
+</body>
+</html>
