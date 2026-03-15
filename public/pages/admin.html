@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — BizDir</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0f0f0f; --ink-2: #3a3a3a; --ink-3: #888;
+      --paper: #faf9f6; --surface: #f0ede6; --accent: #e84c1e;
+      --border: #e2ddd6; --card-bg: #ffffff;
+      --green: #16a34a; --green-bg: #dcfce7;
+      --yellow: #854d0e; --yellow-bg: #fef9c3;
+      --red: #991b1b; --red-bg: #fee2e2;
+      --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+    nav {
+      background: var(--ink); padding: 0 2rem; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.03em; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .nav-logo span { background: var(--accent); padding: 1px 7px 2px; border-radius: 4px; }
+    .nav-badge { background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: 6px; }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .nav-link { font-size: 0.85rem; color: #aaa; text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: #fff; }
+    .btn-logout { font-size: 0.82rem; color: #aaa; background: none; border: 1.5px solid #333; padding: 6px 14px; border-radius: 7px; cursor: pointer; font-family: var(--font-body); transition: all 0.18s; }
+    .btn-logout:hover { border-color: #666; color: #fff; }
+
+    .page { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .page-header h1 { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; }
+    .page-header p { color: var(--ink-3); font-size: 0.875rem; margin-top: 3px; }
+
+    /* STATS */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+    .stat-value { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; }
+    .stat-value.pending { color: #d97706; }
+    .stat-value.approved { color: var(--green); }
+    .stat-value.rejected { color: #dc2626; }
+    .stat-value.total { color: var(--accent); }
+    .stat-label { font-size: 0.8rem; color: var(--ink-3); margin-top: 3px; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    .tab { padding: 10px 18px; font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; color: var(--ink-3); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.18s; display: flex; align-items: center; gap: 6px; }
+    .tab:hover { color: var(--ink); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-count { background: var(--surface); color: var(--ink-2); font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    .tab.active .tab-count { background: #fde8e2; color: var(--accent); }
+
+    /* LISTING CARDS */
+    .listing-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem; display: flex;
+      align-items: flex-start; gap: 1.25rem;
+      animation: fadeUp 0.3s both;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .listing-logo {
+      width: 52px; height: 52px; border-radius: 10px;
+      background: var(--surface); display: flex; align-items: center;
+      justify-content: center; font-size: 1.3rem; font-weight: 700;
+      color: var(--ink-2); flex-shrink: 0; overflow: hidden;
+    }
+    .listing-logo img { width: 100%; height: 100%; object-fit: cover; }
+
+    .listing-info { flex: 1; min-width: 0; }
+    .listing-name { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
+    .listing-meta { font-size: 0.8rem; color: var(--ink-3); margin-bottom: 6px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .listing-desc { font-size: 0.85rem; color: var(--ink-2); font-weight: 300; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .listing-owner { font-size: 0.78rem; color: var(--ink-3); margin-top: 6px; }
+
+    .listing-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+
+    .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+    .status-badge.pending { background: var(--yellow-bg); color: var(--yellow); }
+    .status-badge.approved { background: var(--green-bg); color: var(--green); }
+    .status-badge.rejected { background: var(--red-bg); color: var(--red); }
+
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-family: var(--font-body); font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; text-decoration: none; white-space: nowrap; }
+    .btn-approve { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
+    .btn-approve:hover { background: #bbf7d0; }
+    .btn-reject { background: var(--red-bg); color: var(--red); border: 1px solid #fca5a5; }
+    .btn-reject:hover { background: #fca5a5; }
+    .btn-view { background: var(--surface); color: var(--ink-2); border: 1px solid var(--border); }
+    .btn-view:hover { border-color: var(--ink); }
+    .btn-restore { background: var(--yellow-bg); color: var(--yellow); border: 1px solid #fde68a; }
+    .btn-restore:hover { background: #fde68a; }
+
+    /* EMPTY */
+    .empty { text-align: center; padding: 4rem 2rem; color: var(--ink-3); }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .empty h3 { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; }
+
+    /* ALERT */
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.5rem; display: none; }
+    .alert.success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; display: block; }
+    .alert.error { background: var(--red-bg); color: var(--red); border: 1px solid #fca5a5; display: block; }
+
+    /* LOADING */
+    .loading { text-align: center; padding: 3rem; color: var(--ink-3); font-size: 0.9rem; }
+    .spinner-dark { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    @media (max-width: 640px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .listing-card { flex-direction: column; }
+      .listing-actions { flex-direction: row; flex-wrap: wrap; }
+      .page { padding: 1.5rem 1.25rem 3rem; }
+      nav { padding: 0 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo"><span>Biz</span>Dir <span class="nav-badge">Admin</span></a>
+    <div class="nav-right">
+      <a href="/" class="nav-link">View site</a>
+      <a href="/pages/dashboard" class="nav-link">Dashboard</a>
+      <button class="btn-logout" onclick="logout()">Log out</button>
+    </div>
+  </nav>
+
+  <div class="page" id="page" style="display:none">
+    <div class="page-header">
+      <div>
+        <h1>Admin panel</h1>
+        <p>Review and manage all business listings.</p>
+      </div>
+    </div>
+
+    <div class="alert" id="alert"></div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat"><div class="stat-value pending" id="statPending">—</div><div class="stat-label">Pending review</div></div>
+      <div class="stat"><div class="stat-value approved" id="statApproved">—</div><div class="stat-label">Approved</div></div>
+      <div class="stat"><div class="stat-value rejected" id="statRejected">—</div><div class="stat-label">Rejected</div></div>
+      <div class="stat"><div class="stat-value total" id="statTotal">—</div><div class="stat-label">Total listings</div></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('pending')">Pending <span class="tab-count" id="countPending">0</span></button>
+      <button class="tab" onclick="switchTab('approved')">Approved <span class="tab-count" id="countApproved">0</span></button>
+      <button class="tab" onclick="switchTab('rejected')">Rejected <span class="tab-count" id="countRejected">0</span></button>
+      <button class="tab" onclick="switchTab('all')">All listings <span class="tab-count" id="countAll">0</span></button>
+    </div>
+
+    <div class="tab-content active" id="tab-pending"><div class="loading"><span class="spinner-dark"></span>Loading…</div></div>
+    <div class="tab-content" id="tab-approved"></div>
+    <div class="tab-content" id="tab-rejected"></div>
+    <div class="tab-content" id="tab-all"></div>
+  </div>
+
+  <script>
+    const ADMIN_EMAIL = "paolollenado@gmail.com"; // ← replace with your email
+    let allBusinesses = [];
+    let currentUser = null;
+
+    async function init() {
+      const token = localStorage.getItem('bizdir_token');
+      const email = localStorage.getItem('bizdir_email');
+
+      if (!token) { window.location.href = '/pages/login'; return; }
+
+      // Validate token
+      try {
+        const res = await fetch('/api/auth?action=validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
+        const data = await res.json();
+        if (!data.success) { logout(); return; }
+
+        // Check admin access
+        if (data.email !== ADMIN_EMAIL) {
+          document.body.innerHTML = `<div style="text-align:center;padding:5rem 2rem;font-family:sans-serif"><h2>Access denied</h2><p style="color:#888;margin-top:0.5rem">You don't have admin access.</p><a href="/" style="color:#e84c1e;margin-top:1rem;display:inline-block">← Back to site</a></div>`;
+          return;
+        }
+
+        currentUser = { token, email: data.email };
+        document.getElementById('page').style.display = 'block';
+        await loadAllListings();
+      } catch(e) {
+        logout();
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('bizdir_token');
+      localStorage.removeItem('bizdir_email');
+      localStorage.removeItem('bizdir_name');
+      window.location.href = '/pages/login';
+    }
+
+    async function loadAllListings() {
+      try {
+        // Fetch all statuses by fetching each
+        const [pendingRes, approvedRes, rejectedRes] = await Promise.all([
+          fetch('/api/listings?status=pending&limit=100'),
+          fetch('/api/listings?status=approved&limit=100'),
+          fetch('/api/listings?status=rejected&limit=100'),
+        ]);
+
+        const [pendingData, approvedData, rejectedData] = await Promise.all([
+          pendingRes.json(), approvedRes.json(), rejectedRes.json()
+        ]);
+
+        const pending  = (pendingData.businesses  || []).filter(b => b.status === 'pending');
+        const approved = (approvedData.businesses || []).filter(b => b.status === 'approved');
+        const rejected = (rejectedData.businesses || []).filter(b => b.status === 'rejected');
+
+        allBusinesses = [...pending, ...approved, ...rejected];
+
+        // Update stats
+        document.getElementById('statPending').textContent  = pending.length;
+        document.getElementById('statApproved').textContent = approved.length;
+        document.getElementById('statRejected').textContent = rejected.length;
+        document.getElementById('statTotal').textContent    = allBusinesses.length;
+
+        document.getElementById('countPending').textContent  = pending.length;
+        document.getElementById('countApproved').textContent = approved.length;
+        document.getElementById('countRejected').textContent = rejected.length;
+        document.getElementById('countAll').textContent      = allBusinesses.length;
+
+        renderTab('pending', pending);
+        renderTab('approved', approved);
+        renderTab('rejected', rejected);
+        renderTab('all', allBusinesses);
+
+      } catch(e) {
+        console.error('Failed to load listings', e);
+      }
+    }
+
+    function renderTab(name, businesses) {
+      const el = document.getElementById('tab-' + name);
+
+      if (!businesses.length) {
+        el.innerHTML = `<div class="empty"><div class="empty-icon">${name === 'pending' ? '🎉' : '📋'}</div><h3>${name === 'pending' ? 'All caught up!' : 'No listings here'}</h3><p>${name === 'pending' ? 'No listings pending review.' : 'Nothing to show in this tab.'}</p></div>`;
+        return;
+      }
+
+      el.innerHTML = businesses.map((b, i) => `
+        <div class="listing-card" id="card-${esc(b.id)}" style="animation-delay:${i*0.04}s">
+          <div class="listing-logo">
+            ${b.logoUrl ? `<img src="${esc(b.logoUrl)}" onerror="this.parentElement.textContent='${esc(b.name.charAt(0))}'"/>` : esc(b.name.charAt(0).toUpperCase())}
+          </div>
+          <div class="listing-info">
+            <div class="listing-name">${esc(b.name)}</div>
+            <div class="listing-meta">
+              <span>📁 ${esc(b.category)}</span>
+              <span>📍 ${esc(b.location)}</span>
+              <span>📞 ${esc(String(b.phone))}</span>
+              ${b.affiliateUrl ? `<span>🔗 Has affiliate link</span>` : ''}
+            </div>
+            <div class="listing-desc">${esc(b.description)}</div>
+            <div class="listing-owner">Submitted by ${esc(b.ownerEmail)} • ${formatDate(b.createdAt)}</div>
+          </div>
+          <div class="listing-actions">
+            <span class="status-badge ${b.status}">${b.status}</span>
+            <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
+            ${b.status !== 'approved' ? `<button class="btn btn-approve" onclick="updateStatus('${esc(b.id)}', 'approved')">✓ Approve</button>` : ''}
+            ${b.status !== 'rejected' ? `<button class="btn btn-reject" onclick="updateStatus('${esc(b.id)}', 'rejected')">✕ Reject</button>` : ''}
+            ${b.status === 'rejected' ? `<button class="btn btn-restore" onclick="updateStatus('${esc(b.id)}', 'pending')">↺ Restore</button>` : ''}
+          </div>
+        </div>`).join('');
+    }
+
+    async function updateStatus(id, status) {
+      const card = document.getElementById('card-' + id);
+      if (card) card.style.opacity = '0.5';
+
+      try {
+        const res = await fetch('/api/listing', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, status }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          const messages = {
+            approved: '✓ Listing approved and now live on the site!',
+            rejected: 'Listing rejected.',
+            pending:  'Listing restored to pending.',
+          };
+          showAlert(messages[status] || 'Status updated.', 'success');
+          await loadAllListings();
+        } else {
+          showAlert(data.error || 'Failed to update status.', 'error');
+          if (card) card.style.opacity = '1';
+        }
+      } catch(e) {
+        showAlert('Something went wrong.', 'error');
+        if (card) card.style.opacity = '1';
+      }
+    }
+
+    function switchTab(name) {
+      const tabs = ['pending','approved','rejected','all'];
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', tabs[i] === name));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      try {
+        return new Date(dateStr).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+      } catch { return dateStr; }
+    }
+
+    function showAlert(msg, type) {
+      const el = document.getElementById('alert');
+      el.textContent = msg; el.className = 'alert ' + type;
+      setTimeout(() => { el.className = 'alert'; }, 4000);
+    }
+
+    function esc(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    init();
+  </script>
+</body>
+</html>
