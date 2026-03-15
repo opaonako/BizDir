@@ -6,152 +6,58 @@
   <title>Dashboard — BizDir</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --ink:       #0f0f0f;
-      --ink-2:     #3a3a3a;
-      --ink-3:     #888;
-      --paper:     #faf9f6;
-      --surface:   #f0ede6;
-      --accent:    #e84c1e;
-      --accent-2:  #f7c948;
-      --border:    #e2ddd6;
-      --card-bg:   #ffffff;
-      --green:     #16a34a;
-      --green-bg:  #dcfce7;
-      --yellow-bg: #fef9c3;
-      --yellow:    #854d0e;
-      --font-head: 'Syne', sans-serif;
-      --font-body: 'DM Sans', sans-serif;
+      --ink: #0f0f0f; --ink-2: #3a3a3a; --ink-3: #888;
+      --paper: #faf9f6; --surface: #f0ede6; --accent: #e84c1e;
+      --accent-2: #f7c948; --border: #e2ddd6; --card-bg: #ffffff;
+      --green: #16a34a; --green-bg: #dcfce7;
+      --yellow-bg: #fef9c3; --yellow: #854d0e;
+      --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
     }
-
     body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; }
-
-    /* NAV */
-    nav {
-      background: var(--ink); padding: 0 2rem;
-      height: 60px; display: flex; align-items: center;
-      justify-content: space-between;
-    }
-    .nav-logo {
-      font-family: var(--font-head); font-weight: 800; font-size: 1.3rem;
-      letter-spacing: -0.03em; color: #fff; text-decoration: none;
-      display: flex; align-items: center; gap: 6px;
-    }
+    nav { background: var(--ink); padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.03em; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
     .nav-logo span { background: var(--accent); padding: 1px 7px 2px; border-radius: 4px; }
     .nav-right { display: flex; align-items: center; gap: 1rem; }
     .nav-user { font-size: 0.85rem; color: #aaa; }
-    .btn-logout {
-      font-size: 0.82rem; color: #aaa; background: none; border: 1.5px solid #333;
-      padding: 6px 14px; border-radius: 7px; cursor: pointer; font-family: var(--font-body);
-      transition: all 0.18s;
-    }
+    .btn-logout { font-size: 0.82rem; color: #aaa; background: none; border: 1.5px solid #333; padding: 6px 14px; border-radius: 7px; cursor: pointer; font-family: var(--font-body); transition: all 0.18s; }
     .btn-logout:hover { border-color: #666; color: #fff; }
-
-    /* LAYOUT */
     .page { max-width: 860px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
-
-    /* WELCOME */
     .welcome { margin-bottom: 2rem; }
-    .welcome h1 {
-      font-family: var(--font-head); font-size: 1.8rem; font-weight: 800;
-      letter-spacing: -0.03em; margin-bottom: 0.3rem;
-    }
+    .welcome h1 { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.3rem; }
     .welcome p { color: var(--ink-3); font-size: 0.9rem; font-weight: 300; }
-
-    /* STATUS BANNER */
-    .status-banner {
-      padding: 14px 18px; border-radius: 12px; margin-bottom: 2rem;
-      display: flex; align-items: center; gap: 10px; font-size: 0.875rem;
-    }
+    .status-banner { padding: 14px 18px; border-radius: 12px; margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; font-size: 0.875rem; }
     .status-banner.pending { background: var(--yellow-bg); color: var(--yellow); border: 1px solid #fde68a; }
     .status-banner.approved { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
     .status-banner.rejected { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-    .status-icon { font-size: 1.1rem; }
-
-    /* TABS */
-    .tabs {
-      display: flex; gap: 4px; margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border); padding-bottom: 0;
-    }
-    .tab {
-      padding: 10px 18px; font-family: var(--font-body); font-size: 0.875rem;
-      font-weight: 500; color: var(--ink-3); background: none; border: none;
-      cursor: pointer; border-bottom: 2px solid transparent;
-      margin-bottom: -1px; transition: all 0.18s;
-    }
+    .tabs { display: flex; gap: 4px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    .tab { padding: 10px 18px; font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; color: var(--ink-3); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.18s; }
     .tab:hover { color: var(--ink); }
     .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-    /* CARD */
-    .card {
-      background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 16px; padding: 1.75rem; margin-bottom: 1.25rem;
-    }
-    .card-title {
-      font-family: var(--font-head); font-size: 1rem; font-weight: 700;
-      margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
-    }
-
-    /* FORM */
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; margin-bottom: 1.25rem; }
+    .card-title { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .form-group { margin-bottom: 0; }
     .form-group.full { grid-column: 1/-1; }
-    label {
-      display: block; font-size: 0.8rem; font-weight: 500;
-      color: var(--ink-2); margin-bottom: 5px; letter-spacing: 0.02em;
-    }
+    label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--ink-2); margin-bottom: 5px; }
     .label-hint { font-size: 0.75rem; color: var(--ink-3); font-weight: 400; margin-left: 4px; }
-    input, select, textarea {
-      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
-      border-radius: 9px; font-family: var(--font-body); font-size: 0.9rem;
-      color: var(--ink); background: var(--paper); outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,76,30,0.1);
-      background: #fff;
-    }
+    input, select, textarea { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 9px; font-family: var(--font-body); font-size: 0.9rem; color: var(--ink); background: var(--paper); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,76,30,0.1); background: #fff; }
     textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
-    select { cursor: pointer; }
-
-    /* BUTTONS */
-    .btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 11px 22px; border-radius: 9px; font-family: var(--font-body);
-      font-size: 0.9rem; font-weight: 500; cursor: pointer;
-      text-decoration: none; border: none; transition: all 0.18s;
-    }
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 11px 22px; border-radius: 9px; font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; border: none; transition: all 0.18s; }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:hover { background: #c93d12; transform: translateY(-1px); }
     .btn-primary:disabled { background: #ccc; cursor: not-allowed; transform: none; }
     .btn-outline { background: transparent; color: var(--ink-2); border: 1.5px solid var(--border); }
-    .btn-outline:hover { border-color: var(--ink); background: var(--surface); }
     .btn-danger { background: transparent; color: #dc2626; border: 1.5px solid #fca5a5; }
     .btn-danger:hover { background: #fee2e2; }
-
-    .form-actions {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border);
-    }
-
-    /* ALERT */
-    .alert {
-      padding: 10px 14px; border-radius: 8px; font-size: 0.85rem;
-      margin-bottom: 1rem; display: none;
-    }
+    .form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; display: none; }
     .alert.error { background: #fde8e2; color: #a02a0a; border: 1px solid #f9c4b3; display: block; }
     .alert.success { background: #e6f4ea; color: #1a6e2e; border: 1px solid #b7dfc2; display: block; }
-
-    /* LISTING PREVIEW */
-    .preview-card {
-      border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
-      text-decoration: none; color: inherit; display: block;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
+    .preview-card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; text-decoration: none; color: inherit; display: block; transition: transform 0.2s, box-shadow 0.2s; }
     .preview-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
     .preview-banner { height: 8px; background: var(--accent); }
     .preview-body { padding: 1.25rem; }
@@ -159,44 +65,22 @@
     .preview-cat { font-size: 0.75rem; color: var(--accent); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
     .preview-desc { font-size: 0.85rem; color: var(--ink-2); font-weight: 300; line-height: 1.6; }
     .preview-meta { display: flex; gap: 1rem; margin-top: 0.75rem; font-size: 0.8rem; color: var(--ink-3); }
-
-    /* NO LISTING */
     .no-listing { text-align: center; padding: 3rem; }
     .no-listing-icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .no-listing h3 { font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
     .no-listing p { color: var(--ink-3); font-size: 0.875rem; margin-bottom: 1.5rem; }
-
-    /* STATS */
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
-    .stat-card {
-      background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.25rem; text-align: center;
-    }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; text-align: center; }
     .stat-value { font-family: var(--font-head); font-size: 2rem; font-weight: 800; color: var(--accent); }
     .stat-label { font-size: 0.8rem; color: var(--ink-3); margin-top: 3px; }
-
-    /* SPINNER */
-    .spinner {
-      display: inline-block; width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
-      border-radius: 50%; animation: spin 0.7s linear infinite;
-      vertical-align: middle; margin-right: 6px;
-    }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-
-    @media (max-width: 640px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: 1fr; }
-      .page { padding: 1.5rem 1.25rem 3rem; }
-      nav { padding: 0 1.25rem; }
-    }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: 1fr; } .page { padding: 1.5rem 1.25rem 3rem; } nav { padding: 0 1.25rem; } }
   </style>
 </head>
 <body>
-
   <nav>
     <a href="/" class="nav-logo"><span>Biz</span>Dir</a>
     <div class="nav-right">
@@ -206,37 +90,24 @@
   </nav>
 
   <div class="page" id="page" style="display:none">
-
     <div class="welcome">
       <h1 id="welcomeMsg">Welcome back!</h1>
       <p>Manage your business listing from here.</p>
     </div>
-
     <div class="alert" id="alert"></div>
-
-    <!-- TABS -->
     <div class="tabs">
       <button class="tab active" onclick="switchTab('overview')">Overview</button>
       <button class="tab" onclick="switchTab('edit')">Edit listing</button>
       <button class="tab" onclick="switchTab('settings')">Settings</button>
     </div>
 
-    <!-- OVERVIEW TAB -->
+    <!-- OVERVIEW -->
     <div class="tab-content active" id="tab-overview">
       <div id="statusBanner"></div>
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="statViews">—</div>
-          <div class="stat-label">Profile views</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="statClicks">—</div>
-          <div class="stat-label">Clicks today</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="statRating">—</div>
-          <div class="stat-label">Avg. rating</div>
-        </div>
+        <div class="stat-card"><div class="stat-value" id="statStatus">—</div><div class="stat-label">Listing status</div></div>
+        <div class="stat-card"><div class="stat-value" id="statCategory">—</div><div class="stat-label">Category</div></div>
+        <div class="stat-card"><div class="stat-value" id="statAffiliate">—</div><div class="stat-label">Affiliate link</div></div>
       </div>
       <div class="card">
         <div class="card-title">Your listing preview</div>
@@ -244,7 +115,7 @@
       </div>
     </div>
 
-    <!-- EDIT TAB -->
+    <!-- EDIT -->
     <div class="tab-content" id="tab-edit">
       <div class="card">
         <div class="card-title">Business information</div>
@@ -256,9 +127,7 @@
           </div>
           <div class="form-group">
             <label for="bizCategory">Category</label>
-            <select id="bizCategory">
-              <option value="">Select category</option>
-            </select>
+            <select id="bizCategory"><option value="">Select category</option></select>
           </div>
           <div class="form-group">
             <label for="bizPhone">Phone number</label>
@@ -281,20 +150,18 @@
             <input type="url" id="bizLogo" placeholder="https://...your-logo.png">
           </div>
           <div class="form-group full">
-            <label for="bizAffiliate">Affiliate link <span class="label-hint">(optional — earns you commission)</span></label>
+            <label for="bizAffiliate">Affiliate link <span class="label-hint">(optional)</span></label>
             <input type="url" id="bizAffiliate" placeholder="https://...your-affiliate-link">
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn btn-danger" onclick="confirmDelete()">Delete listing</button>
-          <button class="btn btn-primary" id="saveBtn" onclick="saveListing()">
-            Save changes
-          </button>
+          <button class="btn btn-danger" onclick="confirmDelete()" id="deleteBtn" style="display:none">Delete listing</button>
+          <button class="btn btn-primary" id="saveBtn" onclick="saveListing()">Save changes</button>
         </div>
       </div>
     </div>
 
-    <!-- SETTINGS TAB -->
+    <!-- SETTINGS -->
     <div class="tab-content" id="tab-settings">
       <div class="card">
         <div class="card-title">Account settings</div>
@@ -302,99 +169,80 @@
           <label>Email address</label>
           <input type="email" id="settingsEmail" disabled style="opacity:0.6;cursor:not-allowed">
         </div>
-        <div class="form-group">
-          <label>Full name</label>
-          <input type="text" id="settingsName" placeholder="Your name">
+        <div class="form-actions" style="justify-content:flex-end;margin-top:0;padding-top:0;border-top:none">
+          <a href="/" class="btn btn-outline">Back to directory</a>
         </div>
-        <div class="form-actions" style="justify-content:flex-end">
-          <button class="btn btn-primary" onclick="saveSettings()">Save settings</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title" style="color:#dc2626">Danger zone</div>
-        <p style="font-size:0.875rem;color:var(--ink-3);margin-bottom:1rem">
-          Once you delete your account, there is no going back.
-        </p>
-        <button class="btn btn-danger" onclick="alert('Please contact support to delete your account.')">
-          Delete account
-        </button>
       </div>
     </div>
-
   </div>
 
   <script>
     let currentUser = null;
     let currentBusiness = null;
 
-    // ── Auth ─────────────────────────────────────────────────
-    netlifyIdentity.on('init', user => {
-      if (!user) {
-        window.location.href = '/pages/login';
-        return;
+    // ── Auth check ───────────────────────────────────────────
+    async function init() {
+      const token = localStorage.getItem('bizdir_token');
+      if (!token) { window.location.href = '/pages/login'; return; }
+
+      // Validate token
+      try {
+        const res = await fetch('/api/auth?action=validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
+        const data = await res.json();
+        if (!data.success) { logout(); return; }
+
+        currentUser = { token, email: data.email, name: data.name };
+        document.getElementById('welcomeMsg').textContent = `Welcome back, ${data.name || data.email.split('@')[0]}!`;
+        document.getElementById('navUser').textContent = data.email;
+        document.getElementById('settingsEmail').value = data.email;
+        document.getElementById('page').style.display = 'block';
+
+        await Promise.all([loadUserListing(data.email), loadCategories()]);
+      } catch(e) {
+        logout();
       }
-      currentUser = user;
-      initDashboard(user);
-    });
-
-    netlifyIdentity.on('logout', () => {
-      window.location.href = '/pages/login';
-    });
-
-    netlifyIdentity.init();
+    }
 
     function logout() {
-      netlifyIdentity.logout();
+      localStorage.removeItem('bizdir_token');
+      localStorage.removeItem('bizdir_email');
+      localStorage.removeItem('bizdir_name');
+      window.location.href = '/pages/login';
     }
 
-    // ── Init ─────────────────────────────────────────────────
-    async function initDashboard(user) {
-      const name = user.user_metadata?.full_name || user.email.split('@')[0];
-      document.getElementById('welcomeMsg').textContent = `Welcome back, ${name}!`;
-      document.getElementById('navUser').textContent = user.email;
-      document.getElementById('settingsEmail').value = user.email;
-      document.getElementById('settingsName').value = user.user_metadata?.full_name || '';
-      document.getElementById('page').style.display = 'block';
-
-      await Promise.all([loadUserListing(user.email), loadCategories()]);
-    }
-
-    // ── Load user's listing ──────────────────────────────────
     async function loadUserListing(email) {
       try {
         const res = await fetch(`/api/listings?ownerEmail=${encodeURIComponent(email)}`);
         const data = await res.json();
-
         if (data.success && data.businesses?.length > 0) {
-          currentBusiness = data.businesses.find(b => b.ownerEmail === email) || data.businesses[0];
+          currentBusiness = data.businesses[0];
           renderOverview(currentBusiness);
           populateEditForm(currentBusiness);
+          document.getElementById('deleteBtn').style.display = 'inline-flex';
         } else {
           renderNoListing();
         }
       } catch(e) {
-        console.error('Failed to load listing', e);
         renderNoListing();
       }
     }
 
-    // ── Render overview ──────────────────────────────────────
     function renderOverview(b) {
-      // Status banner
       const statuses = {
         approved: { cls: 'approved', icon: '✓', msg: 'Your listing is live and visible to customers.' },
-        pending:  { cls: 'pending',  icon: '⏳', msg: 'Your listing is under review. We\'ll notify you soon.' },
+        pending:  { cls: 'pending',  icon: '⏳', msg: 'Your listing is under review.' },
         rejected: { cls: 'rejected', icon: '✕', msg: 'Your listing was rejected. Please edit and resubmit.' },
       };
       const s = statuses[b.status] || statuses.pending;
-      document.getElementById('statusBanner').innerHTML = `
-        <div class="status-banner ${s.cls}">
-          <span class="status-icon">${s.icon}</span>
-          <span>${s.msg}</span>
-        </div>`;
-
-      // Listing preview
-      document.getElementById('listingPreview').innerHTML = b ? `
+      document.getElementById('statusBanner').innerHTML = `<div class="status-banner ${s.cls}"><span>${s.icon}</span><span>${s.msg}</span></div>`;
+      document.getElementById('statStatus').textContent = b.status || 'pending';
+      document.getElementById('statCategory').textContent = b.category || '—';
+      document.getElementById('statAffiliate').textContent = b.affiliateUrl ? 'Set' : 'None';
+      document.getElementById('listingPreview').innerHTML = `
         <a class="preview-card" href="/pages/business?id=${esc(b.id)}" target="_blank">
           <div class="preview-banner"></div>
           <div class="preview-body">
@@ -403,49 +251,38 @@
             <div class="preview-desc">${esc(b.description)}</div>
             <div class="preview-meta">
               <span>📍 ${esc(b.location)}</span>
-              ${b.phone ? `<span>📞 ${esc(b.phone)}</span>` : ''}
-              ${b.affiliateUrl ? `<span>🔗 Affiliate link set</span>` : ''}
+              ${b.phone ? `<span>📞 ${esc(String(b.phone))}</span>` : ''}
             </div>
           </div>
-        </a>` : '';
-
-      // Stats (placeholder — can be connected to analytics later)
-      document.getElementById('statViews').textContent = '—';
-      document.getElementById('statClicks').textContent = '—';
-      document.getElementById('statRating').textContent = '—';
+        </a>`;
     }
 
     function renderNoListing() {
       document.getElementById('statusBanner').innerHTML = '';
+      document.getElementById('statStatus').textContent = 'None';
+      document.getElementById('statCategory').textContent = '—';
+      document.getElementById('statAffiliate').textContent = '—';
       document.getElementById('listingPreview').innerHTML = `
         <div class="no-listing">
           <div class="no-listing-icon">🏪</div>
           <h3>No listing yet</h3>
-          <p>You haven't created a business listing yet. Add your business to get discovered.</p>
+          <p>You haven't created a business listing yet.</p>
           <button class="btn btn-primary" onclick="switchTab('edit')">Create your listing</button>
         </div>`;
-      document.getElementById('statViews').textContent = '0';
-      document.getElementById('statClicks').textContent = '0';
-      document.getElementById('statRating').textContent = '—';
     }
 
-    // ── Populate edit form ───────────────────────────────────
     function populateEditForm(b) {
       if (!b) return;
-      document.getElementById('bizName').value     = b.name || '';
-      document.getElementById('bizPhone').value    = b.phone || '';
+      document.getElementById('bizName').value = b.name || '';
+      document.getElementById('bizPhone').value = b.phone || '';
       document.getElementById('bizLocation').value = b.location || '';
-      document.getElementById('bizDesc').value     = b.description || '';
-      document.getElementById('bizWebsite').value  = b.website || '';
-      document.getElementById('bizLogo').value     = b.logoUrl || '';
+      document.getElementById('bizDesc').value = b.description || '';
+      document.getElementById('bizWebsite').value = b.website || '';
+      document.getElementById('bizLogo').value = b.logoUrl || '';
       document.getElementById('bizAffiliate').value = b.affiliateUrl || '';
-      // Category set after categories load
-      setTimeout(() => {
-        document.getElementById('bizCategory').value = b.category || '';
-      }, 500);
+      setTimeout(() => { document.getElementById('bizCategory').value = b.category || ''; }, 600);
     }
 
-    // ── Load categories into select ──────────────────────────
     async function loadCategories() {
       try {
         const res = await fetch('/api/categories');
@@ -454,17 +291,14 @@
         const select = document.getElementById('bizCategory');
         data.categories.forEach(cat => {
           const opt = document.createElement('option');
-          opt.value = cat.name;
-          opt.textContent = cat.name;
+          opt.value = cat.name; opt.textContent = cat.name;
           select.appendChild(opt);
         });
-      } catch(e) { console.error('Categories failed', e); }
+      } catch(e) { console.error(e); }
     }
 
-    // ── Save listing ─────────────────────────────────────────
     async function saveListing() {
       const btn = document.getElementById('saveBtn');
-      const alertEl = document.getElementById('editAlert');
       clearAlert('editAlert');
 
       const payload = {
@@ -480,73 +314,49 @@
 
       const required = ['name','category','phone','location','description'];
       const missing = required.filter(f => !payload[f]);
-      if (missing.length) {
-        showAlert('editAlert', 'Please fill in: ' + missing.join(', '), 'error');
-        return;
-      }
+      if (missing.length) { showAlert('editAlert', 'Please fill in: ' + missing.join(', '), 'error'); return; }
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>Saving…';
 
       try {
         let res, data;
-
         if (currentBusiness) {
-          // Update existing
           res = await fetch('/api/listing', {
             method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + currentUser.token.access_token,
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: currentBusiness.id, ...payload }),
           });
         } else {
-          // Create new
           res = await fetch('/api/listings', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + currentUser.token.access_token,
-            },
-            body: JSON.stringify({
-              ...payload,
-              ownerEmail: currentUser.email,
-              ownerName: currentUser.user_metadata?.full_name || '',
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...payload, ownerEmail: currentUser.email, ownerName: currentUser.name || '' }),
           });
         }
-
         data = await res.json();
-
         if (!data.success) {
-          showAlert('editAlert', data.error || 'Failed to save. Please try again.', 'error');
+          showAlert('editAlert', data.error || 'Failed to save.', 'error');
         } else {
-          showAlert('editAlert', currentBusiness ? 'Listing updated successfully!' : 'Listing created! It will be reviewed shortly.', 'success');
+          showAlert('editAlert', currentBusiness ? 'Listing updated!' : 'Listing created! It will be reviewed shortly.', 'success');
           await loadUserListing(currentUser.email);
           if (!currentBusiness) switchTab('overview');
         }
       } catch(e) {
-        console.error(e);
-        showAlert('editAlert', 'Something went wrong. Please try again.', 'error');
+        showAlert('editAlert', 'Something went wrong.', 'error');
       }
 
       btn.disabled = false;
       btn.textContent = 'Save changes';
     }
 
-    // ── Delete listing ───────────────────────────────────────
     async function confirmDelete() {
       if (!currentBusiness) return;
-      if (!confirm(`Are you sure you want to delete "${currentBusiness.name}"? This cannot be undone.`)) return;
-
+      if (!confirm(`Delete "${currentBusiness.name}"? This cannot be undone.`)) return;
       try {
         const res = await fetch('/api/listing', {
           method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + currentUser.token.access_token,
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: currentBusiness.id }),
         });
         const data = await res.json();
@@ -554,51 +364,22 @@
           currentBusiness = null;
           renderNoListing();
           switchTab('overview');
-          showAlert('alert', 'Listing deleted successfully.', 'success');
+          showAlert('alert', 'Listing deleted.', 'success');
         }
-      } catch(e) {
-        showAlert('alert', 'Failed to delete listing.', 'error');
-      }
+      } catch(e) { showAlert('alert', 'Failed to delete.', 'error'); }
     }
 
-    // ── Save settings ─────────────────────────────────────────
-    async function saveSettings() {
-      const name = document.getElementById('settingsName').value.trim();
-      try {
-        await netlifyIdentity.gotrue.currentUser().update({ data: { full_name: name } });
-        showAlert('alert', 'Settings saved!', 'success');
-      } catch(e) {
-        showAlert('alert', 'Failed to save settings.', 'error');
-      }
-    }
-
-    // ── Tabs ─────────────────────────────────────────────────
     function switchTab(name) {
-      document.querySelectorAll('.tab').forEach((t, i) => {
-        const tabs = ['overview', 'edit', 'settings'];
-        t.classList.toggle('active', tabs[i] === name);
-      });
-      document.querySelectorAll('.tab-content').forEach(c => {
-        c.classList.toggle('active', c.id === 'tab-' + name);
-      });
+      const tabs = ['overview','edit','settings'];
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', tabs[i] === name));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
     }
 
-    // ── Helpers ──────────────────────────────────────────────
-    function showAlert(id, msg, type) {
-      const el = document.getElementById(id);
-      el.textContent = msg;
-      el.className = 'alert ' + type;
-      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    function showAlert(id, msg, type) { const el = document.getElementById(id); el.textContent = msg; el.className = 'alert ' + type; }
+    function clearAlert(id) { const el = document.getElementById(id); el.className = 'alert'; el.textContent = ''; }
+    function esc(s) { return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    function clearAlert(id) {
-      const el = document.getElementById(id);
-      el.className = 'alert'; el.textContent = '';
-    }
-
-    function esc(s) {
-      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
+    init();
   </script>
 </body>
 </html>

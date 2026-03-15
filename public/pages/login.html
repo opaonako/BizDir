@@ -6,378 +6,109 @@
   <title>Log In — BizDir</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --ink:       #0f0f0f;
-      --ink-2:     #3a3a3a;
-      --ink-3:     #888;
-      --paper:     #faf9f6;
-      --surface:   #f0ede6;
-      --accent:    #e84c1e;
-      --border:    #e2ddd6;
-      --card-bg:   #ffffff;
-      --font-head: 'Syne', sans-serif;
-      --font-body: 'DM Sans', sans-serif;
+      --ink: #0f0f0f; --ink-2: #3a3a3a; --ink-3: #888;
+      --paper: #faf9f6; --surface: #f0ede6; --accent: #e84c1e;
+      --border: #e2ddd6; --card-bg: #ffffff;
+      --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
     }
-
-    body {
-      font-family: var(--font-body);
-      background: var(--paper);
-      color: var(--ink);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    nav {
-      padding: 0 2rem;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      background: var(--paper);
-    }
-    .nav-logo {
-      font-family: var(--font-head);
-      font-weight: 800;
-      font-size: 1.3rem;
-      letter-spacing: -0.03em;
-      color: var(--ink);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+    nav { padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.03em; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 6px; }
     .nav-logo span { background: var(--accent); color: #fff; padding: 1px 7px 2px; border-radius: 4px; }
     .nav-link { font-size: 0.875rem; color: var(--ink-2); text-decoration: none; font-weight: 500; }
     .nav-link:hover { color: var(--accent); }
-
-    .page {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem 1.5rem;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2.5rem;
-      width: 100%;
-      max-width: 420px;
-    }
-
-    .card-accent {
-      width: 40px;
-      height: 4px;
-      background: var(--accent);
-      border-radius: 2px;
-      margin-bottom: 1.5rem;
-    }
-
-    h1 {
-      font-family: var(--font-head);
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 0.4rem;
-    }
-
+    .page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px; }
+    .card-accent { width: 40px; height: 4px; background: var(--accent); border-radius: 2px; margin-bottom: 1.5rem; }
+    h1 { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
     .subtitle { font-size: 0.9rem; color: var(--ink-3); font-weight: 300; margin-bottom: 2rem; }
-
     .form-group { margin-bottom: 1.1rem; }
-
-    label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--ink-2);
-      margin-bottom: 6px;
-      letter-spacing: 0.02em;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      color: var(--ink);
-      background: var(--paper);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(232,76,30,0.1);
-      background: #fff;
-    }
+    label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--ink-2); margin-bottom: 6px; }
+    input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.95rem; color: var(--ink); background: var(--paper); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,76,30,0.1); background: #fff; }
     input::placeholder { color: var(--ink-3); }
-
-    .forgot {
-      display: block;
-      text-align: right;
-      font-size: 0.8rem;
-      color: var(--ink-3);
-      text-decoration: none;
-      margin-top: 4px;
-    }
-    .forgot:hover { color: var(--accent); }
-
-    .btn-submit {
-      width: 100%;
-      padding: 13px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-family: var(--font-head);
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 0.75rem;
-      transition: background 0.18s, transform 0.18s;
-    }
+    .btn-submit { width: 100%; padding: 13px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: var(--font-head); font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.75rem; transition: background 0.18s, transform 0.18s; }
     .btn-submit:hover { background: #c93d12; transform: translateY(-1px); }
     .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-
-    .footer-link {
-      text-align: center;
-      font-size: 0.875rem;
-      color: var(--ink-3);
-      margin-top: 1.25rem;
-    }
+    .footer-link { text-align: center; font-size: 0.875rem; color: var(--ink-3); margin-top: 1.25rem; }
     .footer-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
-    .footer-link a:hover { text-decoration: underline; }
-
-    .alert {
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-      display: none;
-    }
-    .alert.error   { background: #fde8e2; color: #a02a0a; border: 1px solid #f9c4b3; display: block; }
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; display: none; }
+    .alert.error { background: #fde8e2; color: #a02a0a; border: 1px solid #f9c4b3; display: block; }
     .alert.success { background: #e6f4ea; color: #1a6e2e; border: 1px solid #b7dfc2; display: block; }
-
-    .spinner {
-      display: inline-block;
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
-    }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Reset password section */
-    .reset-section { display: none; }
-    .reset-section.visible { display: block; }
-    .back-link {
-      font-size: 0.85rem;
-      color: var(--ink-3);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 1.25rem;
-      background: none;
-      border: none;
-      font-family: var(--font-body);
-      padding: 0;
-    }
-    .back-link:hover { color: var(--accent); }
-
-    @media (max-width: 480px) {
-      .card { padding: 1.75rem 1.25rem; }
-    }
   </style>
 </head>
 <body>
-
   <nav>
     <a href="/" class="nav-logo"><span>Biz</span>Dir</a>
     <a href="/pages/signup" class="nav-link">Create an account</a>
   </nav>
-
   <div class="page">
     <div class="card">
-
-      <!-- LOGIN SECTION -->
-      <div id="loginSection">
-        <div class="card-accent"></div>
-        <h1>Welcome back</h1>
-        <p class="subtitle">Log in to manage your business listing.</p>
-
-        <div class="alert" id="loginAlert"></div>
-
-        <div class="form-group">
-          <label for="email">Email address</label>
-          <input type="email" id="email" placeholder="juan@example.com" autocomplete="email">
-        </div>
-
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" placeholder="Your password" autocomplete="current-password">
-          <a class="forgot" onclick="showReset()">Forgot password?</a>
-        </div>
-
-        <button class="btn-submit" id="loginBtn" onclick="handleLogin()">
-          Log in
-        </button>
-
-        <div class="footer-link">
-          Don't have an account? <a href="/pages/signup">Sign up free</a>
-        </div>
+      <div class="card-accent"></div>
+      <h1>Welcome back</h1>
+      <p class="subtitle">Log in to manage your business listing.</p>
+      <div class="alert" id="alert"></div>
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" id="email" placeholder="juan@example.com" autocomplete="email">
       </div>
-
-      <!-- RESET PASSWORD SECTION -->
-      <div id="resetSection" class="reset-section">
-        <button class="back-link" onclick="showLogin()">← Back to login</button>
-        <div class="card-accent"></div>
-        <h1>Reset password</h1>
-        <p class="subtitle">We'll send you a link to reset your password.</p>
-
-        <div class="alert" id="resetAlert"></div>
-
-        <div class="form-group">
-          <label for="resetEmail">Email address</label>
-          <input type="email" id="resetEmail" placeholder="juan@example.com">
-        </div>
-
-        <button class="btn-submit" id="resetBtn" onclick="handleReset()">
-          Send reset link
-        </button>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Your password" autocomplete="current-password">
       </div>
-
+      <button class="btn-submit" id="loginBtn" onclick="handleLogin()">Log in</button>
+      <div class="footer-link">Don't have an account? <a href="/pages/signup">Sign up free</a></div>
     </div>
   </div>
-
   <script>
-    // Redirect if already logged in
-    netlifyIdentity.on('init', user => {
-      if (user) window.location.href = '/pages/dashboard';
-    });
-
-    netlifyIdentity.on('login', user => {
-      // Sync user to Google Sheets via our Netlify Function
-      syncUser(user).finally(() => {
-        window.location.href = '/pages/dashboard';
-      });
-    });
-
-    netlifyIdentity.init();
+    if (localStorage.getItem('bizdir_token')) window.location.href = '/pages/dashboard';
 
     async function handleLogin() {
-      const email    = document.getElementById('email').value.trim();
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const btn      = document.getElementById('loginBtn');
+      const btn = document.getElementById('loginBtn');
 
-      clearAlert('loginAlert');
-
-      if (!email || !password) {
-        showAlert('loginAlert', 'Please enter your email and password.', 'error'); return;
-      }
+      clearAlert();
+      if (!email || !password) { showAlert('Please enter your email and password.', 'error'); return; }
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>Logging in…';
 
       try {
-        await netlifyIdentity.gotrue.login(email, password, true);
-        // netlifyIdentity 'login' event above handles redirect
-      } catch (err) {
-        console.error(err);
-        showAlert('loginAlert',
-          err.message?.includes('Invalid') || err.message?.includes('invalid')
-            ? 'Incorrect email or password. Please try again.'
-            : (err.message || 'Login failed. Please try again.'),
-          'error');
+        const res = await fetch('/api/auth?action=login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+          showAlert(data.error || 'Login failed. Please try again.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Log in';
+          return;
+        }
+
+        localStorage.setItem('bizdir_token', data.token);
+        localStorage.setItem('bizdir_email', data.email);
+        localStorage.setItem('bizdir_name', data.name);
+        showAlert('Logged in! Redirecting…', 'success');
+        setTimeout(() => window.location.href = '/pages/dashboard', 800);
+      } catch(e) {
+        showAlert('Something went wrong. Please try again.', 'error');
         btn.disabled = false;
         btn.textContent = 'Log in';
       }
     }
 
-    async function handleReset() {
-      const email = document.getElementById('resetEmail').value.trim();
-      const btn   = document.getElementById('resetBtn');
-
-      clearAlert('resetAlert');
-
-      if (!email) {
-        showAlert('resetAlert', 'Please enter your email address.', 'error'); return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>Sending…';
-
-      try {
-        await netlifyIdentity.gotrue.requestPasswordRecovery(email);
-        showAlert('resetAlert', 'Reset link sent! Check your inbox.', 'success');
-        btn.textContent = 'Email sent';
-      } catch (err) {
-        showAlert('resetAlert', err.message || 'Failed to send reset email.', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Send reset link';
-      }
-    }
-
-    // Sync user to Google Sheets on first login
-    async function syncUser(user) {
-      try {
-        await fetch('/api/auth-sync', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + user.token.access_token,
-          },
-          body: JSON.stringify({
-            email: user.email,
-            name: user.user_metadata?.full_name || '',
-          }),
-        });
-      } catch (e) {
-        console.warn('User sync failed (non-critical):', e);
-      }
-    }
-
-    function showReset() {
-      document.getElementById('loginSection').style.display = 'none';
-      document.getElementById('resetSection').classList.add('visible');
-      document.getElementById('resetEmail').value = document.getElementById('email').value;
-    }
-
-    function showLogin() {
-      document.getElementById('loginSection').style.display = 'block';
-      document.getElementById('resetSection').classList.remove('visible');
-    }
-
-    function showAlert(id, msg, type) {
-      const el = document.getElementById(id);
-      el.textContent = msg;
-      el.className = 'alert ' + type;
-    }
-
-    function clearAlert(id) {
-      const el = document.getElementById(id);
-      el.className = 'alert';
-      el.textContent = '';
-    }
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        if (document.getElementById('resetSection').classList.contains('visible')) handleReset();
-        else handleLogin();
-      }
-    });
+    function showAlert(msg, type) { const el = document.getElementById('alert'); el.textContent = msg; el.className = 'alert ' + type; }
+    function clearAlert() { const el = document.getElementById('alert'); el.className = 'alert'; el.textContent = ''; }
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
   </script>
 </body>
 </html>

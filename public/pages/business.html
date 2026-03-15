@@ -501,7 +501,7 @@
             <div class="section-title">More in ${esc(category)}</div>
             <div class="related-grid">
               ${related.map(b => `
-                <a class="related-card" href="/pages/business.html?id=${esc(b.id)}">
+                <a class="related-card" href="/pages/business?id=${esc(b.id)}">
                   <div class="related-name">${esc(b.name)}</div>
                   <div class="related-cat">${esc(b.location)}</div>
                 </a>`).join('')}

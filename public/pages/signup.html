@@ -6,363 +6,132 @@
   <title>Sign Up — BizDir</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --ink:       #0f0f0f;
-      --ink-2:     #3a3a3a;
-      --ink-3:     #888;
-      --paper:     #faf9f6;
-      --surface:   #f0ede6;
-      --accent:    #e84c1e;
-      --border:    #e2ddd6;
-      --card-bg:   #ffffff;
-      --font-head: 'Syne', sans-serif;
-      --font-body: 'DM Sans', sans-serif;
+      --ink: #0f0f0f; --ink-2: #3a3a3a; --ink-3: #888;
+      --paper: #faf9f6; --surface: #f0ede6; --accent: #e84c1e;
+      --border: #e2ddd6; --card-bg: #ffffff;
+      --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
     }
-
-    body {
-      font-family: var(--font-body);
-      background: var(--paper);
-      color: var(--ink);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* NAV */
-    nav {
-      padding: 0 2rem;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      background: var(--paper);
-    }
-    .nav-logo {
-      font-family: var(--font-head);
-      font-weight: 800;
-      font-size: 1.3rem;
-      letter-spacing: -0.03em;
-      color: var(--ink);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .nav-logo span {
-      background: var(--accent);
-      color: #fff;
-      padding: 1px 7px 2px;
-      border-radius: 4px;
-    }
-    .nav-link {
-      font-size: 0.875rem;
-      color: var(--ink-2);
-      text-decoration: none;
-      font-weight: 500;
-    }
+    body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+    nav { padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.03em; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .nav-logo span { background: var(--accent); color: #fff; padding: 1px 7px 2px; border-radius: 4px; }
+    .nav-link { font-size: 0.875rem; color: var(--ink-2); text-decoration: none; font-weight: 500; }
     .nav-link:hover { color: var(--accent); }
-
-    /* LAYOUT */
-    .page {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem 1.5rem;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2.5rem;
-      width: 100%;
-      max-width: 460px;
-    }
-
-    /* SIDE ACCENT */
-    .card-accent {
-      width: 40px;
-      height: 4px;
-      background: var(--accent);
-      border-radius: 2px;
-      margin-bottom: 1.5rem;
-    }
-
-    h1 {
-      font-family: var(--font-head);
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      color: var(--ink);
-      margin-bottom: 0.4rem;
-    }
-
-    .subtitle {
-      font-size: 0.9rem;
-      color: var(--ink-3);
-      font-weight: 300;
-      margin-bottom: 2rem;
-    }
-
-    /* FORM */
-    .form-group {
-      margin-bottom: 1.1rem;
-    }
-
-    label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--ink-2);
-      margin-bottom: 6px;
-      letter-spacing: 0.02em;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      color: var(--ink);
-      background: var(--paper);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(232,76,30,0.1);
-      background: #fff;
-    }
-
+    .page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 460px; }
+    .card-accent { width: 40px; height: 4px; background: var(--accent); border-radius: 2px; margin-bottom: 1.5rem; }
+    h1 { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
+    .subtitle { font-size: 0.9rem; color: var(--ink-3); font-weight: 300; margin-bottom: 2rem; }
+    .form-group { margin-bottom: 1.1rem; }
+    label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--ink-2); margin-bottom: 6px; }
+    input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.95rem; color: var(--ink); background: var(--paper); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,76,30,0.1); background: #fff; }
     input::placeholder { color: var(--ink-3); }
-
-    .btn-submit {
-      width: 100%;
-      padding: 13px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-family: var(--font-head);
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 0.5rem;
-      transition: background 0.18s, transform 0.18s;
-      letter-spacing: 0.01em;
-    }
-
+    .btn-submit { width: 100%; padding: 13px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: var(--font-head); font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; transition: background 0.18s, transform 0.18s; }
     .btn-submit:hover { background: #c93d12; transform: translateY(-1px); }
     .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 1.5rem 0;
-      color: var(--ink-3);
-      font-size: 0.8rem;
-    }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .footer-link {
-      text-align: center;
-      font-size: 0.875rem;
-      color: var(--ink-3);
-      margin-top: 1.25rem;
-    }
+    .footer-link { text-align: center; font-size: 0.875rem; color: var(--ink-3); margin-top: 1.25rem; }
     .footer-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
-    .footer-link a:hover { text-decoration: underline; }
-
-    /* ALERT */
-    .alert {
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-      display: none;
-    }
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; display: none; }
     .alert.error { background: #fde8e2; color: #a02a0a; border: 1px solid #f9c4b3; display: block; }
     .alert.success { background: #e6f4ea; color: #1a6e2e; border: 1px solid #b7dfc2; display: block; }
-
-    /* BENEFITS */
-    .benefits {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
-    }
-    .benefits p {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--ink-3);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 0.75rem;
-    }
-    .benefit-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
-      color: var(--ink-2);
-      margin-bottom: 6px;
-    }
-    .benefit-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-    }
-
-    /* LOADING SPINNER */
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
-    }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 480px) {
-      .card { padding: 1.75rem 1.25rem; }
-    }
+    .benefits { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .benefits p { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+    .benefit-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--ink-2); margin-bottom: 6px; }
+    .benefit-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
   </style>
 </head>
 <body>
-
   <nav>
     <a href="/" class="nav-logo"><span>Biz</span>Dir</a>
     <a href="/pages/login" class="nav-link">Already have an account? Log in</a>
   </nav>
-
   <div class="page">
     <div class="card">
       <div class="card-accent"></div>
       <h1>List your business</h1>
       <p class="subtitle">Create a free account to get your business discovered.</p>
-
       <div class="alert" id="alert"></div>
-
       <div class="form-group">
         <label for="fullName">Full name</label>
         <input type="text" id="fullName" placeholder="Juan dela Cruz" autocomplete="name">
       </div>
-
       <div class="form-group">
         <label for="email">Email address</label>
         <input type="email" id="email" placeholder="juan@example.com" autocomplete="email">
       </div>
-
       <div class="form-group">
         <label for="password">Password</label>
         <input type="password" id="password" placeholder="At least 8 characters" autocomplete="new-password">
       </div>
-
       <div class="form-group">
         <label for="confirmPassword">Confirm password</label>
         <input type="password" id="confirmPassword" placeholder="Repeat your password" autocomplete="new-password">
       </div>
-
-      <button class="btn-submit" id="signupBtn" onclick="handleSignup()">
-        Create free account
-      </button>
-
-      <div class="footer-link">
-        Already have an account? <a href="/pages/login">Log in</a>
-      </div>
-
+      <button class="btn-submit" id="signupBtn" onclick="handleSignup()">Create free account</button>
+      <div class="footer-link">Already have an account? <a href="/pages/login">Log in</a></div>
       <div class="benefits">
         <p>What you get</p>
         <div class="benefit-item"><span class="benefit-dot"></span>Free business listing page</div>
         <div class="benefit-item"><span class="benefit-dot"></span>Show up in search results</div>
         <div class="benefit-item"><span class="benefit-dot"></span>Manage your listing anytime</div>
-        <div class="benefit-item"><span class="benefit-dot"></span>Customer reviews & ratings</div>
+        <div class="benefit-item"><span class="benefit-dot"></span>Affiliate link support</div>
       </div>
     </div>
   </div>
-
   <script>
-    // Redirect if already logged in
-    netlifyIdentity.on('init', user => {
-      if (user) window.location.href = '/pages/dashboard';
-    });
-
-    netlifyIdentity.init();
+    if (localStorage.getItem('bizdir_token')) window.location.href = '/pages/dashboard';
 
     async function handleSignup() {
-      const name     = document.getElementById('fullName').value.trim();
-      const email    = document.getElementById('email').value.trim();
+      const name = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const confirm  = document.getElementById('confirmPassword').value;
-      const btn      = document.getElementById('signupBtn');
-      const alertEl  = document.getElementById('alert');
+      const confirm = document.getElementById('confirmPassword').value;
+      const btn = document.getElementById('signupBtn');
 
-      // Reset
-      alertEl.className = 'alert';
-      alertEl.textContent = '';
-
-      // Validate
-      if (!name || !email || !password || !confirm) {
-        showAlert('Please fill in all fields.', 'error'); return;
-      }
-      if (password.length < 8) {
-        showAlert('Password must be at least 8 characters.', 'error'); return;
-      }
-      if (password !== confirm) {
-        showAlert('Passwords do not match.', 'error'); return;
-      }
+      clearAlert();
+      if (!name || !email || !password || !confirm) { showAlert('Please fill in all fields.', 'error'); return; }
+      if (password.length < 8) { showAlert('Password must be at least 8 characters.', 'error'); return; }
+      if (password !== confirm) { showAlert('Passwords do not match.', 'error'); return; }
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>Creating account…';
 
       try {
-        // Sign up via Netlify Identity
-        await netlifyIdentity.gotrue.signup(email, password, { full_name: name });
+        const res = await fetch('/api/auth?action=signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password }),
+        });
+        const data = await res.json();
 
-        showAlert('Account created! Please check your email to confirm your address, then log in.', 'success');
-        btn.textContent = 'Check your email';
+        if (!data.success) {
+          showAlert(data.error || 'Signup failed.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Create free account';
+          return;
+        }
 
-      } catch (err) {
-        console.error(err);
-        const msg = err.message || 'Signup failed. Please try again.';
-        showAlert(msg.includes('already registered')
-          ? 'An account with this email already exists. Try logging in.'
-          : msg, 'error');
+        localStorage.setItem('bizdir_token', data.token);
+        localStorage.setItem('bizdir_email', data.email);
+        localStorage.setItem('bizdir_name', data.name);
+        showAlert('Account created! Redirecting…', 'success');
+        setTimeout(() => window.location.href = '/pages/dashboard', 1000);
+      } catch(e) {
+        showAlert('Something went wrong. Please try again.', 'error');
         btn.disabled = false;
         btn.textContent = 'Create free account';
       }
     }
 
-    function showAlert(msg, type) {
-      const el = document.getElementById('alert');
-      el.textContent = msg;
-      el.className = 'alert ' + type;
-    }
-
-    // Allow Enter key to submit
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter') handleSignup();
-    });
+    function showAlert(msg, type) { const el = document.getElementById('alert'); el.textContent = msg; el.className = 'alert ' + type; }
+    function clearAlert() { const el = document.getElementById('alert'); el.className = 'alert'; el.textContent = ''; }
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') handleSignup(); });
   </script>
 </body>
 </html>
