@@ -254,10 +254,13 @@
   <nav>
     <a href="/" class="nav-logo"><span>Biz</span>Dir</a>
     <ul class="nav-links">
-      <li><a href="/">Browse</a></li>
-      <li><a href="/pages/login">Login</a></li>
-      <li><a href="/pages/signup" class="btn btn-primary">List your business</a></li>
-    </ul>
+  <li><a href="/">Browse</a></li>
+  <li id="navDashboard" style="display:none"><a href="/pages/dashboard">Dashboard</a></li>
+  <li id="navAdmin" style="display:none"><a href="/pages/admin">Admin</a></li>
+  <li id="navLogin"><a href="/pages/login">Login</a></li>
+  <li id="navSignup"><a href="/pages/signup" class="btn btn-primary">List your business</a></li>
+  <li id="navLogout" style="display:none"><button onclick="handleLogout()" style="background:none;border:none;cursor:pointer;font-size:0.875rem;font-weight:500;color:var(--ink-2);font-family:var(--font-body)">Log out</button></li>
+</ul>
   </nav>
 
   <section class="hero">
@@ -493,5 +496,33 @@ function showSkeleton(grid) {
     loadCategories();
     loadListings();
   </script>
+
+  <script>
+  const ADMIN_EMAIL = "paolollenado@gmail.com"; // same as admin.html
+
+  function initNav() {
+    const token = localStorage.getItem('bizdir_token');
+    const email = localStorage.getItem('bizdir_email');
+
+    if (token && email) {
+      document.getElementById('navLogin').style.display = 'none';
+      document.getElementById('navSignup').style.display = 'none';
+      document.getElementById('navLogout').style.display = 'block';
+      document.getElementById('navDashboard').style.display = 'block';
+      if (email === ADMIN_EMAIL) {
+        document.getElementById('navAdmin').style.display = 'block';
+      }
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('bizdir_token');
+    localStorage.removeItem('bizdir_email');
+    localStorage.removeItem('bizdir_name');
+    window.location.reload();
+  }
+
+  initNav();
+</script>
 </body>
 </html>
