@@ -268,19 +268,36 @@
     }
 
     // ── Add lead ─────────────────────────────────────────
-   async function addLead() {
-  const name = document.getElementById('leadName').value.trim();
-  let phone = document.getElementById('leadPhone').value.trim();
-  const category = document.getElementById('leadCategory').value;
-  const address = document.getElementById('leadAddress').value.trim();
-  const website = document.getElementById('leadWebsite').value.trim();
+    async function addLead() {
+      const name = document.getElementById('leadName').value.trim();
+      let phone = document.getElementById('leadPhone').value.trim();
+      if (phone && !phone.startsWith('+')) phone = '+' + phone;
+      const category = document.getElementById('leadCategory').value;
+      const address = document.getElementById('leadAddress').value.trim();
+      const website = document.getElementById('leadWebsite').value.trim();
 
-  // Normalize phone number - ensure it has + prefix
-  if (phone && !phone.startsWith('+')) {
-    phone = '+' + phone;
-  }
+      if (!phone) { showAlert('Phone number is required', 'error'); return; }
 
-  if (!phone) { showAlert('Phone number is required', 'error'); return; }
+      try {
+        const res = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, businessName: name, address, category, website, source: 'manual' }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert('Lead added to queue!', 'success');
+          document.getElementById('leadName').value = '';
+          document.getElementById('leadPhone').value = '';
+          document.getElementById('leadAddress').value = '';
+          document.getElementById('leadWebsite').value = '';
+          loadLeads();
+          log('info', `Lead added: ${name} (${phone})`);
+        }
+      } catch(e) {
+        showAlert('Failed to add lead', 'error');
+      }
+    }
 
     // ── Call single lead ──────────────────────────────────
     async function callLead(id, phone, name, address, category) {
@@ -379,10 +396,8 @@
         headers.forEach((h, idx) => row[h] = values[idx] || '');
 
         let phone = row.phone || row.telephone || row.mobile || row.number;
-if (!phone) continue;
-if (!phone.startsWith('+')) {
-  phone = '+' + phone;
-}
+        if (phone && !phone.startsWith('+')) phone = '+' + phone;
+        if (!phone) continue;
 
         await fetch('/api/leads', {
           method: 'POST',
