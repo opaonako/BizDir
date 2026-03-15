@@ -30,9 +30,55 @@
     input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.95rem; color: var(--ink); background: var(--paper); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,76,30,0.1); background: #fff; }
     input::placeholder { color: var(--ink-3); }
+    input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .phone-row { display: flex; gap: 8px; }
+    .phone-row input:first-child { width: 90px; flex-shrink: 0; }
+    .phone-row input:last-child { flex: 1; }
+
+    .otp-row { display: flex; gap: 8px; }
+    .otp-row input { flex: 1; text-align: center; font-size: 1.3rem; font-weight: 700; letter-spacing: 0.1em; }
+    .btn-send-otp {
+      flex-shrink: 0; padding: 12px 16px; background: var(--surface);
+      color: var(--ink-2); border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: var(--font-body); font-size: 0.85rem; font-weight: 500;
+      cursor: pointer; transition: all 0.18s; white-space: nowrap;
+    }
+    .btn-send-otp:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .btn-send-otp:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .verified-badge {
+      display: none; align-items: center; gap: 6px;
+      font-size: 0.82rem; color: #16a34a; font-weight: 500;
+      background: #dcfce7; padding: 8px 12px; border-radius: 8px;
+      border: 1px solid #bbf7d0; margin-top: 6px;
+    }
+    .verified-badge.show { display: flex; }
+
+    .step { display: none; }
+    .step.active { display: block; }
+
+    .step-indicator {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .step-dot.done { background: #dcfce7; color: #16a34a; }
+    .step-dot.active { background: var(--accent); color: #fff; }
+    .step-dot.inactive { background: var(--surface); color: var(--ink-3); }
+    .step-line { flex: 1; height: 2px; background: var(--border); }
+    .step-line.done { background: #16a34a; }
+
     .btn-submit { width: 100%; padding: 13px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: var(--font-head); font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; transition: background 0.18s, transform 0.18s; }
     .btn-submit:hover { background: #c93d12; transform: translateY(-1px); }
     .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+    .btn-outline { width: 100%; padding: 11px; background: transparent; color: var(--ink-2); border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; cursor: pointer; margin-top: 8px; transition: all 0.18s; }
+    .btn-outline:hover { border-color: var(--ink); }
+
     .footer-link { text-align: center; font-size: 0.875rem; color: var(--ink-3); margin-top: 1.25rem; }
     .footer-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
     .alert { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; display: none; }
@@ -40,10 +86,9 @@
     .alert.success { background: #e6f4ea; color: #1a6e2e; border: 1px solid #b7dfc2; display: block; }
     .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .benefits { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
-    .benefits p { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
-    .benefit-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--ink-2); margin-bottom: 6px; }
-    .benefit-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .resend-timer { font-size: 0.8rem; color: var(--ink-3); text-align: center; margin-top: 8px; }
+    .resend-timer a { color: var(--accent); cursor: pointer; text-decoration: none; }
+    #recaptcha-container { margin: 8px 0; }
   </style>
 </head>
 <body>
@@ -51,87 +96,320 @@
     <a href="/" class="nav-logo"><span>Biz</span>Dir</a>
     <a href="/pages/login" class="nav-link">Already have an account? Log in</a>
   </nav>
+
   <div class="page">
     <div class="card">
       <div class="card-accent"></div>
-      <h1>List your business</h1>
-      <p class="subtitle">Create a free account to get your business discovered.</p>
+
+      <!-- Step indicator -->
+      <div class="step-indicator">
+        <div class="step-dot active" id="dot1">1</div>
+        <div class="step-line" id="line1"></div>
+        <div class="step-dot inactive" id="dot2">2</div>
+        <div class="step-line" id="line2"></div>
+        <div class="step-dot inactive" id="dot3">3</div>
+      </div>
+
       <div class="alert" id="alert"></div>
-      <div class="form-group">
-        <label for="fullName">Full name</label>
-        <input type="text" id="fullName" placeholder="Juan dela Cruz" autocomplete="name">
+
+      <!-- STEP 1: Basic info -->
+      <div class="step active" id="step1">
+        <h1>Create account</h1>
+        <p class="subtitle">Step 1 of 3 — Your basic info</p>
+        <div class="form-group">
+          <label for="fullName">Full name</label>
+          <input type="text" id="fullName" placeholder="Juan dela Cruz" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" id="email" placeholder="juan@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="At least 8 characters" autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm password</label>
+          <input type="password" id="confirmPassword" placeholder="Repeat your password" autocomplete="new-password">
+        </div>
+        <button class="btn-submit" onclick="goToStep2()">Continue →</button>
+        <div class="footer-link">Already have an account? <a href="/pages/login">Log in</a></div>
       </div>
-      <div class="form-group">
-        <label for="email">Email address</label>
-        <input type="email" id="email" placeholder="juan@example.com" autocomplete="email">
+
+      <!-- STEP 2: Phone verification -->
+      <div class="step" id="step2">
+        <h1>Verify phone</h1>
+        <p class="subtitle">Step 2 of 3 — We'll send an OTP to your number</p>
+
+        <div class="form-group">
+          <label>Mobile number</label>
+          <div class="phone-row">
+            <input type="text" id="countryCode" value="+63" placeholder="+63">
+            <input type="tel" id="phoneNumber" placeholder="917 123 4567" autocomplete="tel">
+          </div>
+        </div>
+
+        <div id="recaptcha-container"></div>
+
+        <button class="btn-submit" id="sendOtpBtn" onclick="sendOTP()">Send OTP</button>
+        <button class="btn-outline" onclick="goBackToStep1()">← Back</button>
       </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="At least 8 characters" autocomplete="new-password">
+
+      <!-- STEP 3: Enter OTP -->
+      <div class="step" id="step3">
+        <h1>Enter OTP</h1>
+        <p class="subtitle" id="otpSubtitle">Step 3 of 3 — Enter the code sent to your number</p>
+
+        <div class="form-group">
+          <label>6-digit verification code</label>
+          <div class="otp-row">
+            <input type="text" id="otpInput" placeholder="• • • • • •" maxlength="6" autocomplete="one-time-code">
+          </div>
+        </div>
+
+        <button class="btn-submit" id="verifyBtn" onclick="verifyOTP()">Verify & create account</button>
+        <button class="btn-outline" onclick="goBackToStep2()">← Change number</button>
+
+        <div class="resend-timer" id="resendTimer"></div>
       </div>
-      <div class="form-group">
-        <label for="confirmPassword">Confirm password</label>
-        <input type="password" id="confirmPassword" placeholder="Repeat your password" autocomplete="new-password">
-      </div>
-      <button class="btn-submit" id="signupBtn" onclick="handleSignup()">Create free account</button>
-      <div class="footer-link">Already have an account? <a href="/pages/login">Log in</a></div>
-      <div class="benefits">
-        <p>What you get</p>
-        <div class="benefit-item"><span class="benefit-dot"></span>Free business listing page</div>
-        <div class="benefit-item"><span class="benefit-dot"></span>Show up in search results</div>
-        <div class="benefit-item"><span class="benefit-dot"></span>Manage your listing anytime</div>
-        <div class="benefit-item"><span class="benefit-dot"></span>Affiliate link support</div>
-      </div>
+
     </div>
   </div>
-  <script>
-    if (localStorage.getItem('bizdir_token')) window.location.href = '/pages/dashboard';
 
-    async function handleSignup() {
-      const name = document.getElementById('fullName').value.trim();
-      const email = document.getElementById('email').value.trim();
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCkD609SS33TWpEenpbQP4_KeZX4Imz4gg",
+      authDomain: "bizdir-8ec87.firebaseapp.com",
+      projectId: "bizdir-8ec87",
+      storageBucket: "bizdir-8ec87.firebasestorage.app",
+      messagingSenderId: "208132241097",
+      appId: "1:208132241097:web:e582ed914871071bdd7f18"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    auth.useDeviceLanguage();
+
+    let confirmationResult = null;
+    let recaptchaVerifier = null;
+    let resendCountdown = null;
+
+    // Redirect if already logged in
+    if (localStorage.getItem('bizdir_token')) {
+      window.location.href = '/pages/dashboard';
+    }
+
+    // ── Step navigation ──────────────────────────────────────
+    window.goToStep2 = function() {
+      const name     = document.getElementById('fullName').value.trim();
+      const email    = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const confirm = document.getElementById('confirmPassword').value;
-      const btn = document.getElementById('signupBtn');
+      const confirm  = document.getElementById('confirmPassword').value;
 
       clearAlert();
       if (!name || !email || !password || !confirm) { showAlert('Please fill in all fields.', 'error'); return; }
       if (password.length < 8) { showAlert('Password must be at least 8 characters.', 'error'); return; }
       if (password !== confirm) { showAlert('Passwords do not match.', 'error'); return; }
+      if (!email.includes('@')) { showAlert('Please enter a valid email.', 'error'); return; }
+
+      setStep(2);
+      initRecaptcha();
+    };
+
+    window.goBackToStep1 = function() {
+      clearAlert();
+      setStep(1);
+      if (recaptchaVerifier) {
+        recaptchaVerifier.clear();
+        recaptchaVerifier = null;
+      }
+    };
+
+    window.goBackToStep2 = function() {
+      clearAlert();
+      setStep(2);
+      clearInterval(resendCountdown);
+      if (recaptchaVerifier) {
+        recaptchaVerifier.clear();
+        recaptchaVerifier = null;
+      }
+      setTimeout(initRecaptcha, 300);
+    };
+
+    function setStep(n) {
+      [1,2,3].forEach(i => {
+        document.getElementById('step'+i).classList.toggle('active', i === n);
+        const dot = document.getElementById('dot'+i);
+        dot.className = 'step-dot ' + (i < n ? 'done' : i === n ? 'active' : 'inactive');
+        dot.textContent = i < n ? '✓' : i;
+      });
+      [1,2].forEach(i => {
+        document.getElementById('line'+i).className = 'step-line' + (i < n ? ' done' : '');
+      });
+      clearAlert();
+    }
+
+    // ── reCAPTCHA ────────────────────────────────────────────
+    function initRecaptcha() {
+      try {
+        if (recaptchaVerifier) {
+          recaptchaVerifier.clear();
+          recaptchaVerifier = null;
+        }
+        document.getElementById('recaptcha-container').innerHTML = '';
+        recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'normal',
+          callback: () => {
+            document.getElementById('sendOtpBtn').disabled = false;
+          },
+          'expired-callback': () => {
+            document.getElementById('sendOtpBtn').disabled = true;
+            showAlert('reCAPTCHA expired. Please verify again.', 'error');
+          }
+        });
+        recaptchaVerifier.render();
+        document.getElementById('sendOtpBtn').disabled = true;
+      } catch(e) {
+        console.error('reCAPTCHA error:', e);
+        // Allow send without recaptcha in case of error
+        document.getElementById('sendOtpBtn').disabled = false;
+      }
+    }
+
+    // ── Send OTP ─────────────────────────────────────────────
+    window.sendOTP = async function() {
+      const countryCode = document.getElementById('countryCode').value.trim();
+      const number      = document.getElementById('phoneNumber').value.trim().replace(/\s/g, '');
+      const btn         = document.getElementById('sendOtpBtn');
+
+      clearAlert();
+
+      if (!number) { showAlert('Please enter your mobile number.', 'error'); return; }
+
+      // Build full number — remove leading 0 if present
+      const cleanNumber = number.startsWith('0') ? number.slice(1) : number;
+      const fullPhone = countryCode + cleanNumber;
 
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>Creating account…';
+      btn.innerHTML = '<span class="spinner"></span>Sending OTP…';
 
       try {
+        confirmationResult = await signInWithPhoneNumber(auth, fullPhone, recaptchaVerifier);
+
+        document.getElementById('otpSubtitle').textContent =
+          `Step 3 of 3 — Code sent to ${fullPhone}`;
+
+        setStep(3);
+        startResendTimer();
+        showAlert(`OTP sent to ${fullPhone}`, 'success');
+
+      } catch(e) {
+        console.error('OTP send error:', e);
+        const messages = {
+          'auth/invalid-phone-number': 'Invalid phone number. Use format: 917 123 4567',
+          'auth/too-many-requests': 'Too many attempts. Please try again later.',
+          'auth/quota-exceeded': 'SMS quota exceeded. Please try again later.',
+        };
+        showAlert(messages[e.code] || e.message || 'Failed to send OTP. Please try again.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Send OTP';
+        if (recaptchaVerifier) {
+          recaptchaVerifier.clear();
+          recaptchaVerifier = null;
+          setTimeout(initRecaptcha, 300);
+        }
+      }
+    };
+
+    // ── Verify OTP & create account ──────────────────────────
+    window.verifyOTP = async function() {
+      const otp = document.getElementById('otpInput').value.trim();
+      const btn = document.getElementById('verifyBtn');
+
+      clearAlert();
+      if (!otp || otp.length !== 6) { showAlert('Please enter the 6-digit code.', 'error'); return; }
+      if (!confirmationResult) { showAlert('Please request an OTP first.', 'error'); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Verifying…';
+
+      try {
+        // Verify OTP with Firebase
+        await confirmationResult.confirm(otp);
+
+        // OTP verified — now create account in our system
+        const name     = document.getElementById('fullName').value.trim();
+        const email    = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const phone    = document.getElementById('countryCode').value.trim() +
+                         document.getElementById('phoneNumber').value.trim().replace(/\s/g,'');
+
+        btn.innerHTML = '<span class="spinner"></span>Creating account…';
+
         const res = await fetch('/api/auth?action=signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password }),
+          body: JSON.stringify({ name, email, password, phone }),
         });
         const data = await res.json();
 
         if (!data.success) {
-          showAlert(data.error || 'Signup failed.', 'error');
+          showAlert(data.error || 'Account creation failed.', 'error');
           btn.disabled = false;
-          btn.textContent = 'Create free account';
+          btn.textContent = 'Verify & create account';
           return;
         }
 
+        // Save session
         localStorage.setItem('bizdir_token', data.token);
         localStorage.setItem('bizdir_email', data.email);
         localStorage.setItem('bizdir_name', data.name);
-        showAlert('Account created! Redirecting…', 'success');
-        setTimeout(() => window.location.href = '/pages/dashboard', 1000);
+
+        showAlert('Phone verified! Account created. Redirecting…', 'success');
+        setTimeout(() => window.location.href = '/pages/dashboard', 1200);
+
       } catch(e) {
-        showAlert('Something went wrong. Please try again.', 'error');
+        console.error('OTP verify error:', e);
+        const messages = {
+          'auth/invalid-verification-code': 'Incorrect code. Please try again.',
+          'auth/code-expired': 'Code expired. Please request a new one.',
+        };
+        showAlert(messages[e.code] || 'Verification failed. Please try again.', 'error');
         btn.disabled = false;
-        btn.textContent = 'Create free account';
+        btn.textContent = 'Verify & create account';
       }
+    };
+
+    // ── Resend timer ─────────────────────────────────────────
+    function startResendTimer() {
+      let seconds = 60;
+      const el = document.getElementById('resendTimer');
+      clearInterval(resendCountdown);
+      el.innerHTML = `Resend code in <strong>${seconds}s</strong>`;
+      resendCountdown = setInterval(() => {
+        seconds--;
+        if (seconds <= 0) {
+          clearInterval(resendCountdown);
+          el.innerHTML = `Didn't receive it? <a onclick="window.goBackToStep2()">Resend OTP</a>`;
+        } else {
+          el.innerHTML = `Resend code in <strong>${seconds}s</strong>`;
+        }
+      }, 1000);
     }
 
-    function showAlert(msg, type) { const el = document.getElementById('alert'); el.textContent = msg; el.className = 'alert ' + type; }
-    function clearAlert() { const el = document.getElementById('alert'); el.className = 'alert'; el.textContent = ''; }
-    document.addEventListener('keydown', e => { if (e.key === 'Enter') handleSignup(); });
+    // ── Helpers ──────────────────────────────────────────────
+    function showAlert(msg, type) {
+      const el = document.getElementById('alert');
+      el.textContent = msg; el.className = 'alert ' + type;
+    }
+    function clearAlert() {
+      const el = document.getElementById('alert');
+      el.className = 'alert'; el.textContent = '';
+    }
   </script>
 </body>
 </html>
