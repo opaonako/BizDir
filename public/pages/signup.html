@@ -204,41 +204,38 @@
     }
 
     // ── Step navigation ──────────────────────────────────────
-    window.goToStep2 = function() {
-      const name     = document.getElementById('fullName').value.trim();
-      const email    = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const confirm  = document.getElementById('confirmPassword').value;
+   window.goToStep2 = function() {
+  const name     = document.getElementById('fullName').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const confirm  = document.getElementById('confirmPassword').value;
 
-      clearAlert();
-      if (!name || !email || !password || !confirm) { showAlert('Please fill in all fields.', 'error'); return; }
-      if (password.length < 8) { showAlert('Password must be at least 8 characters.', 'error'); return; }
-      if (password !== confirm) { showAlert('Passwords do not match.', 'error'); return; }
-      if (!email.includes('@')) { showAlert('Please enter a valid email.', 'error'); return; }
+  clearAlert();
+  if (!name || !email || !password || !confirm) { showAlert('Please fill in all fields.', 'error'); return; }
+  if (password.length < 8) { showAlert('Password must be at least 8 characters.', 'error'); return; }
+  if (password !== confirm) { showAlert('Passwords do not match.', 'error'); return; }
+  if (!email.includes('@')) { showAlert('Please enter a valid email.', 'error'); return; }
 
-      setStep(2);
-      initRecaptcha();
-    };
+  setStep(2);
 
-    window.goBackToStep1 = function() {
-      clearAlert();
-      setStep(1);
-      if (recaptchaVerifier) {
-        recaptchaVerifier.clear();
-        recaptchaVerifier = null;
-      }
-    };
+  // Only init reCAPTCHA if not already initialized
+  if (!recaptchaVerifier) {
+    initRecaptcha();
+  }
+};
+
+   window.goBackToStep1 = function() {
+  clearAlert();
+  setStep(1);
+  // Don't clear recaptchaVerifier — keep it alive
+};
 
     window.goBackToStep2 = function() {
-      clearAlert();
-      setStep(2);
-      clearInterval(resendCountdown);
-      if (recaptchaVerifier) {
-        recaptchaVerifier.clear();
-        recaptchaVerifier = null;
-      }
-      setTimeout(initRecaptcha, 300);
-    };
+  clearAlert();
+  setStep(2);
+  clearInterval(resendCountdown);
+  // Don't reinitialize recaptcha
+};
 
     function setStep(n) {
       [1,2,3].forEach(i => {
@@ -274,10 +271,17 @@
         recaptchaVerifier.render();
         document.getElementById('sendOtpBtn').disabled = true;
       } catch(e) {
-        console.error('reCAPTCHA error:', e);
-        // Allow send without recaptcha in case of error
-        document.getElementById('sendOtpBtn').disabled = false;
-      }
+  console.error('OTP send error:', e);
+  const messages = {
+    'auth/invalid-phone-number': 'Invalid phone number. Use format: 917 123 4567',
+    'auth/too-many-requests': 'Too many attempts. Please try again later.',
+    'auth/quota-exceeded': 'SMS quota exceeded. Try again later.',
+  };
+  showAlert(messages[e.code] || e.message || 'Failed to send OTP.', 'error');
+  btn.disabled = false;
+  btn.textContent = 'Send OTP';
+  // Remove the recaptcha clear/reinit from here
+}
     }
 
     // ── Send OTP ─────────────────────────────────────────────
