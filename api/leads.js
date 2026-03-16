@@ -1,6 +1,6 @@
 // api/leads.js
 // GET  /api/leads         - get all leads from Sheets
-// POST /api/leads         - add a new lead  ✅ now checks for duplicates first
+// POST /api/leads         - add a new lead  ✅ checks for duplicates first
 // PUT  /api/leads         - update lead status
 
 const { callAppsScript, ok, err } = require("./_utils");
@@ -25,11 +25,10 @@ module.exports = async (req, res) => {
 
     try {
       // ── DUPLICATE CHECK ──────────────────────────────────
-      // Uses POST (not GET) to avoid URL length limits when the
-      // dataset grows large (100+ leads). Wrapped in its own
-      // try/catch so a getLeads failure never blocks creation.
+      // Wrapped in its own try/catch so if this fails for any
+      // reason it never blocks the actual lead creation.
       try {
-        const existing = await callAppsScript("getLeads", {}, "POST");
+        const existing = await callAppsScript("getLeads", {});
         const leads = existing.leads || [];
         const normalize = p => String(p).replace(/\D/g, "");
 
@@ -42,7 +41,7 @@ module.exports = async (req, res) => {
         });
 
         if (isDuplicate) {
-          // 200 not an error — tells caller it already exists, don't crash
+          // Return 200 not an error — caller knows it already exists
           return ok(res, { skipped: true, message: "Lead already exists" });
         }
       } catch (dupCheckErr) {
@@ -56,10 +55,10 @@ module.exports = async (req, res) => {
         businessName,
         address,
         category,
-        website:  website  || "",
-        source:   source   || "manual",
-        placeId:  placeId  || "",
-      }, "POST");
+        website: website || "",
+        source:  source  || "manual",
+        placeId: placeId || "",
+      });
 
       return ok(res, { leadId: data.leadId }, 201);
 
@@ -73,7 +72,7 @@ module.exports = async (req, res) => {
     const { id, status, transcript } = req.body;
     if (!id) return err(res, "Lead ID is required");
     try {
-      await callAppsScript("updateLeadStatus", { id, status, transcript: transcript || "" }, "POST");
+      await callAppsScript("updateLeadStatus", { id, status, transcript: transcript || "" });
       return ok(res, { message: "Lead updated" });
     } catch(e) {
       return err(res, "Failed to update lead", 500);

@@ -8,21 +8,29 @@ async function callAppsScript(action, payload = {}, method = "GET") {
 
   const enriched = { ...payload, action, _secret: SECRET };
 
-  let url = URL, options = {};
+  // ── WHY ALL REQUESTS USE GET ─────────────────────────────
+  // Apps Script Web Apps always respond with a 302 redirect.
+  // fetch() follows redirects but POST-to-GET redirect drops
+  // the request body, so the second request arrives with no
+  // _secret and Apps Script returns "Unauthorized" → 500.
+  // Sending everything as GET query params sidesteps this
+  // entirely. URLSearchParams safely encodes all values.
+  // For large payloads (createLead etc.) this is fine because
+  // the payload is small. For getLeads the response is large
+  // but the REQUEST is tiny — no URL length issue.
+  const qs = new URLSearchParams(
+    // URLSearchParams needs string values
+    Object.fromEntries(
+      Object.entries(enriched).map(([k, v]) => [k, String(v ?? "")])
+    )
+  ).toString();
 
-  if (method === "GET") {
-    url = URL + "?" + new URLSearchParams(enriched).toString();
-    options = { method: "GET" };
-  } else {
-    options = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(enriched),
-    };
-  }
+  const res = await fetch(URL + "?" + qs, {
+    method: "GET",
+    redirect: "follow",
+  });
 
-  const res = await fetch(url, { ...options, redirect: "follow" });
-  if (!res.ok) throw new Error("Apps Script error: " + res.status);
+  if (!res.ok) throw new Error("Apps Script HTTP error: " + res.status);
 
   const data = await res.json();
   if (data.success === false) throw new Error(data.error || "Apps Script failed");
