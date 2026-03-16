@@ -283,7 +283,6 @@
               `<button class="btn btn-call" onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}')">📞 Call</button>` : ''}
             <span class="status-badge ${b.status}">${b.status}</span>
   
-            <span class="status-badge ${b.status}">${b.status}</span>
             <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
             ${b.status !== 'approved' ? `<button class="btn btn-approve" onclick="updateStatus('${esc(b.id)}', 'approved')">✓ Approve</button>` : ''}
             ${b.status !== 'rejected' ? `<button class="btn btn-reject" onclick="updateStatus('${esc(b.id)}', 'rejected')">✕ Reject</button>` : ''}
