@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
   }
 
   // Multiple listings with cache
-  const cacheKey = `${category||""}_${search||""}_${page}_${limit}`;
+  const cacheKey = `${params.status||""}_${category||""}_${search||""}_${page}_${limit}`;
   const cached = cache.get(cacheKey);
   if (cached && Date.now() - cached.time < CACHE_TTL) {
     return res.status(200).json(cached.data);
