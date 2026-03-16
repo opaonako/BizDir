@@ -215,9 +215,9 @@
       try {
         // Fetch all statuses by fetching each
         const [pendingRes, approvedRes, rejectedRes] = await Promise.all([
-          fetch('/api/listings?status=pending&limit=100'),
-          fetch('/api/listings?status=approved&limit=100'),
-          fetch('/api/listings?status=rejected&limit=100'),
+          fetch('/api/listings?status=pending&limit=500'),
+          fetch('/api/listings?status=approved&limit=500'),
+          fetch('/api/listings?status=rejected&limit=500'),
         ]);
 
         const [pendingData, approvedData, rejectedData] = await Promise.all([
