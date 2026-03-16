@@ -9,14 +9,14 @@ module.exports = async (req, res) => {
 
   // ── GET ──────────────────────────────────────────────────
   if (req.method === "GET") {
-  const { status } = req.query;
-  try {
-    const data = await callAppsScript("getLeads", { status: status || "" });
-    return ok(res, { leads: data.leads || [] });
-  } catch(e) {
-    return err(res, e.message, 500); // ← temporarily return actual error
+    const { status } = req.query;
+    try {
+      const data = await callAppsScript("getLeads", { status: status || "" });
+      return ok(res, { leads: data.leads || [] });
+    } catch(e) {
+      return err(res, "Failed to fetch leads", 500);
+    }
   }
-}
 
   // ── POST ─────────────────────────────────────────────────
   if (req.method === "POST") {
@@ -25,27 +25,25 @@ module.exports = async (req, res) => {
 
     try {
       // ── DUPLICATE CHECK ──────────────────────────────────
-      // Wrapped in its own try/catch so if this fails for any
-      // reason it never blocks the actual lead creation.
+      // Uses POST so the _secret travels in the request body,
+      // not as a query param — avoids 302 redirect body-drop
+      // issue that caused 401 Unauthorized from Apps Script.
+      // Wrapped in try/catch so it never blocks lead creation.
       try {
-        const existing = await callAppsScript("getLeads", {});
+        const existing = await callAppsScript("getLeads", {}, "POST");
         const leads = existing.leads || [];
         const normalize = p => String(p).replace(/\D/g, "");
 
         const isDuplicate = leads.some(lead => {
-          // 1. PlaceId match — strongest signal (LeadHunter leads)
           if (placeId && lead.placeId && lead.placeId === placeId) return true;
-          // 2. Phone number match — digits only, ignores formatting
           if (normalize(lead.phone) === normalize(phone)) return true;
           return false;
         });
 
         if (isDuplicate) {
-          // Return 200 not an error — caller knows it already exists
           return ok(res, { skipped: true, message: "Lead already exists" });
         }
       } catch (dupCheckErr) {
-        // Duplicate check failed — log and proceed rather than blocking
         console.error("Duplicate check failed, proceeding:", dupCheckErr.message);
       }
       // ── END DUPLICATE CHECK ──────────────────────────────
@@ -58,7 +56,7 @@ module.exports = async (req, res) => {
         website: website || "",
         source:  source  || "manual",
         placeId: placeId || "",
-      });
+      }, "POST");
 
       return ok(res, { leadId: data.leadId }, 201);
 
@@ -72,7 +70,7 @@ module.exports = async (req, res) => {
     const { id, status, transcript } = req.body;
     if (!id) return err(res, "Lead ID is required");
     try {
-      await callAppsScript("updateLeadStatus", { id, status, transcript: transcript || "" });
+      await callAppsScript("updateLeadStatus", { id, status, transcript: transcript || "" }, "POST");
       return ok(res, { message: "Lead updated" });
     } catch(e) {
       return err(res, "Failed to update lead", 500);
