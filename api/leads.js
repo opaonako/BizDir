@@ -9,14 +9,14 @@ module.exports = async (req, res) => {
 
   // ── GET ──────────────────────────────────────────────────
   if (req.method === "GET") {
-    const { status } = req.query;
-    try {
-      const data = await callAppsScript("getLeads", { status: status || "" });
-      return ok(res, { leads: data.leads || [] });
-    } catch(e) {
-      return err(res, "Failed to fetch leads", 500);
-    }
+  const { status } = req.query;
+  try {
+    const data = await callAppsScript("getLeads", { status: status || "" });
+    return ok(res, { leads: data.leads || [] });
+  } catch(e) {
+    return err(res, e.message, 500); // ← temporarily return actual error
   }
+}
 
   // ── POST ─────────────────────────────────────────────────
   if (req.method === "POST") {
