@@ -91,6 +91,8 @@
     .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-family: var(--font-body); font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; text-decoration: none; white-space: nowrap; }
     .btn-approve { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
     .btn-approve:hover { background: #bbf7d0; }
+       .btn-call     { background: var(--accent);   color: #fff;          border: 1px solid var(--accent); }
+    .btn-call:hover     { background: #c93d12; }
     .btn-reject { background: var(--red-bg); color: var(--red); border: 1px solid #fca5a5; }
     .btn-reject:hover { background: #fca5a5; }
     .btn-view { background: var(--surface); color: var(--ink-2); border: 1px solid var(--border); }
@@ -276,10 +278,10 @@
             <div class="listing-desc">${esc(b.description)}</div>
             <div class="listing-owner">Submitted by ${esc(b.ownerEmail)} • ${formatDate(b.createdAt)}</div>
           </div>
-          <div class="listing-actions">
             <div class="listing-actions">
-  ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ?
-    `<button class="btn btn-call" onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}')">📞 Call</button>` : ''}
+            ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ?
+              `<button class="btn btn-call" onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}')">📞 Call</button>` : ''}
+            <span class="status-badge ${b.status}">${b.status}</span>
   
             <span class="status-badge ${b.status}">${b.status}</span>
             <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
