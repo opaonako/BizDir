@@ -24,28 +24,32 @@ module.exports = async (req, res) => {
     if (!phone) return err(res, "Phone is required");
 
     try {
-      // ── DUPLICATE CHECK ────────────────────────────────
-      // Fetch all existing leads and check before inserting.
-      // Priority: match by placeId (LeadHunter leads), then
-      // fall back to phone number match (manual leads).
-      const existing = await callAppsScript("getLeads", {});
-      const leads = existing.leads || [];
-
-      const isDuplicate = leads.some(lead => {
-        // 1. PlaceId match — strongest signal (LeadHunter leads)
-        if (placeId && lead.placeId && lead.placeId === placeId) return true;
-        // 2. Phone match — normalize digits only before comparing
+      // ── DUPLICATE CHECK ──────────────────────────────────
+      // Uses POST (not GET) to avoid URL length limits when the
+      // dataset grows large (100+ leads). Wrapped in its own
+      // try/catch so a getLeads failure never blocks creation.
+      try {
+        const existing = await callAppsScript("getLeads", {}, "POST");
+        const leads = existing.leads || [];
         const normalize = p => String(p).replace(/\D/g, "");
-        if (normalize(lead.phone) === normalize(phone)) return true;
-        return false;
-      });
 
-      if (isDuplicate) {
-        // Return 200 (not an error) so LeadHunter sync doesn't crash —
-        // just skip silently and tell the caller it already exists.
-        return ok(res, { skipped: true, message: "Lead already exists" });
+        const isDuplicate = leads.some(lead => {
+          // 1. PlaceId match — strongest signal (LeadHunter leads)
+          if (placeId && lead.placeId && lead.placeId === placeId) return true;
+          // 2. Phone number match — digits only, ignores formatting
+          if (normalize(lead.phone) === normalize(phone)) return true;
+          return false;
+        });
+
+        if (isDuplicate) {
+          // 200 not an error — tells caller it already exists, don't crash
+          return ok(res, { skipped: true, message: "Lead already exists" });
+        }
+      } catch (dupCheckErr) {
+        // Duplicate check failed — log and proceed rather than blocking
+        console.error("Duplicate check failed, proceeding:", dupCheckErr.message);
       }
-      // ── END DUPLICATE CHECK ────────────────────────────
+      // ── END DUPLICATE CHECK ──────────────────────────────
 
       const data = await callAppsScript("createLead", {
         phone,
@@ -54,7 +58,7 @@ module.exports = async (req, res) => {
         category,
         website:  website  || "",
         source:   source   || "manual",
-        placeId:  placeId  || "",   // pass through so the sheet stores it
+        placeId:  placeId  || "",
       }, "POST");
 
       return ok(res, { leadId: data.leadId }, 201);
