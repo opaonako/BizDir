@@ -31,7 +31,8 @@
     .nav-link:hover { color: #fff; }
     .btn-logout { font-size: 0.82rem; color: #aaa; background: none; border: 1.5px solid #333; padding: 6px 14px; border-radius: 7px; cursor: pointer; font-family: var(--font-body); transition: all 0.18s; }
     .btn-logout:hover { border-color: #666; color: #fff; }
-
+    .btn-call { background: var(--accent); color: #fff; border: 1px solid var(--accent); }
+    .btn-call:hover { background: #c93d12; }
     .page { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
 
     .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
@@ -240,7 +241,10 @@
         document.getElementById('countApproved').textContent = approved.length;
         document.getElementById('countRejected').textContent = rejected.length;
         document.getElementById('countAll').textContent      = allBusinesses.length;
-
+        <div class="listing-actions">
+  ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ?
+    `<button class="btn btn-call" onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}')">📞 Call</button>` : ''}
+  <span class="status-badge ${b.status}">${b.status}</span>
         renderTab('pending', pending);
         renderTab('approved', approved);
         renderTab('rejected', rejected);
