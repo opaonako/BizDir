@@ -490,15 +490,53 @@ function showSkeleton(grid) {
   loadListings();
 }
 
-    document.getElementById('searchInput').addEventListener('input', e => {
+  document.getElementById('searchInput').addEventListener('input', e => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => {
     currentSearch = e.target.value.trim();
     currentPage = 1;
-    // Clear cache so search + category always fetches fresh
     Object.keys(localStorage)
       .filter(k => k.startsWith('bizdir_listings'))
       .forEach(k => localStorage.removeItem(k));
+
+    // Auto-highlight matching category chip based on search keyword
+    const searchKeywordCategoryMap = {
+      'restaurant': 'Food & Dining',  'cafe': 'Food & Dining',
+      'bakery': 'Food & Dining',      'bar': 'Food & Dining',
+      'food': 'Food & Dining',        'coffee': 'Food & Dining',
+      'pizza': 'Food & Dining',       'burger': 'Food & Dining',
+      'sushi': 'Food & Dining',       'donut': 'Food & Dining',
+      'salon': 'Health & Wellness',   'spa': 'Health & Wellness',
+      'dentist': 'Health & Wellness', 'doctor': 'Health & Wellness',
+      'gym': 'Health & Wellness',     'health': 'Health & Wellness',
+      'fitness': 'Health & Wellness', 'yoga': 'Health & Wellness',
+      'store': 'Retail & Shopping',   'shop': 'Retail & Shopping',
+      'retail': 'Retail & Shopping',  'boutique': 'Retail & Shopping',
+      'school': 'Education',          'tutor': 'Education',
+      'academy': 'Education',         'class': 'Education',
+      'entertainment': 'Entertainment','arcade': 'Entertainment',
+      'bowling': 'Entertainment',     'event': 'Entertainment',
+      'repair': 'Services',           'plumber': 'Services',
+      'contractor': 'Services',       'cleaning': 'Services',
+    };
+
+    const q = currentSearch.toLowerCase();
+    const matchedCategory = Object.keys(searchKeywordCategoryMap)
+      .find(kw => q.includes(kw));
+
+    if (matchedCategory && currentSearch) {
+      // Highlight the matching category chip but don't filter by it
+      const matchedCatName = searchKeywordCategoryMap[matchedCategory];
+      document.querySelectorAll('.cat-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.textContent.trim().includes(matchedCatName));
+      });
+    } else if (!currentSearch) {
+      // Reset to All when search is cleared
+      document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+      document.querySelector('.cat-chip[data-slug=""]').classList.add('active');
+      currentCategory = '';
+    }
+
     loadListings();
   }, 400);
 });
