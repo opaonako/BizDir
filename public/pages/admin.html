@@ -341,7 +341,25 @@
     function esc(s) {
       return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
+    // ── CALL LEAD ─────────────────────────────────────────────
+// Telnyx integration will be wired here later.
+// For now logs the call and marks status as called.
+async function callLead(id, name, phone) {
+  showToast('📞 Calling ' + name + ' at ' + phone + '...');
 
+  // ── TELNYX WILL GO HERE ──────────────────────────────────
+  // When ready, replace this block with:
+  // await fetch('/api/voice/call', {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({ to: phone, businessName: name, businessId: id })
+  // });
+  // ─────────────────────────────────────────────────────────
+
+  // For now — just log it and update status to pending
+  // so you know this lead has been attempted
+  console.log('Call initiated:', name, phone, id);
+}
     init();
   </script>
 </body>
