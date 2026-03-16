@@ -1,7 +1,4 @@
 // api/voice/call.js
-// Initiates an outbound call to a business
-// POST /api/voice/call
-
 const TELNYX_API_KEY = process.env.TELNYX_API_KEY;
 const TELNYX_PHONE_NUMBER = process.env.TELNYX_PHONE_NUMBER;
 const TELNYX_APP_ID = process.env.TELNYX_APP_ID;
@@ -11,15 +8,27 @@ module.exports = async (req, res) => {
     return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
-  const { phone, businessName, address, category, leadId } = req.body;
+  const { phone: rawPhone, businessName, address, category, leadId } = req.body;
 
-  if (!phone) {
-    return res.status(400).json({ success: false, error: "Phone number is required" });
+  // Normalize phone to E164 format
+  let phone = String(rawPhone || "").trim();
+  if (!phone) return res.status(400).json({ success: false, error: "Phone number is required" });
+
+  // Remove all spaces and dashes
+  phone = phone.replace(/[\s\-\(\)]/g, "");
+
+  // Add + if missing
+  if (!phone.startsWith("+")) {
+    phone = "+" + phone;
   }
 
-  // Encode business info in client_state so AI has context during the call
+  console.log("Raw phone:", rawPhone);
+  console.log("Normalized phone:", phone);
+  console.log("From:", TELNYX_PHONE_NUMBER);
+  console.log("App ID:", TELNYX_APP_ID);
+
   const clientState = Buffer.from(JSON.stringify({
-    leadId,
+    leadId: leadId || "",
     businessName: businessName || "your business",
     address: address || "",
     category: category || "",
@@ -45,24 +54,23 @@ module.exports = async (req, res) => {
         webhook_url: "https://biz-dir.vercel.app/api/voice/webhook",
         webhook_url_method: "POST",
         timeout_secs: 30,
-        record_audio: false,
       }),
     });
 
     const data = await response.json();
+    console.log("Telnyx response:", JSON.stringify(data));
 
     if (!response.ok) {
-      console.error("Telnyx call error:", data);
       return res.status(500).json({
         success: false,
         error: data?.errors?.[0]?.detail || "Failed to initiate call",
+        debug: { phone, from: TELNYX_PHONE_NUMBER, appId: TELNYX_APP_ID }
       });
     }
 
     return res.status(200).json({
       success: true,
       callId: data.data?.id,
-      callControlId: data.data?.call_control_id,
       message: `Calling ${businessName} at ${phone}`,
     });
 
