@@ -30,12 +30,13 @@ module.exports = async (req, res) => {
 
   try {
     const data = await callAppsScript("getListings", {
-      id: "",
-      category: category || "",
-      search: search || "",
-      page,
-      limit,
-    });
+  id: "",
+  category: category || "",
+  search: search || "",
+  page,
+  limit,
+  status: status || "",   // ← add this line
+});
 
     const response = {
       success: true,
