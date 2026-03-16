@@ -241,10 +241,7 @@
         document.getElementById('countApproved').textContent = approved.length;
         document.getElementById('countRejected').textContent = rejected.length;
         document.getElementById('countAll').textContent      = allBusinesses.length;
-        <div class="listing-actions">
-  ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ?
-    `<button class="btn btn-call" onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}')">📞 Call</button>` : ''}
-  <span class="status-badge ${b.status}">${b.status}</span>
+       
         renderTab('pending', pending);
         renderTab('approved', approved);
         renderTab('rejected', rejected);
@@ -280,6 +277,10 @@
             <div class="listing-owner">Submitted by ${esc(b.ownerEmail)} • ${formatDate(b.createdAt)}</div>
           </div>
           <div class="listing-actions">
+            <div class="listing-actions">
+  ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ?
+    `<button class="btn btn-call" onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}')">📞 Call</button>` : ''}
+  <span class="status-badge ${b.status}">${b.status}</span>
             <span class="status-badge ${b.status}">${b.status}</span>
             <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
             ${b.status !== 'approved' ? `<button class="btn btn-approve" onclick="updateStatus('${esc(b.id)}', 'approved')">✓ Approve</button>` : ''}
