@@ -478,18 +478,30 @@ function showSkeleton(grid) {
 
     function goPage(p) { currentPage = p; window.scrollTo({top:0,behavior:'smooth'}); loadListings(); }
 
-    function setCategory(name, btn) {
-  currentCategory = name; // empty string = show all
+  function setCategory(name, btn) {
+  currentCategory = name;
   currentPage = 1;
   document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
   btn.classList.add('active');
+  // Clear all cached listings so category + search combo always fetches fresh
+  Object.keys(localStorage)
+    .filter(k => k.startsWith('bizdir_listings'))
+    .forEach(k => localStorage.removeItem(k));
   loadListings();
 }
 
     document.getElementById('searchInput').addEventListener('input', e => {
-      clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => { currentSearch = e.target.value.trim(); currentPage = 1; loadListings(); }, 400);
-    });
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    currentSearch = e.target.value.trim();
+    currentPage = 1;
+    // Clear cache so search + category always fetches fresh
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('bizdir_listings'))
+      .forEach(k => localStorage.removeItem(k));
+    loadListings();
+  }, 400);
+});
 
     function esc(s) { return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
