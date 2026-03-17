@@ -14,13 +14,18 @@ module.exports = async (req, res) => {
   let phone = String(rawPhone || "").trim();
   if (!phone) return res.status(400).json({ success: false, error: "Phone number is required" });
 
-  // Remove all spaces and dashes
-  phone = phone.replace(/[\s\-\(\)]/g, "");
+ phone = phone.replace(/[\s\-\(\)\.]/g, "");
 
-  // Add + if missing
-  if (!phone.startsWith("+")) {
-    phone = "+" + phone;
+// Add US country code if it's a 10-digit number without country code
+if (!phone.startsWith("+")) {
+  if (phone.length === 10) {
+    phone = "+1" + phone;        // US 10-digit → +1XXXXXXXXXX
+  } else if (phone.length === 11 && phone.startsWith("1")) {
+    phone = "+" + phone;         // Already has country code → +1XXXXXXXXXX
+  } else {
+    phone = "+" + phone;         // International — just add +
   }
+}
 
   console.log("Raw phone:", rawPhone);
   console.log("Normalized phone:", phone);
