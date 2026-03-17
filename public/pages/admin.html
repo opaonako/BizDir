@@ -114,7 +114,44 @@
     .loading { text-align: center; padding: 3rem; color: var(--ink-3); font-size: 0.9rem; }
     .spinner-dark { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    /* MODAL OVERLAY */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.95) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
 
+    /* DIALER */
+    .dialer-modal { background: var(--card-bg); border-radius: 20px; padding: 2rem; width: 320px; max-width: 94vw; box-shadow: 0 24px 64px rgba(0,0,0,0.2); animation: modalIn 0.22s ease; text-align: center; }
+    .dialer-avatar-wrap { position: relative; display: inline-block; margin-bottom: 1rem; }
+    .dialer-avatar { width: 68px; height: 68px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 1.7rem; font-weight: 800; color: var(--ink); }
+    @keyframes pulse-ring { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.5); opacity: 0; } }
+    .dialer-avatar-wrap.ringing::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--accent); animation: pulse-ring 1.1s ease-out infinite; }
+    .dialer-name  { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .dialer-phone { font-size: 0.875rem; color: var(--ink-3); margin-bottom: 1rem; }
+    .dialer-status { font-size: 0.82rem; font-weight: 500; min-height: 20px; margin-bottom: 1.25rem; color: var(--ink-3); }
+    .dialer-status.calling   { color: var(--accent); }
+    .dialer-status.connected { color: var(--green); }
+    .dialer-status.ended     { color: var(--ink-3); }
+    .dialer-status.error     { color: var(--red); }
+    .dialer-timer { font-family: var(--font-head); font-size: 2rem; font-weight: 800; letter-spacing: 0.05em; color: var(--ink); margin-bottom: 1.5rem; display: none; }
+    .dialer-btns  { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 1rem; }
+    .d-btn { width: 52px; height: 52px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: all 0.18s; }
+    .d-btn.big   { width: 68px; height: 68px; font-size: 1.5rem; }
+    .d-btn.green { background: var(--green); color: #fff; }
+    .d-btn.green:hover { background: #14803c; transform: scale(1.06); }
+    .d-btn.red   { background: var(--red);   color: #fff; }
+    .d-btn.red:hover   { background: #7f1d1d; transform: scale(1.06); }
+    .d-btn.gray  { background: var(--surface); color: var(--ink-2); }
+    .d-btn.gray:hover  { background: var(--border); }
+    .d-btn.gray.active { background: var(--ink); color: #fff; }
+    .dialer-notes { display: none; margin-top: 1rem; text-align: left; }
+    .dialer-notes textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.875rem; resize: none; outline: none; color: var(--ink); background: var(--card-bg); transition: border-color 0.2s; }
+    .dialer-notes textarea:focus { border-color: var(--accent); }
+    .dialer-notes-save { margin-top: 8px; width: 100%; padding: 10px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: var(--font-body); font-size: 0.875rem; font-weight: 600; cursor: pointer; }
+    .dialer-notes-save:hover { background: #c93d12; }
+    .dialer-close { margin-top: 8px; width: 100%; padding: 8px; background: none; color: var(--ink-3); border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.82rem; cursor: pointer; }
+    .dialer-close:hover { border-color: var(--ink-3); color: var(--ink); }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; z-index: 999; transition: transform 0.3s ease; pointer-events: none; white-space: nowrap; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
@@ -172,6 +209,27 @@
     <div class="tab-content" id="tab-all"></div>
   </div>
 
+    <!-- DIALER MODAL -->
+  <div class="modal-overlay" id="dialerModal">
+    <div class="dialer-modal">
+      <div class="dialer-avatar-wrap" id="dialerAvatarWrap">
+        <div class="dialer-avatar" id="dialerAvatar">?</div>
+      </div>
+      <div class="dialer-name"   id="dialerName">—</div>
+      <div class="dialer-phone"  id="dialerPhone">—</div>
+      <div class="dialer-status" id="dialerStatus">Ready</div>
+      <div class="dialer-timer"  id="dialerTimer">0:00</div>
+      <div class="dialer-btns"   id="dialerBtns"></div>
+      <div class="dialer-notes"  id="dialerNotes">
+        <textarea id="dialerNoteText" rows="3" placeholder="Add a note about this call…"></textarea>
+        <button class="dialer-notes-save" onclick="saveNote()">Save note</button>
+      </div>
+      <button class="dialer-close" id="dialerCloseBtn" onclick="closeDialer()">Close</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
   <script>
     const ADMIN_EMAIL = "paolollenado@gmail.com"; // ← replace with your email
     let allBusinesses = [];
@@ -346,22 +404,153 @@
     // ── CALL LEAD ─────────────────────────────────────────────
 // Telnyx integration will be wired here later.
 // For now logs the call and marks status as called.
-async function callLead(id, name, phone) {
-  showToast('📞 Calling ' + name + ' at ' + phone + '...');
+    // ── DIALER ────────────────────────────────────────────────
+    let dialerLead  = null;
+    let callTimer   = null;
+    let callSeconds = 0;
+    let callActive  = false;
+    let isMuted     = false;
 
-  // ── TELNYX WILL GO HERE ──────────────────────────────────
-  // When ready, replace this block with:
-  // await fetch('/api/voice/call', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ to: phone, businessName: name, businessId: id })
-  // });
-  // ─────────────────────────────────────────────────────────
+    function callLead(id, name, phone) {
+      dialerLead  = { id, name, phone };
+      callActive  = false;
+      isMuted     = false;
+      callSeconds = 0;
+      document.getElementById('dialerAvatar').textContent     = (name||'?').charAt(0).toUpperCase();
+      document.getElementById('dialerName').textContent       = name;
+      document.getElementById('dialerPhone').textContent      = phone;
+      document.getElementById('dialerTimer').style.display    = 'none';
+      document.getElementById('dialerTimer').textContent      = '0:00';
+      document.getElementById('dialerNotes').style.display    = 'none';
+      document.getElementById('dialerNoteText').value         = '';
+      document.getElementById('dialerCloseBtn').style.display = 'block';
+      document.getElementById('dialerAvatarWrap').classList.remove('ringing');
+      setDialerStatus('Ready to call', '');
+      setDialerBtns('ready');
+      document.getElementById('dialerModal').classList.add('open');
+    }
 
-  // For now — just log it and update status to pending
-  // so you know this lead has been attempted
-  console.log('Call initiated:', name, phone, id);
-}
+    function closeDialer() {
+      if (callActive) return;
+      stopTimer();
+      document.getElementById('dialerModal').classList.remove('open');
+      document.getElementById('dialerAvatarWrap').classList.remove('ringing');
+    }
+
+    function setDialerStatus(msg, cls) {
+      const el = document.getElementById('dialerStatus');
+      el.textContent = msg;
+      el.className   = 'dialer-status ' + cls;
+    }
+
+    function setDialerBtns(state) {
+      const btns = document.getElementById('dialerBtns');
+      if (state === 'ready') {
+        btns.innerHTML = `<button class="d-btn big green" onclick="startCall()">📞</button>`;
+      } else if (state === 'calling') {
+        btns.innerHTML = `<button class="d-btn big red" onclick="endCall()">📵</button>`;
+      } else if (state === 'connected') {
+        btns.innerHTML = `
+          <button class="d-btn gray" id="muteBtn" onclick="toggleMute()" title="Mute">🎤</button>
+          <button class="d-btn big red" onclick="endCall()">📵</button>
+          <button class="d-btn gray" onclick="toggleNotes()" title="Note">📝</button>`;
+      } else if (state === 'ended') {
+        btns.innerHTML = `<button class="d-btn big green" onclick="startCall()">📞</button>`;
+      }
+    }
+
+    async function startCall() {
+      if (!dialerLead) return;
+      setDialerStatus('Calling…', 'calling');
+      setDialerBtns('calling');
+      document.getElementById('dialerAvatarWrap').classList.add('ringing');
+      document.getElementById('dialerCloseBtn').style.display = 'none';
+
+      try {
+        const res  = await fetch('/api/voice/call', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            phone:        dialerLead.phone,
+            businessName: dialerLead.name,
+            leadId:       dialerLead.id,
+          }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Call failed');
+
+        callActive = true;
+        document.getElementById('dialerAvatarWrap').classList.remove('ringing');
+        setDialerStatus('Connected', 'connected');
+        setDialerBtns('connected');
+        document.getElementById('dialerTimer').style.display = 'block';
+        startTimer();
+        showToast('📞 Call connected!');
+
+      } catch(e) {
+        callActive = false;
+        document.getElementById('dialerAvatarWrap').classList.remove('ringing');
+        document.getElementById('dialerCloseBtn').style.display = 'block';
+        setDialerStatus('Failed: ' + e.message, 'error');
+        setDialerBtns('ended');
+        showToast('Call failed: ' + e.message, true);
+      }
+    }
+
+    function endCall() {
+      callActive = false;
+      stopTimer();
+      document.getElementById('dialerAvatarWrap').classList.remove('ringing');
+      setDialerStatus('Call ended · ' + formatTime(callSeconds), 'ended');
+      setDialerBtns('ended');
+      document.getElementById('dialerNotes').style.display    = 'block';
+      document.getElementById('dialerCloseBtn').style.display = 'block';
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      const btn = document.getElementById('muteBtn');
+      if (btn) { btn.classList.toggle('active', isMuted); btn.textContent = isMuted ? '🔇' : '🎤'; }
+      showToast(isMuted ? 'Muted' : 'Unmuted');
+    }
+
+    function toggleNotes() {
+      const n = document.getElementById('dialerNotes');
+      n.style.display = n.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function saveNote() {
+      const note = document.getElementById('dialerNoteText').value.trim();
+      if (note && dialerLead) {
+        try {
+          await fetch('/api/leads', {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ id: dialerLead.id, transcript: note }),
+          });
+          showToast('Note saved!');
+        } catch(e) { showToast('Could not save note', true); }
+      }
+      closeDialer();
+    }
+
+    function startTimer() {
+      callSeconds = 0;
+      callTimer = setInterval(() => {
+        callSeconds++;
+        document.getElementById('dialerTimer').textContent = formatTime(callSeconds);
+      }, 1000);
+    }
+    function stopTimer()  { clearInterval(callTimer); callTimer = null; }
+    function formatTime(s) { return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+
+    function showToast(msg, isError) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.background = isError ? '#991b1b' : 'var(--ink)';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
     init();
   </script>
 </body>
