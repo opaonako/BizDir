@@ -1,126 +1,156 @@
 // api/voice/webhook.js
-// AI Sales Agent - handles inbound calls
-// Presents services, collects info, sends payment link
+// BizDir AI Sales Agent — Outbound call handler
+// Handles real-time AI conversation via Telnyx
+// On call end → calls Apps Script to update sheet directly
 
-const TELNYX_API_KEY = process.env.TELNYX_API_KEY;
+const TELNYX_API_KEY     = process.env.TELNYX_API_KEY;
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-const VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; // Rachel - professional American voice
+const ANTHROPIC_API_KEY  = process.env.ANTHROPIC_API_KEY;
+const APPS_SCRIPT_URL    = process.env.APPS_SCRIPT_URL;
+const INTERNAL_SECRET    = process.env.INTERNAL_SECRET;
 
-const SERVICES = {
-  website: { name: "Website Design", price: 299, description: "Professional business website" },
-  ai: { name: "AI Automation", price: 499, description: "Custom AI tools for your business" },
-  mobile: { name: "Mobile App", price: 799, description: "iOS and Android mobile app" },
-  webapp: { name: "Web Application", price: 599, description: "Custom web application" },
-};
+const VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; // Rachel — ElevenLabs
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") return res.status(405).end();
 
-  const event = req.body;
-  const eventType = event?.data?.event_type;
-  const callControlId = event?.data?.payload?.call_control_id;
-  const clientState = decodeState(event?.data?.payload?.client_state);
-  // ── MANUAL CLICK-TO-DIAL — skip AI, just connect audio ──
-if (clientState.callType === "manual") {
-  if (eventType === "call.answered") {
-    console.log("Manual call answered:", clientState.businessName);
-    // Just answer and bridge — no AI, no TTS
-    // The admin hears through WebRTC
-  }
-  res.status(200).json({ received: true });
-  return;  // ← exit early, don't run AI flow
-}
-  console.log("Event:", eventType, "Stage:", clientState.stage);
+  const event         = req.body;
+  const eventType     = event?.data?.event_type;
+  const payload       = event?.data?.payload;
+  const callControlId = payload?.call_control_id;
+  const clientState   = decodeState(payload?.client_state);
 
+  console.log("Event:", eventType, "| Stage:", clientState.stage, "| Lead:", clientState.businessName);
+
+  // Always respond 200 immediately — Telnyx requires fast response
   res.status(200).json({ received: true });
+
+  // Skip AI for manual click-to-dial calls
+  if (clientState.callType === "manual") return;
 
   try {
     switch (eventType) {
 
-      case "call.answered": {
-        const callerNumber = event.data.payload.from;
-        const greeting = `Hello! Thank you for calling BizDir. I'm Sarah, your digital services advisor. 
-We help businesses grow online with four key services. 
-Website design starting at $299, AI automation tools at $499, mobile apps at $799, and custom web applications at $599. 
-Which of these sounds most interesting to you, or would you like more details on any of them?`;
-
-        await speak(callControlId, greeting, {
-          callerNumber,
-          stage: "intro",
-          transcript: [],
-          interestedService: null,
-          customerName: null,
-          customerEmail: null,
-          customerPhone: callerNumber,
-          paymentSent: false,
-        });
+      // ── ANSWERING MACHINE DETECTED ─────────────────────
+      case "call.machine.detection.ended": {
+        const result = payload?.result;
+        if (result === "machine_start" || result === "machine_end_beep") {
+          // Leave a voicemail
+          await speak(callControlId,
+            `Hi, this is Sarah from BizDir, a free local business directory. ` +
+            `We'd love to list ${clientState.businessName || "your business"} for free. ` +
+            `Please call us back or visit biz-dir.vercel.app. Have a great day!`,
+            { ...clientState, ending: true }
+          );
+          setTimeout(() => hangup(callControlId), 12000);
+        }
         break;
       }
 
+      // ── CALL ANSWERED ──────────────────────────────────
+      case "call.answered": {
+        await speak(callControlId,
+          `Hi there! This is Sarah calling from BizDir, a free local business directory. ` +
+          `Am I speaking with someone from ${clientState.businessName || "the business"}?`,
+          { ...clientState, stage: "verify_name", transcript: [], retries: 0 }
+        );
+        break;
+      }
+
+      // ── CUSTOMER FINISHED SPEAKING ─────────────────────
       case "call.gather.ended": {
-        const speech = event.data.payload.speech?.transcript || "";
-        if (!speech) {
-          await speak(callControlId, "I'm sorry, I didn't catch that. Could you repeat?", clientState);
+        const speech = payload?.speech?.transcript || "";
+
+        if (!speech || speech.trim().length < 2) {
+          const retries = (clientState.retries || 0) + 1;
+          if (retries >= 2) {
+            await speak(callControlId,
+              "I'm sorry I couldn't hear you. We'll try again another time. Have a great day!",
+              { ...clientState, ending: true }
+            );
+            setTimeout(async () => {
+              await hangup(callControlId);
+              await syncToSheet({ ...clientState, outcome: "no_answer" });
+            }, 6000);
+            break;
+          }
+          await speak(callControlId, "Sorry, I didn't catch that. Could you say that again?",
+            { ...clientState, retries }
+          );
           break;
         }
 
-        console.log("Customer said:", speech);
-        const transcript = [...(clientState.transcript || []), { role: "customer", text: speech }];
-        const aiResponse = await getAIResponse({ ...clientState, speech, transcript });
-        console.log("AI response:", JSON.stringify(aiResponse));
+        console.log(`[${clientState.stage}] Customer: "${speech}"`);
+
+        const transcript = [
+          ...(clientState.transcript || []),
+          { role: "customer", text: speech, stage: clientState.stage }
+        ];
+
+        const ai = await getAIResponse({ ...clientState, speech, transcript });
+        console.log("AI decision:", JSON.stringify(ai));
 
         const newState = {
           ...clientState,
           transcript,
-          stage: aiResponse.nextStage || clientState.stage,
-          customerName: aiResponse.customerName || clientState.customerName,
-          customerEmail: aiResponse.customerEmail || clientState.customerEmail,
-          interestedService: aiResponse.interestedService || clientState.interestedService,
+          stage:      ai.nextStage   || clientState.stage,
+          email:      ai.email       || clientState.email,
+          website:    ai.website     || clientState.website,
+          hasWebsite: ai.hasWebsite  !== undefined ? ai.hasWebsite : clientState.hasWebsite,
+          address:    ai.address     || clientState.address,
+          verified:   ai.verified    !== undefined ? ai.verified   : clientState.verified,
+          retries:    0,
+          outcome:    ai.outcome     || clientState.outcome,
         };
 
-        // Process payment if we have email
-        if (aiResponse.nextStage === "payment" && newState.customerEmail) {
-          const service = SERVICES[newState.interestedService] || SERVICES.website;
-          const paymentLink = await createPaymentLink(service, newState.customerName, newState.customerEmail);
-          await sendPaymentEmail(newState.customerEmail, newState.customerName, service, paymentLink);
+        // ── TRIGGER SHEET UPDATE when all info gathered ──
+        if (ai.nextStage === "approve") {
+          // Don't wait — fire and forget so call continues fast
+          syncToSheet({ ...newState, outcome: "approved" }).catch(console.error);
+        }
 
-          const msg = paymentLink
-            ? `Excellent! I've just sent a secure payment link to ${newState.customerEmail}. Please check your inbox — it should arrive within a minute. The link accepts all major credit and debit cards. Once payment is confirmed, our team will reach out within 24 hours to kick off your project. Is there anything else I can help you with?`
-            : `Our team will send payment details to ${newState.customerEmail} shortly. Is there anything else I can help you with?`;
-
-          await speak(callControlId, msg, { ...newState, paymentSent: true });
+        if (ai.endCall) {
+          await speak(callControlId, ai.message, { ...newState, ending: true });
+          setTimeout(async () => {
+            await hangup(callControlId);
+            await syncToSheet({ ...newState, outcome: newState.outcome || "completed" });
+          }, 8000);
           break;
         }
 
-        if (aiResponse.endCall) {
-          await speak(callControlId, aiResponse.message, { ...newState, ending: true });
-          setTimeout(() => hangup(callControlId), 10000);
-          break;
-        }
-
-        await speak(callControlId, aiResponse.message, newState);
+        await speak(callControlId, ai.message, newState);
         break;
       }
 
+      // ── AUDIO FINISHED PLAYING ─────────────────────────
       case "call.playback.ended": {
         if (clientState.ending) {
           setTimeout(() => hangup(callControlId), 1000);
           break;
         }
-        await telnyxAction(callControlId, "gather_using_speech", {
-          minimum_silence_ms: 800,
-          speech_timeout_ms: 10000,
-          maximum_tries: 1,
-          client_state: event.data.payload.client_state,
-        });
+        await telnyxGather(callControlId, payload?.client_state);
         break;
       }
 
+      // ── TELNYX TTS FINISHED (fallback TTS) ────────────
+      case "call.speak.ended": {
+        if (clientState.ending) {
+          setTimeout(() => hangup(callControlId), 1000);
+          break;
+        }
+        await telnyxGather(callControlId, payload?.client_state);
+        break;
+      }
+
+      // ── CALL ENDED ─────────────────────────────────────
       case "call.hangup": {
-        console.log("Call ended:", JSON.stringify(clientState));
-        if (clientState.customerEmail || clientState.customerPhone) {
-          await saveSalesLead(clientState);
+        console.log("Call ended. Turns:", clientState.transcript?.length);
+        // Final sync to sheet on hangup
+        if (clientState.leadId && clientState.transcript?.length > 0) {
+          await syncToSheet({
+            ...clientState,
+            outcome: clientState.outcome || "completed",
+          });
         }
         break;
       }
@@ -130,153 +160,202 @@ Which of these sounds most interesting to you, or would you like more details on
   }
 };
 
-async function getAIResponse({ stage, speech, transcript, customerName, customerEmail, customerPhone, interestedService }) {
-  const prompt = `You are Sarah, a professional AI sales agent for BizDir digital services company. You are on a phone call.
+// ============================================================
+// AI BRAIN — Claude decides what Sarah says next
+// ============================================================
+async function getAIResponse(state) {
+  const { stage, speech, businessName, address, phone,
+          email, website, hasWebsite, transcript, category } = state;
 
-Services we offer:
-1. Website Design - $299 (professional business website, 5 pages, mobile responsive)
-2. AI Automation - $499 (custom AI chatbot, workflow automation, lead generation)
-3. Mobile App - $799 (iOS and Android, custom design, backend included)
-4. Web Application - $599 (custom web app, database, user authentication)
+  const recentTranscript = (transcript || [])
+    .slice(-6)
+    .map(t => `${t.role === "customer" ? "Customer" : "Sarah"}: ${t.text}`)
+    .join("\n");
 
-Current stage: ${stage}
-Customer name: ${customerName || "not collected"}
-Customer email: ${customerEmail || "not collected"}
-Customer phone: ${customerPhone}
-Interested service: ${interestedService || "not determined"}
+  const prompt = `You are Sarah, a friendly AI agent for BizDir — a free local business directory.
+You called ${businessName || "a local business"} to verify their info and offer a free listing.
 
-Customer just said: "${speech}"
+INFO WE HAVE:
+- Business: ${businessName || "unknown"}
+- Address: ${address || "unknown"}
+- Phone: ${phone || "unknown"}
+- Category: ${category || "unknown"}
+- Email: ${email || "not collected yet"}
+- Website: ${hasWebsite === null ? "not asked yet" : hasWebsite ? "yes — " + (website || "url not collected") : "no"}
 
-Stage guide:
-- intro: Find out which service interests them
-- service_details: Explain the service benefits, answer questions, handle objections
-- collect_name: Get their first and last name
-- collect_email: Get their email for payment link
-- payment: Confirm everything and process payment link
-- goodbye: Thank them and end call
+CURRENT STAGE: ${stage}
+RECENT CONVERSATION:
+${recentTranscript}
+CUSTOMER JUST SAID: "${speech}"
 
-Respond with JSON only (no markdown):
+STAGE FLOW (follow in order):
+1. verify_name — Confirm speaking with someone from the business. If yes move to verify_address.
+2. verify_address — Confirm their address is "${address}". If different collect correct one.
+3. ask_website — Ask if they have a website. If yes ask for URL.
+4. ask_email — Ask for their email for the free listing confirmation.
+5. approve — All info collected. Thank them. Tell listing is live on BizDir. Then move to upsell.
+6. upsell — 
+   IF NO WEBSITE: Offer free pre-built website. Say we can set it up at no cost and they just need to confirm by email. 
+   IF HAS WEBSITE: Ask if they're happy with it getting customers. Offer: web app $599, AI automation $499, SEO $199/mo, e-commerce $799.
+   Keep it brief — plant the seed, don't pressure.
+7. followup_email — They want to think about it. Confirm we'll email them details. 
+8. goodbye — Warm closing. "Have a great day!"
+
+RULES:
+- MAX 2 sentences per response. Be natural and conversational.
+- If they seem busy: "No problem at all — I'll send details to your email. Have a great day!"
+- If wrong number / not interested: endCall immediately with polite goodbye.
+- Extract email carefully — reconstruct if spelled out ("john at gmail dot com" → "john@gmail.com")
+- Once you have email and address confirmed → nextStage must be "approve"
+
+RESPOND JSON ONLY:
 {
-  "message": "your response (warm, professional, conversational, max 3 sentences)",
-  "nextStage": "one of: intro|service_details|collect_name|collect_email|payment|goodbye",
+  "message": "Sarah's spoken response — max 2 sentences",
+  "nextStage": "verify_name|verify_address|ask_website|ask_email|approve|upsell|followup_email|goodbye",
   "endCall": false,
-  "customerName": "extracted name or null",
-  "customerEmail": "extracted valid email or null",
-  "interestedService": "website|ai|mobile|webapp or null"
-}
-
-Important rules:
-- Be warm and conversational, not robotic
-- Keep responses SHORT - 2-3 sentences max
-- If they show interest, move toward collecting name then email
-- If they mention a name, extract it to customerName
-- If they spell or say an email, extract it to customerEmail
-- Handle objections positively (price too high = mention payment plans, not sure = offer free consultation)
-- If they say not interested/goodbye/no thank you = endCall: true with a polite farewell
-- Always progress toward the sale`;
-
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 400,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
-
-  const data = await response.json();
-  const text = data.content?.[0]?.text || "";
-  try {
-    return JSON.parse(text.replace(/```json|```/g, "").trim());
-  } catch {
-    return { message: "Could you repeat that? I want to make sure I help you correctly.", nextStage: stage, endCall: false };
-  }
-}
-
-async function createPaymentLink(service, customerName, customerEmail) {
-  const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-  if (!STRIPE_SECRET_KEY) return `https://biz-dir.vercel.app/pages/payment?service=${service.name}&price=${service.price}`;
+  "email": "extracted email or null",
+  "website": "extracted URL or null",
+  "hasWebsite": true/false/null,
+  "address": "corrected address or null",
+  "verified": true/false,
+  "outcome": "approved|not_interested|busy|wrong_number|followup|null"
+}`;
 
   try {
-    const params = new URLSearchParams({
-      "line_items[0][price_data][currency]": "usd",
-      "line_items[0][price_data][product_data][name]": service.name,
-      "line_items[0][price_data][product_data][description]": service.description,
-      "line_items[0][price_data][unit_amount]": String(service.price * 100),
-      "line_items[0][quantity]": "1",
-      "mode": "payment",
-      "success_url": "https://biz-dir.vercel.app/pages/payment-success",
-      "cancel_url": "https://biz-dir.vercel.app",
-      "customer_email": customerEmail || "",
-    });
-
-    const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:  "POST",
       headers: {
-        "Authorization": `Bearer ${STRIPE_SECRET_KEY}`,
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type":      "application/json",
+        "x-api-key":         ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
       },
-      body: params.toString(),
+      body: JSON.stringify({
+        model:      "claude-sonnet-4-20250514",
+        max_tokens: 400,
+        messages:   [{ role: "user", content: prompt }],
+      }),
     });
-    const session = await res.json();
-    return session.url || null;
+    const data  = await res.json();
+    const text  = data.content?.[0]?.text || "";
+    return JSON.parse(text.replace(/```json|```/g, "").trim());
   } catch(e) {
-    console.error("Stripe error:", e.message);
-    return null;
+    console.error("Claude error:", e.message);
+    return {
+      message:   "Could you repeat that? I want to make sure I have your details right.",
+      nextStage: stage, endCall: false,
+      email: null, website: null, hasWebsite: null, address: null, verified: false,
+    };
   }
 }
 
-async function sendPaymentEmail(email, name, service, paymentLink) {
-  const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
-  const INTERNAL_SECRET = process.env.INTERNAL_SECRET;
-  if (!APPS_SCRIPT_URL) return;
+// ============================================================
+// SYNC TO SHEET — calls Apps Script to update Businesses sheet
+// This is the "hybrid" part — fast Vercel AI + direct sheet write
+// ============================================================
+async function syncToSheet(state) {
+  if (!APPS_SCRIPT_URL || !state.leadId) return;
 
-  const body = JSON.stringify({ action: "sendPaymentEmail", _secret: INTERNAL_SECRET, email, name: name || "Valued Customer", serviceName: service.name, servicePrice: service.price, paymentLink: paymentLink || "https://biz-dir.vercel.app" });
+  const fullTranscript = (state.transcript || [])
+    .map(t => `${t.role === "customer" ? "Customer" : "Sarah"}: ${t.text}`)
+    .join("\n");
 
-  await fetch(APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body,
-    redirect: "follow",
-  }).catch(e => console.error("Email error:", e.message));
+  const description = [
+    state.businessName || "",
+    state.category     ? `Category: ${state.category}` : "",
+    state.address      ? `Address: ${state.address}`   : "",
+    state.phone        ? `Phone: ${state.phone}`        : "",
+    state.email        ? `Email: ${state.email}`        : "",
+    state.hasWebsite   ? `Website: ${state.website || "yes"}` : "No website",
+  ].filter(Boolean).join("\n");
+
+  try {
+    // Update listing status + transcript via Apps Script
+    await fetch(APPS_SCRIPT_URL, {
+      method:   "POST",
+      headers:  { "Content-Type": "application/json" },
+      redirect: "follow",
+      body: JSON.stringify({
+        action:      "updateCallResult",   // new Apps Script function
+        _secret:     INTERNAL_SECRET,
+        id:          state.leadId,
+        status:      state.outcome === "approved" ? "approved" : "pending",
+        description,
+        transcript:  fullTranscript,
+        email:       state.email    || "",
+        website:     state.website  || "",
+        calledAt:    new Date().toISOString(),
+      }),
+    });
+    console.log("Sheet synced for:", state.businessName, "outcome:", state.outcome);
+
+    // Send welcome email if approved
+    if (state.outcome === "approved" && state.email) {
+      await fetch(APPS_SCRIPT_URL, {
+        method:   "POST",
+        headers:  { "Content-Type": "application/json" },
+        redirect: "follow",
+        body: JSON.stringify({
+          action:  "sendWelcomeEmail",
+          _secret: INTERNAL_SECRET,
+          email:   state.email,
+          name:    state.businessName || "Business Owner",
+        }),
+      });
+      console.log("Welcome email sent to:", state.email);
+    }
+  } catch(e) {
+    console.error("Sheet sync error:", e.message);
+  }
 }
 
-async function saveSalesLead(state) {
-  const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
-  const INTERNAL_SECRET = process.env.INTERNAL_SECRET;
-  if (!APPS_SCRIPT_URL) return;
-
-  await fetch(APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "saveSalesLead", _secret: INTERNAL_SECRET, name: state.customerName || "", email: state.customerEmail || "", phone: state.customerPhone || "", service: state.interestedService || "", paymentSent: state.paymentSent || false }),
-    redirect: "follow",
-  }).catch(e => console.error("Save lead error:", e.message));
+// ============================================================
+// TELNYX + ELEVENLABS HELPERS
+// ============================================================
+async function speak(callControlId, text, newState) {
+  console.log("Sarah:", text.substring(0, 100));
+  if (ELEVENLABS_API_KEY) {
+    try {
+      const audio = await textToSpeech(text);
+      await telnyxAction(callControlId, "play_audio", {
+        audio_url:    `data:audio/mpeg;base64,${audio}`,
+        client_state: encodeState(newState),
+        overlay:      false,
+        loop:         false,
+      });
+      return;
+    } catch(e) {
+      console.error("ElevenLabs failed, using Telnyx TTS:", e.message);
+    }
+  }
+  // Fallback to Telnyx built-in TTS
+  await telnyxAction(callControlId, "speak", {
+    payload:      text,
+    voice:        "female",
+    language:     "en-US",
+    client_state: encodeState(newState),
+  });
 }
 
 async function textToSpeech(text) {
   const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
-    method: "POST",
+    method:  "POST",
     headers: { "Content-Type": "application/json", "xi-api-key": ELEVENLABS_API_KEY },
-    body: JSON.stringify({ text, model_id: "eleven_monolingual_v1", voice_settings: { stability: 0.6, similarity_boost: 0.8 } }),
+    body: JSON.stringify({
+      text, model_id: "eleven_monolingual_v1",
+      voice_settings: { stability: 0.6, similarity_boost: 0.8 },
+    }),
   });
-  if (!res.ok) throw new Error("TTS failed: " + await res.text());
-  const buffer = await res.arrayBuffer();
-  return Buffer.from(buffer).toString("base64");
+  if (!res.ok) throw new Error("ElevenLabs failed: " + res.status);
+  const buf = await res.arrayBuffer();
+  return Buffer.from(buf).toString("base64");
 }
 
-async function speak(callControlId, text, newState) {
-  const audio = await textToSpeech(text);
-  await telnyxAction(callControlId, "play_audio", {
-    audio_url: `data:audio/mpeg;base64,${audio}`,
-    client_state: encodeState(newState),
-    overlay: false,
-    loop: false,
+async function telnyxGather(callControlId, encodedState) {
+  await telnyxAction(callControlId, "gather_using_speech", {
+    minimum_silence_ms: 800,
+    speech_timeout_ms:  12000,
+    maximum_tries:      1,
+    client_state:       encodedState,
   });
 }
 
@@ -285,11 +364,14 @@ async function hangup(callControlId) {
 }
 
 async function telnyxAction(callControlId, action, params = {}) {
-  const res = await fetch(`https://api.telnyx.com/v2/calls/${callControlId}/actions/${action}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TELNYX_API_KEY}` },
-    body: JSON.stringify(params),
-  });
+  const res = await fetch(
+    `https://api.telnyx.com/v2/calls/${callControlId}/actions/${action}`,
+    {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TELNYX_API_KEY}` },
+      body:    JSON.stringify(params),
+    }
+  );
   if (!res.ok) throw new Error(`Telnyx ${action} failed: ${await res.text()}`);
   return res.json();
 }
