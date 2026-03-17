@@ -28,8 +28,8 @@ module.exports = async (req, res) => {
         "Authorization": `Bearer ${TELNYX_API_KEY}`,
       },
       body: JSON.stringify({
-        connection_id: process.env.TELNYX_APP_ID,
-      }),
+  connection_id: process.env.TELNYX_SIP_CONNECTION_ID,
+}),
     });
 
     const data = await response.json();
