@@ -528,11 +528,12 @@
         try {
           // Make call via WebRTC SDK — audio comes through browser
           activeCall = telnyxClient.newCall({
-            destinationNumber: phone,
-            callerName:        'BizDir',
-            audio:             true,
-            video:             false,
-          });
+  destinationNumber: phone,
+  callerNumber:      process?.env?.TELNYX_PHONE_NUMBER || '',
+  audio:             true,
+  video:             false,
+  remoteElement:     document.getElementById('remoteAudio'),
+});
           // Call state updates handled by handleCallUpdate()
         } catch(e) {
           setDialerStatus('WebRTC call failed: ' + e.message, 'error');

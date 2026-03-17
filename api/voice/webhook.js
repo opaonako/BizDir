@@ -21,7 +21,16 @@ module.exports = async (req, res) => {
   const eventType = event?.data?.event_type;
   const callControlId = event?.data?.payload?.call_control_id;
   const clientState = decodeState(event?.data?.payload?.client_state);
-
+  // ── MANUAL CLICK-TO-DIAL — skip AI, just connect audio ──
+if (clientState.callType === "manual") {
+  if (eventType === "call.answered") {
+    console.log("Manual call answered:", clientState.businessName);
+    // Just answer and bridge — no AI, no TTS
+    // The admin hears through WebRTC
+  }
+  res.status(200).json({ received: true });
+  return;  // ← exit early, don't run AI flow
+}
   console.log("Event:", eventType, "Stage:", clientState.stage);
 
   res.status(200).json({ received: true });
