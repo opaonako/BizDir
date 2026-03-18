@@ -3,7 +3,7 @@
 // Handles real-time AI conversation via Telnyx
 // On call end → calls Apps Script to update sheet directly
 
-const TELNYX_API_KEY     = process.env.TELNYX_API_KEY;
+const TELNYX_API_KEY    = process.env.TELNYX_API_KEY;
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 const ANTHROPIC_API_KEY  = process.env.ANTHROPIC_API_KEY;
 const APPS_SCRIPT_URL    = process.env.APPS_SCRIPT_URL;
@@ -22,20 +22,16 @@ module.exports = async (req, res) => {
 
   console.log("Event:", eventType, "| Stage:", clientState.stage, "| Lead:", clientState.businessName);
 
-  // Always respond 200 immediately — Telnyx requires fast response
   res.status(200).json({ received: true });
 
-  // Skip AI for manual click-to-dial calls
   if (clientState.callType === "manual") return;
 
   try {
     switch (eventType) {
 
-      // ── ANSWERING MACHINE DETECTED ─────────────────────
       case "call.machine.detection.ended": {
         const result = payload?.result;
         if (result === "machine_start" || result === "machine_end_beep") {
-          // Leave a voicemail
           await speak(callControlId,
             `Hi, this is Sarah from BizDir, a free local business directory. ` +
             `We'd love to list ${clientState.businessName || "your business"} for free. ` +
@@ -47,7 +43,6 @@ module.exports = async (req, res) => {
         break;
       }
 
-      // ── CALL ANSWERED ──────────────────────────────────
       case "call.answered": {
         await speak(callControlId,
           `Hi there! This is Sarah calling from BizDir, a free local business directory. ` +
@@ -57,7 +52,6 @@ module.exports = async (req, res) => {
         break;
       }
 
-      // ── CUSTOMER FINISHED SPEAKING ─────────────────────
       case "call.gather.ended": {
         const speech = payload?.speech?.transcript || "";
 
@@ -103,9 +97,7 @@ module.exports = async (req, res) => {
           outcome:    ai.outcome     || clientState.outcome,
         };
 
-        // ── TRIGGER SHEET UPDATE when all info gathered ──
         if (ai.nextStage === "approve") {
-          // Don't wait — fire and forget so call continues fast
           syncToSheet({ ...newState, outcome: "approved" }).catch(console.error);
         }
 
@@ -122,7 +114,6 @@ module.exports = async (req, res) => {
         break;
       }
 
-      // ── AUDIO FINISHED PLAYING ─────────────────────────
       case "call.playback.ended": {
         if (clientState.ending) {
           setTimeout(() => hangup(callControlId), 1000);
@@ -132,7 +123,6 @@ module.exports = async (req, res) => {
         break;
       }
 
-      // ── TELNYX TTS FINISHED (fallback TTS) ────────────
       case "call.speak.ended": {
         if (clientState.ending) {
           setTimeout(() => hangup(callControlId), 1000);
@@ -142,10 +132,8 @@ module.exports = async (req, res) => {
         break;
       }
 
-      // ── CALL ENDED ─────────────────────────────────────
       case "call.hangup": {
         console.log("Call ended. Turns:", clientState.transcript?.length);
-        // Final sync to sheet on hangup
         if (clientState.leadId && clientState.transcript?.length > 0) {
           await syncToSheet({
             ...clientState,
@@ -160,9 +148,7 @@ module.exports = async (req, res) => {
   }
 };
 
-// ============================================================
-// AI BRAIN — Claude decides what Sarah says next
-// ============================================================
+// ── AI BRAIN ──────────────────────────────────────────────────
 async function getAIResponse(state) {
   const { stage, speech, businessName, address, phone,
           email, website, hasWebsite, transcript, category } = state;
@@ -194,18 +180,15 @@ STAGE FLOW (follow in order):
 3. ask_website — Ask if they have a website. If yes ask for URL.
 4. ask_email — Ask for their email for the free listing confirmation.
 5. approve — All info collected. Thank them. Tell listing is live on BizDir. Then move to upsell.
-6. upsell — 
-   IF NO WEBSITE: Offer free pre-built website. Say we can set it up at no cost and they just need to confirm by email. 
-   IF HAS WEBSITE: Ask if they're happy with it getting customers. Offer: web app $599, AI automation $499, SEO $199/mo, e-commerce $799.
-   Keep it brief — plant the seed, don't pressure.
-7. followup_email — They want to think about it. Confirm we'll email them details. 
+6. upsell — IF NO WEBSITE: Offer free pre-built website. IF HAS WEBSITE: Offer web app $599, AI automation $499, SEO $199/mo.
+7. followup_email — They want to think about it. Confirm we'll email them details.
 8. goodbye — Warm closing. "Have a great day!"
 
 RULES:
 - MAX 2 sentences per response. Be natural and conversational.
-- If they seem busy: "No problem at all — I'll send details to your email. Have a great day!"
-- If wrong number / not interested: endCall immediately with polite goodbye.
-- Extract email carefully — reconstruct if spelled out ("john at gmail dot com" → "john@gmail.com")
+- If they seem busy: offer to email details and end call politely.
+- If wrong number / not interested: endCall immediately.
+- Extract email carefully — reconstruct if spelled out.
 - Once you have email and address confirmed → nextStage must be "approve"
 
 RESPOND JSON ONLY:
@@ -215,9 +198,9 @@ RESPOND JSON ONLY:
   "endCall": false,
   "email": "extracted email or null",
   "website": "extracted URL or null",
-  "hasWebsite": true/false/null,
+  "hasWebsite": true,
   "address": "corrected address or null",
-  "verified": true/false,
+  "verified": true,
   "outcome": "approved|not_interested|busy|wrong_number|followup|null"
 }`;
 
@@ -235,23 +218,25 @@ RESPOND JSON ONLY:
         messages:   [{ role: "user", content: prompt }],
       }),
     });
-    const data  = await res.json();
-    const text  = data.content?.[0]?.text || "";
+    const data = await res.json();
+    const text = data.content?.[0]?.text || "";
     return JSON.parse(text.replace(/```json|```/g, "").trim());
   } catch(e) {
     console.error("Claude error:", e.message);
     return {
-      message:   "Could you repeat that? I want to make sure I have your details right.",
-      nextStage: stage, endCall: false,
-      email: null, website: null, hasWebsite: null, address: null, verified: false,
+      message:    "Could you repeat that? I want to make sure I have your details right.",
+      nextStage:  stage,
+      endCall:    false,
+      email:      null,
+      website:    null,
+      hasWebsite: null,
+      address:    null,
+      verified:   false,
     };
   }
 }
 
-// ============================================================
-// SYNC TO SHEET — calls Apps Script to update Businesses sheet
-// This is the "hybrid" part — fast Vercel AI + direct sheet write
-// ============================================================
+// ── SYNC TO SHEET ─────────────────────────────────────────────
 async function syncToSheet(state) {
   if (!APPS_SCRIPT_URL || !state.leadId) return;
 
@@ -269,26 +254,24 @@ async function syncToSheet(state) {
   ].filter(Boolean).join("\n");
 
   try {
-    // Update listing status + transcript via Apps Script
     await fetch(APPS_SCRIPT_URL, {
       method:   "POST",
       headers:  { "Content-Type": "application/json" },
       redirect: "follow",
       body: JSON.stringify({
-        action:      "updateCallResult",   // new Apps Script function
+        action:      "updateCallResult",
         _secret:     INTERNAL_SECRET,
         id:          state.leadId,
         status:      state.outcome === "approved" ? "approved" : "pending",
         description,
         transcript:  fullTranscript,
-        email:       state.email    || "",
-        website:     state.website  || "",
+        email:       state.email   || "",
+        website:     state.website || "",
         calledAt:    new Date().toISOString(),
       }),
     });
-    console.log("Sheet synced for:", state.businessName, "outcome:", state.outcome);
+    console.log("Sheet synced:", state.businessName, "→", state.outcome);
 
-    // Send welcome email if approved
     if (state.outcome === "approved" && state.email) {
       await fetch(APPS_SCRIPT_URL, {
         method:   "POST",
@@ -308,9 +291,7 @@ async function syncToSheet(state) {
   }
 }
 
-// ============================================================
-// TELNYX + ELEVENLABS HELPERS
-// ============================================================
+// ── TELNYX HELPERS ────────────────────────────────────────────
 async function speak(callControlId, text, newState) {
   console.log("Sarah:", text.substring(0, 100));
   await telnyxAction(callControlId, "speak", {
@@ -319,28 +300,6 @@ async function speak(callControlId, text, newState) {
     language:     "en-US",
     client_state: encodeState(newState),
   });
-}
-  // Fallback to Telnyx built-in TTS
-  await telnyxAction(callControlId, "speak", {
-    payload:      text,
-    voice:        "female",
-    language:     "en-US",
-    client_state: encodeState(newState),
-  });
-}
-
-async function textToSpeech(text) {
-  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
-    method:  "POST",
-    headers: { "Content-Type": "application/json", "xi-api-key": ELEVENLABS_API_KEY },
-    body: JSON.stringify({
-      text, model_id: "eleven_monolingual_v1",
-      voice_settings: { stability: 0.6, similarity_boost: 0.8 },
-    }),
-  });
-  if (!res.ok) throw new Error("ElevenLabs failed: " + res.status);
-  const buf = await res.arrayBuffer();
-  return Buffer.from(buf).toString("base64");
 }
 
 async function telnyxGather(callControlId, encodedState) {
@@ -361,17 +320,27 @@ async function telnyxAction(callControlId, action, params = {}) {
     `https://api.telnyx.com/v2/calls/${callControlId}/actions/${action}`,
     {
       method:  "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TELNYX_API_KEY}` },
-      body:    JSON.stringify(params),
+      headers: {
+        "Content-Type":  "application/json",
+        "Authorization": `Bearer ${TELNYX_API_KEY}`,
+      },
+      body: JSON.stringify(params),
     }
   );
   if (!res.ok) throw new Error(`Telnyx ${action} failed: ${await res.text()}`);
   return res.json();
 }
 
-function encodeState(obj) { return Buffer.from(JSON.stringify(obj)).toString("base64"); }
+// ── STATE HELPERS ─────────────────────────────────────────────
+function encodeState(obj) {
+  return Buffer.from(JSON.stringify(obj)).toString("base64");
+}
+
 function decodeState(str) {
   if (!str) return {};
-  try { return JSON.parse(Buffer.from(str, "base64").toString("utf8")); }
-  catch { return {}; }
+  try {
+    return JSON.parse(Buffer.from(str, "base64").toString("utf8"));
+  } catch {
+    return {};
+  }
 }
