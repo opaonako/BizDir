@@ -22,12 +22,12 @@ module.exports = async (req, res) => {
 
   console.log("Event:", eventType, "| Stage:", clientState.stage, "| Lead:", clientState.businessName);
 
-  res.status(200).json({ received: true });
+  if (clientState.callType === "manual") {
+  return res.status(200).json({ received: true });
+}
 
-  if (clientState.callType === "manual") return;
-
-  try {
-    switch (eventType) {
+try {
+  switch (eventType) {
 
       case "call.machine.detection.ended": {
         const result = payload?.result;
@@ -146,6 +146,7 @@ module.exports = async (req, res) => {
   } catch(e) {
     console.error("Webhook error:", e.message);
   }
+res.status(200).json({ received: true });
 };
 
 // ── AI BRAIN ──────────────────────────────────────────────────
