@@ -29,6 +29,71 @@ module.exports = async (req, res) => {
 try {
   switch (eventType) {
 
+    case "call.transcription": {
+  const transcript = payload?.transcription_data?.transcript || "";
+  const isFinal    = payload?.transcription_data?.is_final;
+  
+  if (!isFinal || !transcript) break;
+  
+  console.log("Transcription:", transcript);
+  
+  // Stop transcription
+  await telnyxAction(callControlId, "transcription_stop", {});
+  
+  // Re-emit as gather.ended so existing logic handles it
+  const fakeGatherEvent = {
+    data: {
+      event_type: "call.gather.ended",
+      payload: {
+        call_control_id: callControlId,
+        speech: { transcript },
+        client_state: payload?.client_state,
+      }
+    }
+  };
+  
+  // Process through existing gather logic
+  const speech = transcript;
+  const cs = decodeState(payload?.client_state);
+  
+  if (!speech || speech.trim().length < 2) break;
+  
+  console.log(`[${cs.stage}] Customer: "${speech}"`);
+  
+  const transcriptArr = [...(cs.transcript || []), { role: "customer", text: speech, stage: cs.stage }];
+  const ai = await getAIResponse({ ...cs, speech, transcript: transcriptArr });
+  console.log("AI decision:", JSON.stringify(ai));
+  
+  const newState = {
+    ...cs,
+    transcript: transcriptArr,
+    stage:      ai.nextStage   || cs.stage,
+    email:      ai.email       || cs.email,
+    website:    ai.website     || cs.website,
+    hasWebsite: ai.hasWebsite  !== undefined ? ai.hasWebsite : cs.hasWebsite,
+    address:    ai.address     || cs.address,
+    verified:   ai.verified    !== undefined ? ai.verified   : cs.verified,
+    retries:    0,
+    outcome:    ai.outcome     || cs.outcome,
+  };
+  
+  if (ai.nextStage === "approve") {
+    syncToSheet({ ...newState, outcome: "approved" }).catch(console.error);
+  }
+  
+  if (ai.endCall) {
+    await speak(callControlId, ai.message, { ...newState, ending: true });
+    setTimeout(async () => {
+      await hangup(callControlId);
+      await syncToSheet({ ...newState, outcome: newState.outcome || "completed" });
+    }, 8000);
+    break;
+  }
+  
+  await speak(callControlId, ai.message, newState);
+  break;
+}
+
       case "call.machine.detection.ended": {
         const result = payload?.result;
         if (result === "machine_start" || result === "machine_end_beep") {
@@ -44,12 +109,20 @@ try {
       }
 
       case "call.answered": {
-        await speak(callControlId,
-          `Hi there! This is Sarah calling from BizDir, a free local business directory. ` +
-          `Am I speaking with someone from ${clientState.businessName || "the business"}?`,
-          { ...clientState, stage: "verify_name", transcript: [], retries: 0 }
-        );
-        break;
+          const state = { ...clientState, stage: "verify_name", transcript: [], retries: 0 };
+          await speak(callControlId,
+            `Hi there! This is Sarah calling from BizDir, a free local business directory. ` +
+            `Am I speaking with someone from ${clientState.businessName || "the business"}?`,
+            state
+          );
+          // Start transcription to listen for customer response
+          await telnyxAction(callControlId, "transcription_start", {
+            language:             "en-US",
+            transcription_tracks: "inbound",
+            client_state:         encodeState(state),
+          });
+          break;
+    
       }
 
       case "call.gather.ended": {
@@ -304,13 +377,13 @@ async function speak(callControlId, text, newState) {
 }
 
 async function telnyxGather(callControlId, encodedState) {
-  await telnyxAction(callControlId, "gather_using_speech", {
-    minimum_silence_ms: 800,
-    speech_timeout_ms:  12000,
-    maximum_tries:      1,
-    client_state:       encodedState,
+  // Start transcription to capture customer speech
+  await telnyxAction(callControlId, "transcription_start", {
+    language:        "en-US",
+    transcription_tracks: "inbound",
+    client_state:    encodedState,
   });
-}
+}}
 
 async function hangup(callControlId) {
   await telnyxAction(callControlId, "hangup", {}).catch(() => {});
