@@ -155,9 +155,6 @@
   </div>
 
   <script>
-    const API = '/api/auth';
-    const SECRET = 'newfreelisting';
-
     // Redirect if already logged in
     if (localStorage.getItem('bizdir_token')) {
       window.location.href = '/pages/dashboard';
@@ -182,33 +179,25 @@
       const password = document.getElementById('password').value;
       const confirm  = document.getElementById('confirm').value;
 
-      // Validation
-      if (!name)                        return showAlert('Please enter your full name.', 'error');
+      if (!name)                         return showAlert('Please enter your full name.', 'error');
       if (!email || !email.includes('@')) return showAlert('Please enter a valid email address.', 'error');
-      if (password.length < 8)          return showAlert('Password must be at least 8 characters.', 'error');
-      if (password !== confirm)          return showAlert('Passwords do not match.', 'error');
+      if (password.length < 8)           return showAlert('Password must be at least 8 characters.', 'error');
+      if (password !== confirm)           return showAlert('Passwords do not match.', 'error');
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>Creating account…';
+      btn.innerHTML = '<span class="spinner"></span>Creating account...';
 
       try {
-        const res = await fetch(API, {
+        const res = await fetch('/api/auth?action=signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action:   'createUser',
-            _secret:  SECRET,
-            name,
-            email,
-            password,
-            phone: '', // optional — left blank for now
-          })
+          body: JSON.stringify({ name, email, password, phone: '' })
         });
 
         const data = await res.json();
 
-        if (!data.success) {
+        if (!res.ok) {
           showAlert(data.error || 'Something went wrong. Please try again.', 'error');
           btn.disabled = false;
           btn.textContent = 'CREATE ACCOUNT';
@@ -220,7 +209,7 @@
         localStorage.setItem('bizdir_email', data.email);
         localStorage.setItem('bizdir_name',  data.name);
 
-        showAlert('Account created! Redirecting…', 'success');
+        showAlert('Account created! Redirecting...', 'success');
         setTimeout(() => window.location.href = '/pages/dashboard', 900);
 
       } catch(e) {
