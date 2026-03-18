@@ -311,23 +311,17 @@ async function syncToSheet(state) {
 // ============================================================
 // TELNYX + ELEVENLABS HELPERS
 // ============================================================
-//async function speak(callControlId, text, newState) {
-  //console.log("Sarah:", text.substring(0, 100));
-  //if (ELEVENLABS_API_KEY) {
-    //try {
-      //const audio = await textToSpeech(text);
-   //   await telnyxAction(callControlId, "play_audio", {
-   //
-   //     audio_url:    `data:audio/mpeg;base64,${audio}`,
-    //    client_state: encodeState(newState),
-     //   overlay:      false,
-      //  loop:         false,
-    //  });
-     // return;
-   // } catch(e) {
-    //  console.error("ElevenLabs failed, using Telnyx TTS:", e.message);
- //   }
- // }
+async function speak(callControlId, text, newState) {
+  console.log("Sarah:", text.substring(0, 100));
+
+  // Use Telnyx built-in TTS (ElevenLabs temporarily disabled)
+  await telnyxAction(callControlId, "speak", {
+    payload:      text,
+    voice:        "female",
+    language:     "en-US",
+    client_state: encodeState(newState),
+  });
+}
   // Fallback to Telnyx built-in TTS
   await telnyxAction(callControlId, "speak", {
     payload:      text,
