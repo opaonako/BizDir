@@ -3,64 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Log In — BizDir</title>
+  <title>Log In — Yellow Pages</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --ink: #0f0f0f; --ink-2: #3a3a3a; --ink-3: #888;
-      --paper: #faf9f6; --surface: #f0ede6; --accent: #e84c1e;
-      --border: #e2ddd6; --card-bg: #ffffff;
-      --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+      --ink: #0f0f0f; --ink-2: #2a2a2a; --ink-3: #666;
+      --paper: #ffffff; --surface: #f4f4f4; --accent: #FFD700;
+      --accent-2: #FFC200; --accent-dark: #B8960A;
+      --border: #e4e4e4; --card-bg: #ffffff;
+      --font-head: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
     }
     body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
-    nav { padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
-    .nav-logo { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.03em; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 6px; }
-    .nav-logo span { background: var(--accent); color: #fff; padding: 1px 7px 2px; border-radius: 4px; }
-    .nav-link { font-size: 0.875rem; color: var(--ink-2); text-decoration: none; font-weight: 500; }
+
+    /* NAV */
+    nav {
+      background: var(--ink); border-bottom: 3px solid var(--accent);
+      padding: 0 2rem; height: 60px; display: flex;
+      align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; line-height: 1; }
+    .nav-logo .logo-yellow { background: var(--accent); color: var(--ink); font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 0.02em; padding: 3px 9px 1px; border-radius: 4px 0 0 4px; }
+    .nav-logo .logo-pages { background: transparent; color: var(--accent); font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 0.05em; padding: 3px 9px 1px; border: 2px solid var(--accent); border-left: none; border-radius: 0 4px 4px 0; }
+    .nav-link { font-size: 0.875rem; color: #bbb; text-decoration: none; font-weight: 500; }
     .nav-link:hover { color: var(--accent); }
+
+    /* PAGE */
     .page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px; }
+    .card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
     .card-accent { width: 40px; height: 4px; background: var(--accent); border-radius: 2px; margin-bottom: 1.5rem; }
-    h1 { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
+
+    h1 { font-family: var(--font-head); font-size: 2.4rem; letter-spacing: 0.03em; margin-bottom: 0.4rem; }
     .subtitle { font-size: 0.9rem; color: var(--ink-3); font-weight: 300; margin-bottom: 2rem; }
+
     .form-group { margin-bottom: 1.1rem; }
     label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--ink-2); margin-bottom: 6px; }
     input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.95rem; color: var(--ink); background: var(--paper); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,76,30,0.1); background: #fff; }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,215,0,0.18); background: #fff; }
     input::placeholder { color: var(--ink-3); }
 
-    .phone-row { display: flex; gap: 8px; }
-    .phone-row input:first-child { width: 90px; flex-shrink: 0; }
-    .phone-row input:last-child { flex: 1; }
-
-    .otp-row input { text-align: center; font-size: 1.3rem; font-weight: 700; letter-spacing: 0.1em; }
-
-    .step { display: none; }
-    .step.active { display: block; }
-
-    .btn-submit { width: 100%; padding: 13px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: var(--font-head); font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; transition: background 0.18s, transform 0.18s; }
-    .btn-submit:hover { background: #c93d12; transform: translateY(-1px); }
-    .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-    .btn-outline { width: 100%; padding: 11px; background: transparent; color: var(--ink-2); border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; cursor: pointer; margin-top: 8px; transition: all 0.18s; }
-    .btn-outline:hover { border-color: var(--ink); }
+    .btn-submit { width: 100%; padding: 13px; background: var(--accent); color: var(--ink); border: none; border-radius: 10px; font-family: var(--font-head); font-size: 1.2rem; letter-spacing: 0.05em; cursor: pointer; margin-top: 0.5rem; transition: background 0.18s, transform 0.18s; }
+    .btn-submit:hover:not(:disabled) { background: var(--accent-2); transform: translateY(-1px); }
+    .btn-submit:disabled { background: #ddd; color: #999; cursor: not-allowed; transform: none; }
 
     .footer-link { text-align: center; font-size: 0.875rem; color: var(--ink-3); margin-top: 1.25rem; }
-    .footer-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .footer-link a { color: var(--accent-dark); text-decoration: none; font-weight: 500; }
+    .footer-link a:hover { text-decoration: underline; }
+
     .alert { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; display: none; }
-    .alert.error { background: #fde8e2; color: #a02a0a; border: 1px solid #f9c4b3; display: block; }
+    .alert.error { background: #fff3cd; color: #7a5c00; border: 1px solid #ffe082; display: block; }
     .alert.success { background: #e6f4ea; color: #1a6e2e; border: 1px solid #b7dfc2; display: block; }
-    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: var(--ink); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .resend-timer { font-size: 0.8rem; color: var(--ink-3); text-align: center; margin-top: 8px; }
-    .resend-timer a { color: var(--accent); cursor: pointer; text-decoration: none; }
-    #recaptcha-container { margin: 8px 0; }
+
+    @media (max-width: 480px) { .card { padding: 1.75rem; } nav { padding: 0 1.25rem; } }
   </style>
 </head>
 <body>
   <nav>
-    <a href="/" class="nav-logo"><span>Biz</span>Dir</a>
+    <a href="/" class="nav-logo">
+      <span class="logo-yellow">YELLOW</span>
+      <span class="logo-pages">PAGES</span>
+    </a>
     <a href="/pages/signup" class="nav-link">Create an account</a>
   </nav>
 
@@ -69,215 +75,80 @@
       <div class="card-accent"></div>
       <div class="alert" id="alert"></div>
 
-      <!-- STEP 1: Enter phone number -->
-      <div class="step active" id="step1">
-        <h1>Welcome back</h1>
-        <p class="subtitle">Enter your mobile number to receive a login code.</p>
-        <div class="form-group">
-          <label>Mobile number</label>
-          <div class="phone-row">
-            <input type="text" id="countryCode" value="+63" placeholder="+63">
-            <input type="tel" id="phoneNumber" placeholder="917 123 4567" autocomplete="tel">
-          </div>
-        </div>
-        <div id="recaptcha-container"></div>
-        <button class="btn-submit" id="sendOtpBtn" onclick="sendOTP()" disabled>Send login code</button>
-        <div class="footer-link">Don't have an account? <a href="/pages/signup">Sign up free</a></div>
+      <h1>Welcome Back</h1>
+      <p class="subtitle">Sign in to manage your business listing.</p>
+
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Your password" autocomplete="current-password">
       </div>
 
-      <!-- STEP 2: Enter OTP -->
-      <div class="step" id="step2">
-        <h1>Enter code</h1>
-        <p class="subtitle" id="otpSubtitle">Enter the 6-digit code sent to your number.</p>
-        <div class="form-group">
-          <label>Verification code</label>
-          <div class="otp-row">
-            <input type="text" id="otpInput" placeholder="• • • • • •" maxlength="6" autocomplete="one-time-code">
-          </div>
-        </div>
-        <button class="btn-submit" id="verifyBtn" onclick="verifyOTP()">Log in →</button>
-        <button class="btn-outline" onclick="goBack()">← Change number</button>
-        <div class="resend-timer" id="resendTimer"></div>
-      </div>
+      <button class="btn-submit" id="loginBtn" onclick="handleLogin()">Log In</button>
 
+      <div class="footer-link">Don't have an account? <a href="/pages/signup">Sign up free</a></div>
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCkD609SS33TWpEenpbQP4_KeZX4Imz4gg",
-      authDomain: "bizdir-8ec87.firebaseapp.com",
-      projectId: "bizdir-8ec87",
-      storageBucket: "bizdir-8ec87.firebasestorage.app",
-      messagingSenderId: "208132241097",
-      appId: "1:208132241097:web:e582ed914871071bdd7f18"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    auth.useDeviceLanguage();
-
-    let confirmationResult = null;
-    let recaptchaVerifier = null;
-    let resendCountdown = null;
-
+  <script>
     // Redirect if already logged in
     if (localStorage.getItem('bizdir_token')) {
       window.location.href = '/pages/dashboard';
     }
 
-    // Init reCAPTCHA on load
-    initRecaptcha();
+    function showAlert(msg, type) { const el = document.getElementById('alert'); el.textContent = msg; el.className = 'alert ' + type; }
+    function clearAlert() { const el = document.getElementById('alert'); el.className = 'alert'; el.textContent = ''; }
 
-    function initRecaptcha() {
-      try {
-        if (recaptchaVerifier) { recaptchaVerifier.clear(); recaptchaVerifier = null; }
-        document.getElementById('recaptcha-container').innerHTML = '';
-        recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          size: 'normal',
-          callback: () => { document.getElementById('sendOtpBtn').disabled = false; },
-          'expired-callback': () => {
-            document.getElementById('sendOtpBtn').disabled = true;
-            showAlert('reCAPTCHA expired. Please verify again.', 'error');
-          }
-        });
-        recaptchaVerifier.render();
-      } catch(e) {
-        console.error('reCAPTCHA error:', e);
-        document.getElementById('sendOtpBtn').disabled = false;
-      }
-    }
-
-    window.sendOTP = async function() {
-      const countryCode = document.getElementById('countryCode').value.trim();
-      const number = document.getElementById('phoneNumber').value.trim().replace(/\s/g, '');
-      const btn = document.getElementById('sendOtpBtn');
-
+    async function handleLogin() {
       clearAlert();
-      if (!number) { showAlert('Please enter your mobile number.', 'error'); return; }
 
-      const cleanNumber = number.startsWith('0') ? number.slice(1) : number;
-      const fullPhone = countryCode + cleanNumber;
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
 
+      if (!email || !email.includes('@')) return showAlert('Please enter a valid email address.', 'error');
+      if (!password)                       return showAlert('Please enter your password.', 'error');
+
+      const btn = document.getElementById('loginBtn');
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>Sending code…';
+      btn.innerHTML = '<span class="spinner"></span>Logging in...';
 
       try {
-        confirmationResult = await signInWithPhoneNumber(auth, fullPhone, recaptchaVerifier);
-        document.getElementById('otpSubtitle').textContent = `Code sent to ${fullPhone}`;
-
-        // Switch to OTP step
-        document.getElementById('step1').classList.remove('active');
-        document.getElementById('step2').classList.add('active');
-        clearAlert();
-        startResendTimer();
-
-      } catch(e) {
-        console.error('OTP send error:', e);
-        const messages = {
-          'auth/invalid-phone-number': 'Invalid phone number. Use format: 917 123 4567',
-          'auth/too-many-requests': 'Too many attempts. Please try again later.',
-          'auth/quota-exceeded': 'SMS quota exceeded. Try again later.',
-        };
-        showAlert(messages[e.code] || e.message || 'Failed to send code.', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Send login code';
-        if (recaptchaVerifier) {
-          recaptchaVerifier.clear();
-          recaptchaVerifier = null;
-          setTimeout(initRecaptcha, 300);
-        }
-      }
-    };
-
-    window.verifyOTP = async function() {
-      const otp = document.getElementById('otpInput').value.trim();
-      const btn = document.getElementById('verifyBtn');
-
-      clearAlert();
-      if (!otp || otp.length !== 6) { showAlert('Please enter the 6-digit code.', 'error'); return; }
-      if (!confirmationResult) { showAlert('Please request a code first.', 'error'); return; }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>Verifying…';
-
-      try {
-        // Verify OTP with Firebase
-        await confirmationResult.confirm(otp);
-
-        // Look up user in our system by phone number
-        const countryCode = document.getElementById('countryCode').value.trim();
-        const number = document.getElementById('phoneNumber').value.trim().replace(/\s/g, '');
-        const cleanNumber = number.startsWith('0') ? number.slice(1) : number;
-        const fullPhone = countryCode + cleanNumber;
-
-        btn.innerHTML = '<span class="spinner"></span>Logging in…';
-
-        const res = await fetch('/api/auth?action=loginByPhone', {
+        const res = await fetch('/api/auth?action=login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: fullPhone }),
+          body: JSON.stringify({ email, password }),
         });
         const data = await res.json();
 
-        if (!data.success) {
-          showAlert(data.error || 'No account found for this number. Please sign up.', 'error');
+        if (!res.ok) {
+          showAlert(data.error || 'Incorrect email or password.', 'error');
           btn.disabled = false;
-          btn.textContent = 'Log in →';
+          btn.textContent = 'Log In';
           return;
         }
 
         // Save session
         localStorage.setItem('bizdir_token', data.token);
         localStorage.setItem('bizdir_email', data.email);
-        localStorage.setItem('bizdir_name', data.name);
+        localStorage.setItem('bizdir_name',  data.name);
 
-        showAlert('Logged in! Redirecting…', 'success');
+        showAlert('Logged in! Redirecting...', 'success');
         setTimeout(() => window.location.href = '/pages/dashboard', 800);
 
       } catch(e) {
-        console.error('Verify error:', e);
-        const messages = {
-          'auth/invalid-verification-code': 'Incorrect code. Please try again.',
-          'auth/code-expired': 'Code expired. Please request a new one.',
-        };
-        showAlert(messages[e.code] || 'Verification failed.', 'error');
+        showAlert('Could not connect. Please check your connection and try again.', 'error');
         btn.disabled = false;
-        btn.textContent = 'Log in →';
+        btn.textContent = 'Log In';
       }
-    };
-
-    window.goBack = function() {
-      clearAlert();
-      document.getElementById('step2').classList.remove('active');
-      document.getElementById('step1').classList.add('active');
-      document.getElementById('otpInput').value = '';
-      clearInterval(resendCountdown);
-      if (recaptchaVerifier) { recaptchaVerifier.clear(); recaptchaVerifier = null; }
-      setTimeout(initRecaptcha, 300);
-    };
-
-    function startResendTimer() {
-      let seconds = 60;
-      const el = document.getElementById('resendTimer');
-      clearInterval(resendCountdown);
-      el.innerHTML = `Resend code in <strong>${seconds}s</strong>`;
-      resendCountdown = setInterval(() => {
-        seconds--;
-        if (seconds <= 0) {
-          clearInterval(resendCountdown);
-          el.innerHTML = `Didn't get it? <a onclick="window.goBack()">Try again</a>`;
-        } else {
-          el.innerHTML = `Resend code in <strong>${seconds}s</strong>`;
-        }
-      }, 1000);
     }
 
-    function showAlert(msg, type) { const el = document.getElementById('alert'); el.textContent = msg; el.className = 'alert ' + type; }
-    function clearAlert() { const el = document.getElementById('alert'); el.className = 'alert'; el.textContent = ''; }
+    // Allow Enter key to submit
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
   </script>
 </body>
 </html>
