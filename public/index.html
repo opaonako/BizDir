@@ -3,25 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BizDir — Discover Local Businesses</title>
+  <title>Yellow Pages — Discover Local Businesses</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --ink:       #0f0f0f;
-      --ink-2:     #3a3a3a;
-      --ink-3:     #888;
-      --paper:     #faf9f6;
-      --surface:   #f0ede6;
-      --accent:    #e84c1e;
-      --accent-2:  #f7c948;
-      --border:    #e2ddd6;
+      --ink-2:     #2a2a2a;
+      --ink-3:     #666;
+      --paper:     #fffff8;
+      --surface:   #f5f3e4;
+      --accent:    #FFD700;
+      --accent-2:  #FFC200;
+      --accent-dark: #B8960A;
+      --border:    #e8e4cc;
       --card-bg:   #ffffff;
       --radius:    14px;
-      --font-head: 'Syne', sans-serif;
+      --font-head: 'Bebas Neue', sans-serif;
       --font-body: 'DM Sans', sans-serif;
     }
 
@@ -31,22 +32,40 @@
     /* NAV */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: var(--paper); border-bottom: 1px solid var(--border);
+      background: var(--ink); border-bottom: 3px solid var(--accent);
       padding: 0 2rem; display: flex; align-items: center;
       justify-content: space-between; height: 60px;
     }
+
+    /* LOGO */
     .nav-logo {
-      font-family: var(--font-head); font-weight: 800; font-size: 1.3rem;
-      letter-spacing: -0.03em; color: var(--ink); text-decoration: none;
-      display: flex; align-items: center; gap: 6px;
+      display: flex; align-items: center;
+      text-decoration: none; line-height: 1;
     }
-    .nav-logo span {
-      background: var(--accent); color: #fff;
-      padding: 1px 7px 2px; border-radius: 4px; font-size: 1.1rem;
+    .nav-logo .logo-yellow {
+      background: var(--accent);
+      color: var(--ink);
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      letter-spacing: 0.02em;
+      padding: 3px 9px 1px;
+      border-radius: 4px 0 0 4px;
     }
+    .nav-logo .logo-pages {
+      background: transparent;
+      color: var(--accent);
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      padding: 3px 9px 1px;
+      border: 2px solid var(--accent);
+      border-left: none;
+      border-radius: 0 4px 4px 0;
+    }
+
     .nav-links { display: flex; align-items: center; gap: 1rem; list-style: none; }
     .nav-links a {
-      font-size: 0.875rem; font-weight: 500; color: var(--ink-2);
+      font-size: 0.875rem; font-weight: 500; color: #bbb;
       text-decoration: none; transition: color 0.2s;
     }
     .nav-links a:hover { color: var(--accent); }
@@ -57,8 +76,8 @@
       font-size: 0.875rem; font-weight: 500; cursor: pointer;
       text-decoration: none; border: none; transition: all 0.18s;
     }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: #c93d12; transform: translateY(-1px); }
+    .btn-primary { background: var(--accent); color: var(--ink); font-weight: 700; }
+    .btn-primary:hover { background: var(--accent-2); transform: translateY(-1px); }
 
     /* HERO */
     .hero {
@@ -68,16 +87,16 @@
     .hero-eyebrow {
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 0.78rem; font-weight: 500; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--accent);
-      background: #fde8e2; padding: 4px 12px;
+      text-transform: uppercase; color: var(--accent-dark);
+      background: #fef9d0; padding: 4px 12px;
       border-radius: 20px; margin-bottom: 1.5rem;
     }
     .hero h1 {
-      font-family: var(--font-head); font-size: clamp(2.4rem, 6vw, 4rem);
-      font-weight: 800; line-height: 1.08; letter-spacing: -0.03em;
+      font-family: var(--font-head); font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 400; line-height: 1.0; letter-spacing: 0.02em;
       color: var(--ink); margin-bottom: 1.2rem;
     }
-    .hero h1 em { font-style: normal; color: var(--accent); }
+    .hero h1 em { font-style: normal; color: var(--accent-dark); }
     .hero p {
       font-size: 1.05rem; color: var(--ink-2); font-weight: 300;
       line-height: 1.7; max-width: 520px; margin: 0 auto 2.5rem;
@@ -96,7 +115,7 @@
     }
     .search-wrap input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(232,76,30,0.1);
+      box-shadow: 0 0 0 4px rgba(255,215,0,0.15);
     }
     .search-wrap input::placeholder { color: var(--ink-3); }
     .search-icon {
@@ -119,7 +138,7 @@
       cursor: pointer; transition: all 0.18s; white-space: nowrap;
     }
     .cat-chip:hover, .cat-chip.active {
-      border-color: var(--accent); background: var(--accent); color: #fff;
+      border-color: var(--accent); background: var(--accent); color: var(--ink); font-weight: 700;
     }
 
     /* MAIN */
@@ -145,7 +164,7 @@
     .card:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 32px rgba(0,0,0,0.09);
-      border-color: #ccc;
+      border-color: var(--accent);
     }
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
@@ -163,12 +182,12 @@
     .card-logo img { width: 100%; height: 100%; object-fit: cover; }
     .card-meta { flex: 1; min-width: 0; }
     .card-name {
-      font-family: var(--font-head); font-size: 1rem; font-weight: 700;
-      color: var(--ink); margin-bottom: 3px;
+      font-family: var(--font-head); font-size: 1.1rem; font-weight: 400;
+      letter-spacing: 0.02em; color: var(--ink); margin-bottom: 3px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .card-category {
-      font-size: 0.75rem; color: var(--accent); font-weight: 500;
+      font-size: 0.75rem; color: var(--accent-dark); font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.05em;
     }
     .card-desc {
@@ -191,7 +210,7 @@
       justify-content: center; font-size: 0.75rem; color: var(--ink-2);
       transition: background 0.18s, color 0.18s;
     }
-    .card:hover .card-arrow { background: var(--accent); color: #fff; }
+    .card:hover .card-arrow { background: var(--accent); color: var(--ink); }
 
     /* SKELETON */
     .skeleton {
@@ -207,7 +226,7 @@
     /* EMPTY */
     .empty { grid-column: 1/-1; text-align: center; padding: 5rem 2rem; }
     .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-    .empty h3 { font-family: var(--font-head); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .empty h3 { font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
     .empty p { color: var(--ink-3); font-size: 0.9rem; }
 
     /* PAGINATION */
@@ -219,29 +238,34 @@
       color: var(--ink-2); cursor: pointer; display: flex;
       align-items: center; justify-content: center; transition: all 0.18s;
     }
-    .page-btn:hover, .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .page-btn:hover, .page-btn.active { background: var(--accent); border-color: var(--accent); color: var(--ink); font-weight: 700; }
     .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
     /* CTA */
     .cta-banner { max-width: 1140px; margin: 0 auto 3rem; padding: 0 2rem; }
     .cta-inner {
       background: var(--ink); border-radius: 16px;
+      border: 2px solid var(--accent);
       padding: 2.5rem 3rem; display: flex; align-items: center;
       justify-content: space-between; gap: 2rem; flex-wrap: wrap;
     }
     .cta-inner h2 {
-      font-family: var(--font-head); font-size: 1.5rem; font-weight: 800;
-      color: #fff; letter-spacing: -0.02em; margin-bottom: 0.3rem;
+      font-family: var(--font-head); font-size: 2rem; font-weight: 400;
+      letter-spacing: 0.04em; color: #fff; margin-bottom: 0.3rem;
     }
     .cta-inner p { color: #aaa; font-size: 0.9rem; font-weight: 300; }
-    .btn-light { background: var(--accent-2); color: var(--ink); font-weight: 600; padding: 10px 24px; white-space: nowrap; }
-    .btn-light:hover { background: #f0b800; transform: translateY(-1px); }
+    .btn-light { background: var(--accent); color: var(--ink); font-weight: 700; padding: 10px 24px; white-space: nowrap; }
+    .btn-light:hover { background: var(--accent-2); transform: translateY(-1px); }
 
-    footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; text-align: center; font-size: 0.8rem; color: var(--ink-3); }
+    footer {
+      background: var(--ink); border-top: 3px solid var(--accent);
+      padding: 1.5rem 2rem; text-align: center;
+      font-size: 0.8rem; color: #666;
+    }
 
     @media (max-width: 640px) {
       .hero { padding: 3rem 1.25rem 2rem; }
-      .hero h1 { font-size: 2rem; }
+      .hero h1 { font-size: 2.8rem; }
       .cta-inner { padding: 1.75rem; flex-direction: column; text-align: center; }
       nav { padding: 0 1.25rem; }
       .main, .categories, .cta-banner { padding-left: 1.25rem; padding-right: 1.25rem; }
@@ -252,14 +276,17 @@
 <body>
 
   <nav>
-    <a href="/" class="nav-logo"><span>Biz</span>Dir</a>
+    <a href="/" class="nav-logo">
+      <span class="logo-yellow">YELLOW</span>
+      <span class="logo-pages">PAGES</span>
+    </a>
     <ul class="nav-links">
   <li><a href="/">Browse</a></li>
   <li id="navDashboard" style="display:none"><a href="/pages/dashboard">Dashboard</a></li>
   <li id="navAdmin" style="display:none"><a href="/pages/admin">Admin</a></li>
   <li id="navLogin"><a href="/pages/login">Login</a></li>
   <li id="navSignup"><a href="/pages/signup" class="btn btn-primary">List your business</a></li>
-  <li id="navLogout" style="display:none"><button onclick="handleLogout()" style="background:none;border:none;cursor:pointer;font-size:0.875rem;font-weight:500;color:var(--ink-2);font-family:var(--font-body)">Log out</button></li>
+  <li id="navLogout" style="display:none"><button onclick="handleLogout()" style="background:none;border:none;cursor:pointer;font-size:0.875rem;font-weight:500;color:#bbb;font-family:var(--font-body)">Log out</button></li>
 </ul>
   </nav>
 
@@ -300,7 +327,7 @@
     </div>
   </section>
 
-  <footer>&copy; 2025 BizDir. All rights reserved.</footer>
+  <footer>&copy; 2025 Yellow Pages. All rights reserved.</footer>
 
   <script>
     let currentPage = 1, currentCategory = '', currentSearch = '', searchTimer = null;
