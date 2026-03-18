@@ -304,7 +304,7 @@ async function speak(callControlId, text, newState) {
 }
 
 async function telnyxGather(callControlId, encodedState) {
-  await telnyxAction(callControlId, "gather", {
+  await telnyxAction(callControlId, "gather_using_speech", {
     minimum_silence_ms: 800,
     speech_timeout_ms:  12000,
     maximum_tries:      1,
