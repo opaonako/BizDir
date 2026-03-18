@@ -64,7 +64,6 @@ module.exports = async (req, res) => {
         webhook_url:                 "https://biz-dir.vercel.app/api/voice/webhook",
         webhook_url_method:          "POST",
         timeout_secs:                30,
-        answering_machine_detection: "detect_beep",
       }),
     });
 
