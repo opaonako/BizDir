@@ -313,8 +313,6 @@ async function syncToSheet(state) {
 // ============================================================
 async function speak(callControlId, text, newState) {
   console.log("Sarah:", text.substring(0, 100));
-
-  // Use Telnyx built-in TTS (ElevenLabs temporarily disabled)
   await telnyxAction(callControlId, "speak", {
     payload:      text,
     voice:        "female",
