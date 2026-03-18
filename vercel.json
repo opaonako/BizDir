@@ -4,6 +4,11 @@
   "outputDirectory": "public",
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/voice/webhook.js": { "maxDuration": 60 },
+    "api/voice/call.js":    { "maxDuration": 30 },
+    "api/voice/token.js":   { "maxDuration": 15 }
+  },
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/:path*" },
     { "source": "/pages/:page", "destination": "/pages/:page.html" },
