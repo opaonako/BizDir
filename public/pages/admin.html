@@ -6,7 +6,6 @@
   <title>Admin — BizDir</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
-  <script type="text/javascript" src="https://unpkg.com/@telnyx/webrtc@2.9.0/lib/bundle.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -19,7 +18,6 @@
       --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
     }
     body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; }
-
     nav { background: var(--ink); padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
     .nav-logo { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.03em; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
     .nav-logo span { background: var(--accent); padding: 1px 7px 2px; border-radius: 4px; }
@@ -29,20 +27,10 @@
     .nav-link:hover { color: #fff; }
     .btn-logout { font-size: 0.82rem; color: #aaa; background: none; border: 1.5px solid #333; padding: 6px 14px; border-radius: 7px; cursor: pointer; font-family: var(--font-body); transition: all 0.18s; }
     .btn-logout:hover { border-color: #666; color: #fff; }
-
-    /* WebRTC status indicator in nav */
-    .webrtc-status { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #666; }
-    .webrtc-dot { width: 8px; height: 8px; border-radius: 50%; background: #444; transition: background 0.3s; }
-    .webrtc-dot.connecting { background: #f59e0b; animation: blink 1s infinite; }
-    .webrtc-dot.ready      { background: var(--green); }
-    .webrtc-dot.error      { background: var(--red); }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
     .page { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
     .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
     .page-header h1 { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; }
     .page-header p { color: var(--ink-3); font-size: 0.875rem; margin-top: 3px; }
-
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
     .stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
     .stat-value { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; }
@@ -51,14 +39,12 @@
     .stat-value.rejected { color: #dc2626; }
     .stat-value.total    { color: var(--accent); }
     .stat-label { font-size: 0.8rem; color: var(--ink-3); margin-top: 3px; }
-
     .tabs { display: flex; gap: 4px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
     .tab { padding: 10px 18px; font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; color: var(--ink-3); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.18s; display: flex; align-items: center; gap: 6px; }
     .tab:hover { color: var(--ink); }
     .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
     .tab-count { background: var(--surface); color: var(--ink-2); font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
     .tab.active .tab-count { background: #fde8e2; color: var(--accent); }
-
     .listing-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 1.25rem; animation: fadeUp 0.3s both; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .listing-logo { width: 52px; height: 52px; border-radius: 10px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700; color: var(--ink-2); flex-shrink: 0; overflow: hidden; }
@@ -69,12 +55,10 @@
     .listing-desc { font-size: 0.85rem; color: var(--ink-2); font-weight: 300; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .listing-owner { font-size: 0.78rem; color: var(--ink-3); margin-top: 6px; }
     .listing-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-
     .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
     .status-badge.pending  { background: var(--yellow-bg); color: var(--yellow); }
     .status-badge.approved { background: var(--green-bg);  color: var(--green); }
     .status-badge.rejected { background: var(--red-bg);    color: var(--red); }
-
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-family: var(--font-body); font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; text-decoration: none; white-space: nowrap; }
     .btn-approve { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
     .btn-approve:hover { background: #bbf7d0; }
@@ -86,20 +70,16 @@
     .btn-restore:hover { background: #fde68a; }
     .btn-call    { background: var(--accent);   color: #fff;         border: 1px solid var(--accent); }
     .btn-call:hover    { background: #c93d12; }
-    .btn-call:disabled { opacity: 0.4; cursor: not-allowed; }
-
+    .btn-call.calling  { background: #c93d12; opacity: 0.7; cursor: not-allowed; }
     .empty { text-align: center; padding: 4rem 2rem; color: var(--ink-3); }
     .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .empty h3 { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; }
-
     .alert { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.5rem; display: none; }
     .alert.success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; display: block; }
     .alert.error   { background: var(--red-bg);   color: var(--red);   border: 1px solid #fca5a5; display: block; }
-
     .loading { text-align: center; padding: 3rem; color: var(--ink-3); font-size: 0.9rem; }
     .spinner-dark { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
@@ -131,21 +111,16 @@
     .d-btn.red:hover   { background: #7f1d1d; transform: scale(1.06); }
     .d-btn.gray  { background: var(--surface); color: var(--ink-2); }
     .d-btn.gray:hover  { background: var(--border); }
-    .d-btn.gray.active { background: var(--ink); color: #fff; }
+    .dialer-stage { font-size: 0.75rem; color: var(--ink-3); background: var(--surface); padding: 4px 10px; border-radius: 20px; margin-bottom: 1rem; display: none; }
     .dialer-notes { display: none; margin-top: 1rem; text-align: left; }
-    .dialer-notes textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.875rem; resize: none; outline: none; color: var(--ink); background: var(--card-bg); transition: border-color 0.2s; }
+    .dialer-notes textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.875rem; resize: none; outline: none; color: var(--ink); background: var(--card-bg); }
     .dialer-notes textarea:focus { border-color: var(--accent); }
     .dialer-notes-save { margin-top: 8px; width: 100%; padding: 10px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: var(--font-body); font-size: 0.875rem; font-weight: 600; cursor: pointer; }
     .dialer-notes-save:hover { background: #c93d12; }
     .dialer-close { margin-top: 8px; width: 100%; padding: 8px; background: none; color: var(--ink-3); border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.82rem; cursor: pointer; transition: all 0.18s; }
     .dialer-close:hover { border-color: var(--ink-3); color: var(--ink); }
-
-    /* hidden audio element for WebRTC */
-    #remoteAudio { display: none; }
-
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; z-index: 999; transition: transform 0.3s ease; pointer-events: none; white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
-
     @media (max-width: 640px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .listing-card { flex-direction: column; }
@@ -157,17 +132,10 @@
 </head>
 <body>
 
-  <!-- Hidden audio output for WebRTC -->
-  <audio id="remoteAudio" autoplay></audio>
-
   <nav>
-    <a href="/pages/dialer" class="nav-link">Dialer</a>
+    <a href="/pages/webphone" class="nav-link">📞 Webphone</a>
     <a href="/" class="nav-logo"><span>Biz</span>Dir <span class="nav-badge">Admin</span></a>
     <div class="nav-right">
-      <div class="webrtc-status">
-        <div class="webrtc-dot" id="webrtcDot"></div>
-        <span id="webrtcLabel">WebRTC</span>
-      </div>
       <a href="/" class="nav-link">View site</a>
       <a href="/pages/dashboard" class="nav-link">Dashboard</a>
       <button class="btn-logout" onclick="logout()">Log out</button>
@@ -213,6 +181,7 @@
       <div class="dialer-name"   id="dialerName">—</div>
       <div class="dialer-phone"  id="dialerPhone">—</div>
       <div class="dialer-status" id="dialerStatus">Ready</div>
+      <div class="dialer-stage"  id="dialerStage"></div>
       <div class="dialer-timer"  id="dialerTimer">0:00</div>
       <div class="dialer-btns"   id="dialerBtns"></div>
       <div class="dialer-notes"  id="dialerNotes">
@@ -230,110 +199,6 @@
     const ADMIN_EMAIL = "paolollenado@gmail.com";
     let allBusinesses = [];
 
-    // ── WEBRTC CLIENT ─────────────────────────────────────────
-    let telnyxClient  = null;
-    let activeCall    = null;
-    let webrtcReady   = false;
-
-    async function initWebRTC() {
-      setWebRTCStatus('connecting', 'Connecting…');
-      try {
-        // Get SIP credentials from your token.js endpoint
-        const res  = await fetch('/api/voice/token', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({}),
-        });
-        const data = await res.json();
-
-        if (!res.ok || data.error) throw new Error(data.error || 'Token failed');
-
-        const sipUsername = data.login;   // sip_username from Telnyx
-        const sipPassword = data.token;   // sip_password from Telnyx
-
-        if (!sipUsername || !sipPassword) throw new Error('Missing SIP credentials');
-
-        // Initialize Telnyx WebRTC client
-        telnyxClient = new TelnyxWebRTC.TelnyxRTC({
-        login:    sipUsername,
-        password: sipPassword,
-        });
-
-        // ── WebRTC event handlers ─────────────────────────────
-        telnyxClient.on('telnyx.ready', () => {
-          webrtcReady = true;
-          setWebRTCStatus('ready', 'Ready');
-          console.log('Telnyx WebRTC ready');
-        });
-
-        telnyxClient.on('telnyx.error', (err) => {
-          webrtcReady = false;
-          setWebRTCStatus('error', 'Error');
-          console.error('Telnyx error:', err);
-        });
-
-        telnyxClient.on('telnyx.notification', (notification) => {
-          const call = notification.call;
-          if (!call) return;
-
-          if (notification.type === 'callUpdate') {
-            handleCallUpdate(call);
-          }
-        });
-
-        telnyxClient.connect();
-
-      } catch(e) {
-        console.error('WebRTC init failed:', e.message);
-        setWebRTCStatus('error', 'Failed');
-        showToast('WebRTC: ' + e.message, true);
-      }
-    }
-
-    function handleCallUpdate(call) {
-      activeCall = call;
-      const state = call.state;
-      console.log('Call state:', state);
-
-      if (state === 'active') {
-        // Call connected — attach remote audio stream
-        const remoteAudio = document.getElementById('remoteAudio');
-        if (call.remoteStream) {
-          remoteAudio.srcObject = call.remoteStream;
-          remoteAudio.play().catch(e => console.error('Audio play error:', e));
-        }
-        callActive = true;
-        document.getElementById('dialerAvatarWrap').classList.remove('ringing');
-        setDialerStatus('Connected', 'connected');
-        setDialerBtns('connected');
-        document.getElementById('dialerTimer').style.display = 'block';
-        if (!callTimer) startTimer();
-        showToast('📞 Connected!');
-
-      } else if (state === 'held') {
-        setDialerStatus('On hold', 'calling');
-
-      } else if (state === 'hangup' || state === 'destroy') {
-        // Call ended
-        callActive = false;
-        stopTimer();
-        activeCall = null;
-        document.getElementById('remoteAudio').srcObject = null;
-        document.getElementById('dialerAvatarWrap').classList.remove('ringing');
-        setDialerStatus('Call ended · ' + formatTime(callSeconds), 'ended');
-        setDialerBtns('ended');
-        document.getElementById('dialerNotes').style.display    = 'block';
-        document.getElementById('dialerCloseBtn').style.display = 'block';
-      }
-    }
-
-    function setWebRTCStatus(status, label) {
-      const dot   = document.getElementById('webrtcDot');
-      const lbl   = document.getElementById('webrtcLabel');
-      dot.className = 'webrtc-dot ' + status;
-      lbl.textContent = label;
-    }
-
     // ── INIT ──────────────────────────────────────────────────
     async function init() {
       const token = localStorage.getItem('bizdir_token');
@@ -350,12 +215,11 @@
           return;
         }
         document.getElementById('page').style.display = 'block';
-        await Promise.all([loadAllListings(), initWebRTC()]);
+        await loadAllListings();
       } catch(e) { logout(); }
     }
 
     function logout() {
-      if (telnyxClient) telnyxClient.disconnect();
       ['bizdir_token','bizdir_email','bizdir_name'].forEach(k => localStorage.removeItem(k));
       window.location.href = '/pages/login';
     }
@@ -369,21 +233,18 @@
           fetch('/api/listings?status=rejected&limit=500'),
         ]);
         const [pData, aData, rData] = await Promise.all([pRes.json(), aRes.json(), rRes.json()]);
-
         const pending  = (pData.businesses  || []).filter(b => b.status === 'pending');
         const approved = (aData.businesses  || []).filter(b => b.status === 'approved');
         const rejected = (rData.businesses  || []).filter(b => b.status === 'rejected');
         allBusinesses  = [...pending, ...approved, ...rejected];
-
-        document.getElementById('statPending').textContent  = pending.length;
-        document.getElementById('statApproved').textContent = approved.length;
-        document.getElementById('statRejected').textContent = rejected.length;
-        document.getElementById('statTotal').textContent    = allBusinesses.length;
+        document.getElementById('statPending').textContent   = pending.length;
+        document.getElementById('statApproved').textContent  = approved.length;
+        document.getElementById('statRejected').textContent  = rejected.length;
+        document.getElementById('statTotal').textContent     = allBusinesses.length;
         document.getElementById('countPending').textContent  = pending.length;
         document.getElementById('countApproved').textContent = approved.length;
         document.getElementById('countRejected').textContent = rejected.length;
         document.getElementById('countAll').textContent      = allBusinesses.length;
-
         renderTab('pending',  pending);
         renderTab('approved', approved);
         renderTab('rejected', rejected);
@@ -414,7 +275,7 @@
           </div>
           <div class="listing-actions">
             ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ?
-              `<button class="btn btn-call" onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}')">📞 Call</button>` : ''}
+              `<button class="btn btn-call" id="callbtn-${esc(b.id)}" onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}','${esc(b.address||b.location||'')}','${esc(b.category||'')}')">🤖 AI Call</button>` : ''}
             <span class="status-badge ${b.status}">${b.status}</span>
             <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
             ${b.status !== 'approved' ? `<button class="btn btn-approve" onclick="updateStatus('${esc(b.id)}','approved')">✓ Approve</button>` : ''}
@@ -457,12 +318,10 @@
     let callTimer   = null;
     let callSeconds = 0;
     let callActive  = false;
-    let isMuted     = false;
 
-    function callLead(id, name, phone) {
-      dialerLead  = { id, name, phone };
+    function callLead(id, name, phone, address, category) {
+      dialerLead  = { id, name, phone, address, category };
       callActive  = false;
-      isMuted     = false;
       callSeconds = 0;
 
       document.getElementById('dialerAvatar').textContent     = (name||'?').charAt(0).toUpperCase();
@@ -473,8 +332,9 @@
       document.getElementById('dialerNotes').style.display    = 'none';
       document.getElementById('dialerNoteText').value         = '';
       document.getElementById('dialerCloseBtn').style.display = 'block';
+      document.getElementById('dialerStage').style.display    = 'none';
       document.getElementById('dialerAvatarWrap').classList.remove('ringing');
-      setDialerStatus('Ready to call', '');
+      setDialerStatus('Ready — Sarah will call this business', '');
       setDialerBtns('ready');
       document.getElementById('dialerModal').classList.add('open');
     }
@@ -495,117 +355,114 @@
     function setDialerBtns(state) {
       const btns = document.getElementById('dialerBtns');
       if (state === 'ready') {
-        btns.innerHTML = `<button class="d-btn big green" onclick="startCall()">📞</button>`;
+        btns.innerHTML = `<button class="d-btn big green" onclick="startAICall()">🤖</button>`;
       } else if (state === 'calling') {
-        btns.innerHTML = `<button class="d-btn big red" onclick="endCall()">📵</button>`;
-      } else if (state === 'connected') {
-        btns.innerHTML = `
-          <button class="d-btn gray" id="muteBtn" onclick="toggleMute()" title="Mute">🎤</button>
-          <button class="d-btn big red" onclick="endCall()">📵</button>
-          <button class="d-btn gray" onclick="toggleNotes()" title="Note">📝</button>`;
+        btns.innerHTML = `<div style="font-size:0.8rem;color:var(--ink-3)">Sarah is handling the call…</div>`;
       } else if (state === 'ended') {
-        btns.innerHTML = `<button class="d-btn big green" onclick="startCall()">📞</button>`;
+        btns.innerHTML = `<button class="d-btn big green" onclick="startAICall()">🤖</button>`;
       }
     }
 
-    async function startCall() {
+    async function startAICall() {
       if (!dialerLead) return;
 
-      // Normalize phone to E.164
-      let phone = String(dialerLead.phone).replace(/[\s\-\(\)\.]/g, '');
-      if (!phone.startsWith('+')) {
-        phone = phone.length === 10 ? '+1' + phone :
-                (phone.length === 11 && phone.startsWith('1')) ? '+' + phone : '+' + phone;
-      }
-
-      setDialerStatus('Calling…', 'calling');
+      setDialerStatus('Initiating AI call…', 'calling');
       setDialerBtns('calling');
       document.getElementById('dialerAvatarWrap').classList.add('ringing');
       document.getElementById('dialerCloseBtn').style.display = 'none';
 
-      // ── Use WebRTC if ready, otherwise fallback to API call ──
-      if (webrtcReady && telnyxClient) {
-        try {
-          // Make call via WebRTC SDK — audio comes through browser
-          activeCall = telnyxClient.newCall({
-  destinationNumber: phone,
-  callerNumber:      process?.env?.TELNYX_PHONE_NUMBER || '',
-  audio:             true,
-  video:             false,
-  remoteElement:     document.getElementById('remoteAudio'),
-});
-          // Call state updates handled by handleCallUpdate()
-        } catch(e) {
-          setDialerStatus('WebRTC call failed: ' + e.message, 'error');
-          setDialerBtns('ended');
-          document.getElementById('dialerAvatarWrap').classList.remove('ringing');
-          document.getElementById('dialerCloseBtn').style.display = 'block';
-          showToast('Call failed: ' + e.message, true);
-        }
-      } else {
-        // Fallback: API call (no browser audio — shows warning)
-        try {
-          const res  = await fetch('/api/voice/call', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({
-              phone:        dialerLead.phone,
-              businessName: dialerLead.name,
-              leadId:       dialerLead.id,
-            }),
-          });
-          const data = await res.json();
-          if (!data.success) throw new Error(data.error || 'Call failed');
+      // Disable the call button on the card
+      const cardBtn = document.getElementById('callbtn-' + dialerLead.id);
+      if (cardBtn) { cardBtn.disabled = true; cardBtn.classList.add('calling'); cardBtn.textContent = '📞 Calling…'; }
 
-          callActive = true;
-          document.getElementById('dialerAvatarWrap').classList.remove('ringing');
-          setDialerStatus('Calling (no browser audio — WebRTC not ready)', 'calling');
-          setDialerBtns('connected');
-          document.getElementById('dialerTimer').style.display = 'block';
-          startTimer();
-          document.getElementById('dialerCloseBtn').style.display = 'block';
-          showToast('⚠️ WebRTC not ready — call placed but no audio', true);
-        } catch(e) {
-          callActive = false;
-          document.getElementById('dialerAvatarWrap').classList.remove('ringing');
-          document.getElementById('dialerCloseBtn').style.display = 'block';
-          setDialerStatus('Failed: ' + e.message, 'error');
-          setDialerBtns('ended');
-          showToast('Call failed: ' + e.message, true);
-        }
+      try {
+        const res  = await fetch('/api/voice/call', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            phone:        dialerLead.phone,
+            businessName: dialerLead.name,
+            address:      dialerLead.address  || '',
+            category:     dialerLead.category || '',
+            leadId:       dialerLead.id,
+            callType:     'ai',   // ← triggers Sarah in webhook.js
+          }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Call failed');
+
+        // Call placed successfully — Sarah is now calling
+        callActive  = true;
+        document.getElementById('dialerTimer').style.display = 'block';
+        document.getElementById('dialerStage').style.display = 'block';
+        document.getElementById('dialerStage').textContent   = 'Stage: verify_name';
+        startTimer();
+
+        setDialerStatus('Sarah is calling ' + dialerLead.name + '…', 'calling');
+        setDialerBtns('calling');
+        showToast('🤖 Sarah is calling ' + dialerLead.name);
+
+        // Poll for status updates every 5 seconds
+        startStatusPolling(dialerLead.id);
+
+      } catch(e) {
+        callActive = false;
+        document.getElementById('dialerAvatarWrap').classList.remove('ringing');
+        document.getElementById('dialerCloseBtn').style.display = 'block';
+        setDialerStatus('Failed: ' + e.message, 'error');
+        setDialerBtns('ended');
+        showToast('Call failed: ' + e.message, true);
+        if (cardBtn) { cardBtn.disabled = false; cardBtn.classList.remove('calling'); cardBtn.textContent = '🤖 AI Call'; }
       }
     }
 
-    function endCall() {
-      if (activeCall) {
-        try { activeCall.hangup(); } catch(e) { console.error('Hangup error:', e); }
-        activeCall = null;
-      }
+    // Poll the listing status to detect when call is done + listing approved
+    let pollInterval = null;
+    function startStatusPolling(id) {
+      let pollCount = 0;
+      pollInterval = setInterval(async () => {
+        pollCount++;
+        // Stop polling after 5 minutes
+        if (pollCount > 60) { clearInterval(pollInterval); endAICallUI(id); return; }
+
+        try {
+          const res  = await fetch('/api/listings?id=' + id);
+          const data = await res.json();
+          const biz  = data.business;
+          if (!biz) return;
+
+          // Update stage display
+          if (biz.description && biz.description.includes('Email:')) {
+            document.getElementById('dialerStage').textContent = 'Stage: collecting info…';
+          }
+
+          // Call is done when status changes to approved
+          if (biz.status === 'approved') {
+            clearInterval(pollInterval);
+            endAICallUI(id, 'approved');
+            showToast('✅ ' + dialerLead.name + ' approved and live!');
+            await loadAllListings();
+          }
+        } catch(e) { console.error('Poll error:', e); }
+      }, 5000);
+    }
+
+    function endAICallUI(id, outcome) {
       callActive = false;
       stopTimer();
-      document.getElementById('remoteAudio').srcObject = null;
       document.getElementById('dialerAvatarWrap').classList.remove('ringing');
-      setDialerStatus('Call ended · ' + formatTime(callSeconds), 'ended');
+
+      const msg = outcome === 'approved'
+        ? '✅ Listing approved — Sarah got the info!'
+        : 'Call ended · ' + formatTime(callSeconds);
+
+      setDialerStatus(msg, outcome === 'approved' ? 'connected' : 'ended');
       setDialerBtns('ended');
       document.getElementById('dialerNotes').style.display    = 'block';
       document.getElementById('dialerCloseBtn').style.display = 'block';
-    }
 
-    function toggleMute() {
-      isMuted = !isMuted;
-      if (activeCall) {
-        try {
-          isMuted ? activeCall.muteAudio() : activeCall.unmuteAudio();
-        } catch(e) { console.error('Mute error:', e); }
-      }
-      const btn = document.getElementById('muteBtn');
-      if (btn) { btn.classList.toggle('active', isMuted); btn.textContent = isMuted ? '🔇' : '🎤'; }
-      showToast(isMuted ? 'Muted' : 'Unmuted');
-    }
-
-    function toggleNotes() {
-      const n = document.getElementById('dialerNotes');
-      n.style.display = n.style.display === 'none' ? 'block' : 'none';
+      const cardBtn = document.getElementById('callbtn-' + id);
+      if (cardBtn) { cardBtn.disabled = false; cardBtn.classList.remove('calling'); cardBtn.textContent = '🤖 AI Call'; }
     }
 
     async function saveNote() {
@@ -620,6 +477,7 @@
           showToast('Note saved!');
         } catch(e) { showToast('Could not save note', true); }
       }
+      if (pollInterval) clearInterval(pollInterval);
       closeDialer();
     }
 
@@ -650,7 +508,7 @@
       t.textContent = msg;
       t.style.background = isError ? '#991b1b' : 'var(--ink)';
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
+      setTimeout(() => t.classList.remove('show'), 3500);
     }
 
     function esc(s) {
