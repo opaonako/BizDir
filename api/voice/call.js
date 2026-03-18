@@ -88,4 +88,21 @@ module.exports = async (req, res) => {
     console.error("Call error:", e.message);
     return res.status(500).json({ success: false, error: e.message });
   }
+  if (!response.ok) {
+  console.error("Telnyx full error:", JSON.stringify(data, null, 2));
+  return res.status(500).json({
+    success: false,
+    error:   data?.errors?.[0]?.detail || "Failed to initiate call",
+    code:    data?.errors?.[0]?.code,
+    title:   data?.errors?.[0]?.title,
+    debug:   { 
+      phone, 
+      from:  TELNYX_PHONE_NUMBER, 
+      appId: TELNYX_APP_ID,
+      keySet: !!TELNYX_API_KEY,
+      numSet: !!TELNYX_PHONE_NUMBER,
+      appSet: !!TELNYX_APP_ID,
+    },
+  });
+}
 };
