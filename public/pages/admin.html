@@ -360,8 +360,7 @@
   <div class="toast" id="toast"></div>
 
   <!-- Telnyx WebRTC SDK -->
-  <script src="https://unpkg.com/@telnyx/webrtc@2.17.0/lib/index.umd.js"></script>
-
+<script src="https://unpkg.com/@telnyx/webrtc@2.9.0/lib/bundle.js"></script>
   <script>
     const ADMIN_EMAIL   = "paolollenado@gmail.com";
     let allBusinesses   = [];
@@ -407,7 +406,7 @@
         if (!res.ok) throw new Error('Token failed');
         const { token, login } = await res.json();
 
-        telnyxClient = new TelnyxRTC({ login, password: token });
+        telnyxClient = new TelnyxWebRTC.TelnyxRTC({ login, password: token });
 
         telnyxClient.on('telnyx.ready', () => {
           setPanelStatus('ready', 'Ready');
