@@ -404,9 +404,16 @@
       try {
         const res = await fetch('/api/voice/token', { method: 'POST' });
         if (!res.ok) throw new Error('Token failed');
-        const { token, login } = await res.json();
+        const data = await res.json();
+        console.log('Token data:', JSON.stringify(data));
 
-        telnyxClient = new TelnyxWebRTC.TelnyxRTC({ login_token: login });
+        let clientConfig;
+        if (data.login_token) {
+        clientConfig = { login_token: data.login_token };
+          } else {
+            clientConfig = { login: data.login, password: data.token };
+          }
+          telnyxClient = new TelnyxWebRTC.TelnyxRTC(clientConfig);
 
         telnyxClient.on('telnyx.ready', () => {
           setPanelStatus('ready', 'Ready');

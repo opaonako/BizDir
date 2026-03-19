@@ -1,10 +1,7 @@
 // api/voice/token.js
-// Returns Telnyx WebRTC credentials for browser dialer
-// POST /api/voice/token
+// Generates Telnyx WebRTC JWT token for browser dialer
 
-const TELNYX_API_KEY          = process.env.TELNYX_API_KEY;
-const TELNYX_SIP_USERNAME     = process.env.TELNYX_SIP_USERNAME; // userpaolollenado24209@sip.telnyx.com
-const TELNYX_SIP_PASSWORD     = process.env.TELNYX_SIP_PASSWORD; // your SIP password
+const TELNYX_API_KEY           = process.env.TELNYX_API_KEY;
 const TELNYX_SIP_CONNECTION_ID = process.env.TELNYX_SIP_CONNECTION_ID;
 
 module.exports = async (req, res) => {
@@ -12,21 +9,13 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // If SIP credentials are set directly, use them
-  if (TELNYX_SIP_USERNAME && TELNYX_SIP_PASSWORD) {
-    return res.status(200).json({
-      login: TELNYX_SIP_USERNAME,
-      token: TELNYX_SIP_PASSWORD,
-    });
-  }
-
-  // Otherwise generate temporary credentials via API
   if (!TELNYX_API_KEY) {
     return res.status(500).json({ error: "Telnyx not configured" });
   }
 
   try {
-    const response = await fetch("https://api.telnyx.com/v2/telephony_credentials", {
+    // Step 1 — Create a telephony credential
+    const credRes = await fetch("https://api.telnyx.com/v2/telephony_credentials", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,19 +26,40 @@ module.exports = async (req, res) => {
       }),
     });
 
-    const data = await response.json();
+    const credData = await credRes.json();
+    console.log("Credential response:", JSON.stringify(credData?.data));
 
-    if (!response.ok) {
-      console.error("Telnyx credential error:", data);
+    if (!credRes.ok) {
       return res.status(500).json({
-        error: "Failed to create WebRTC credentials",
-        details: data?.errors?.[0]?.detail || "Unknown error"
+        error: "Failed to create credential",
+        details: credData?.errors?.[0]?.detail || "Unknown"
       });
     }
 
+    const credentialId = credData.data?.id;
+    if (!credentialId) {
+      return res.status(500).json({ error: "No credential ID returned" });
+    }
+
+    // Step 2 — Generate a JWT token for this credential
+    const tokenRes = await fetch(`https://api.telnyx.com/v2/telephony_credentials/${credentialId}/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${TELNYX_API_KEY}`,
+      },
+    });
+
+    // Telnyx returns the JWT as plain text
+    const jwt = await tokenRes.text();
+    console.log("JWT generated, length:", jwt.length);
+
+    if (!tokenRes.ok || !jwt) {
+      return res.status(500).json({ error: "Failed to generate JWT token" });
+    }
+
     return res.status(200).json({
-      token: data.data?.sip_password,
-      login: data.data?.sip_username,
+      login_token: jwt.trim(),
     });
 
   } catch(e) {
