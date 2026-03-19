@@ -30,7 +30,7 @@
     .btn-logout { font-size: 0.82rem; color: #aaa; background: none; border: 1.5px solid #333; padding: 6px 14px; border-radius: 7px; cursor: pointer; font-family: var(--font-body); transition: all 0.18s; }
     .btn-logout:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* LAYOUT — main content + slide panel */
+    /* LAYOUT */
     .layout { display: flex; min-height: calc(100vh - 63px); }
     .page { flex: 1; max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; transition: margin-right 0.3s ease; min-width: 0; }
 
@@ -46,23 +46,14 @@
     }
     .phone-panel.open { width: 380px; overflow: visible; }
     .phone-panel-inner { width: 380px; height: 100%; display: flex; flex-direction: column; overflow-y: auto; }
-
-    .panel-header {
-      background: var(--ink); padding: 1rem 1.25rem;
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 2px solid var(--accent); flex-shrink: 0;
-    }
+    .panel-header { background: var(--ink); padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--accent); flex-shrink: 0; }
     .panel-header-title { font-family: var(--font-head); font-size: 1.3rem; letter-spacing: 0.03em; color: #fff; }
     .panel-close { background: none; border: 1.5px solid #444; color: #aaa; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-family: var(--font-body); transition: all 0.18s; }
     .panel-close:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* LEAD BANNER inside panel */
     .panel-lead { background: #fff8cc; border-bottom: 1px solid var(--accent); padding: 10px 1.25rem; flex-shrink: 0; display: none; }
     .panel-lead.show { display: block; }
     .panel-lead-name { font-family: var(--font-head); font-size: 1rem; letter-spacing: 0.02em; color: var(--ink); }
     .panel-lead-meta { font-size: 0.75rem; color: var(--accent-dark); margin-top: 2px; }
-
-    /* STATUS */
     .panel-status { padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 8px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
     .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
     .status-dot.ready    { background: var(--green); }
@@ -72,20 +63,14 @@
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
     .status-label { font-size: 0.8rem; color: var(--ink-3); }
     .call-timer { font-family: var(--font-head); font-size: 0.95rem; letter-spacing: 0.05em; color: var(--green); margin-left: auto; display: none; }
-
-    /* DISPLAY */
     .panel-display { padding: 1rem 1.25rem; flex-shrink: 0; }
     .display-number { font-family: var(--font-head); font-size: 1.6rem; letter-spacing: 0.05em; color: var(--ink); background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 0.75rem; word-break: break-all; }
-
-    /* KEYPAD */
     .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 0.75rem; }
     .key { background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 6px; text-align: center; cursor: pointer; transition: all 0.12s; user-select: none; }
     .key:hover { background: #eaeaea; border-color: var(--accent); }
     .key:active { background: var(--accent); transform: scale(0.95); }
     .key-num { font-family: var(--font-head); font-size: 1.1rem; line-height: 1; }
     .key-sub { font-size: 0.55rem; color: var(--ink-3); letter-spacing: 0.1em; margin-top: 2px; }
-
-    /* CALL ACTIONS */
     .call-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
     .btn-action { border: none; border-radius: 50%; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.18s; margin: 0 auto; font-size: 1.2rem; }
     .btn-green { background: var(--green); color: #fff; }
@@ -97,8 +82,6 @@
     .btn-gray:hover { background: #eaeaea; }
     .btn-gray.muted { background: #fff3cd; border-color: var(--accent); color: var(--accent-dark); }
     .btn-label { font-size: 0.68rem; color: var(--ink-3); text-align: center; margin-top: 3px; }
-
-    /* TRANSCRIPT */
     .panel-transcript { flex: 1; padding: 0 1.25rem 1rem; overflow-y: auto; min-height: 120px; }
     .transcript-header { font-size: 0.72rem; font-weight: 500; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 6px; padding-top: 0.75rem; }
     .live-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: blink 1s infinite; display: none; }
@@ -109,8 +92,6 @@
     .t-entry.system { color: var(--ink-3); font-size: 0.72rem; text-align: center; padding: 3px; }
     .t-label { font-size: 0.65rem; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
     .empty-transcript { text-align: center; padding: 1.5rem 0; color: var(--ink-3); font-size: 0.82rem; }
-
-    /* NOTES */
     .panel-notes { padding: 0.75rem 1.25rem 1.25rem; border-top: 1px solid var(--border); flex-shrink: 0; }
     .panel-notes label { font-size: 0.72rem; font-weight: 500; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 5px; }
     .panel-notes textarea { width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font-body); font-size: 0.82rem; color: var(--ink); resize: none; outline: none; min-height: 60px; }
@@ -118,7 +99,7 @@
     .btn-save-notes { margin-top: 6px; width: 100%; padding: 8px; background: var(--accent); color: var(--ink); border: none; border-radius: 8px; font-family: var(--font-head); font-size: 1rem; letter-spacing: 0.03em; cursor: pointer; transition: background 0.18s; }
     .btn-save-notes:hover { background: var(--accent-2); }
 
-    /* PAGE STATS + REST */
+    /* PAGE */
     .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
     .page-header h1 { font-family: var(--font-head); font-size: 2.4rem; letter-spacing: 0.03em; }
     .page-header p { color: var(--ink-3); font-size: 0.875rem; margin-top: 3px; }
@@ -136,7 +117,21 @@
     .tab.active { color: var(--accent-dark); border-bottom-color: var(--accent); }
     .tab-count { background: var(--surface); color: var(--ink-2); font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
     .tab.active .tab-count { background: #fff3cd; color: var(--accent-dark); }
-    .listing-card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.75rem; animation: fadeUp 0.3s both; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* LISTING CARD */
+    .listing-card {
+      background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px;
+      padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+      display: flex; flex-direction: column; gap: 0.75rem;
+      animation: fadeUp 0.3s both; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      transition: opacity 0.15s, transform 0.2s;
+    }
+    /* Optimistic slide-out when status changes */
+    .listing-card.removing {
+      opacity: 0; transform: translateX(12px);
+      pointer-events: none;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .listing-logo { width: 52px; height: 52px; border-radius: 10px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 1.3rem; color: var(--ink-2); flex-shrink: 0; overflow: hidden; border: 1.5px solid var(--border); }
     .listing-logo img { width: 100%; height: 100%; object-fit: cover; }
     .listing-info { flex: 1; min-width: 0; }
@@ -144,22 +139,23 @@
     .listing-meta { font-size: 0.8rem; color: var(--ink-3); margin-bottom: 6px; display: flex; gap: 12px; flex-wrap: wrap; }
     .listing-desc { font-size: 0.85rem; color: var(--ink-2); font-weight: 300; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .listing-owner { font-size: 0.78rem; color: var(--ink-3); margin-top: 6px; }
-    .listing-actions { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; padding-top: 0.75rem; border-top: 1px solid var(--border); }    .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+    .listing-actions { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+    .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
     .status-badge.pending  { background: var(--yellow-bg); color: var(--yellow); }
     .status-badge.approved { background: var(--green-bg);  color: var(--green); }
     .status-badge.rejected { background: var(--red-bg);    color: var(--red); }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-family: var(--font-body); font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; text-decoration: none; white-space: nowrap; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn-approve { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
-    .btn-approve:hover { background: #bbf7d0; }
+    .btn-approve:hover:not(:disabled) { background: #bbf7d0; }
     .btn-reject  { background: var(--red-bg);   color: var(--red);   border: 1px solid #fca5a5; }
-    .btn-reject:hover  { background: #fca5a5; }
+    .btn-reject:hover:not(:disabled)  { background: #fca5a5; }
     .btn-view    { background: var(--surface);  color: var(--ink-2); border: 1px solid var(--border); }
     .btn-view:hover    { border-color: var(--ink); }
     .btn-restore { background: var(--yellow-bg); color: var(--yellow); border: 1px solid #fde68a; }
     .btn-restore:hover { background: #fde68a; }
     .btn-aicall  { background: var(--accent); color: var(--ink); border: 1px solid var(--accent); font-weight: 700; }
     .btn-aicall:hover  { background: var(--accent-2); }
-    .btn-aicall.calling { background: var(--accent-2); opacity: 0.7; cursor: not-allowed; }
     .btn-manual  { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; font-weight: 700; }
     .btn-manual:hover  { background: #bbf7d0; }
     .empty { text-align: center; padding: 4rem 2rem; color: var(--ink-3); }
@@ -173,6 +169,8 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+
+    /* MODALS */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
     .modal-overlay.open { display: flex; }
     @keyframes modalIn { from { opacity:0; transform: scale(0.95) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
@@ -271,18 +269,15 @@
           <div class="panel-header-title">📞 Dialer</div>
           <button class="panel-close" onclick="closePhonePanel()">✕ Close</button>
         </div>
-
         <div class="panel-lead" id="panelLead">
           <div class="panel-lead-name" id="panelLeadName"></div>
           <div class="panel-lead-meta" id="panelLeadMeta"></div>
         </div>
-
         <div class="panel-status">
           <span class="status-dot" id="panelStatusDot"></span>
           <span class="status-label" id="panelStatusText">Connecting...</span>
           <span class="call-timer" id="panelTimer">0:00</span>
         </div>
-
         <div class="panel-display">
           <div class="display-number" id="panelNumber">+1</div>
           <div class="keypad">
@@ -315,16 +310,10 @@
             </div>
           </div>
         </div>
-
         <div class="panel-transcript">
-          <div class="transcript-header">
-            Transcript <span class="live-dot" id="liveDot"></span>
-          </div>
-          <div id="transcriptEntries">
-            <div class="empty-transcript">Start a call to see live transcript</div>
-          </div>
+          <div class="transcript-header">Transcript <span class="live-dot" id="liveDot"></span></div>
+          <div id="transcriptEntries"><div class="empty-transcript">Start a call to see live transcript</div></div>
         </div>
-
         <div class="panel-notes">
           <label>Call notes</label>
           <textarea id="callNotes" placeholder="Notes during or after the call..."></textarea>
@@ -357,19 +346,18 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- Telnyx WebRTC SDK -->
-<script src="/js/telnyx.js"></script>
+  <script src="/js/telnyx.js"></script>
   <script>
-    const ADMIN_EMAIL   = "paolollenado@gmail.com";
-    let allBusinesses   = [];
-    let telnyxClient    = null;
-    let currentCall     = null;
-    let isMuted         = false;
-    let manualTimer     = null;
-    let manualSeconds   = 0;
-    let recognition     = null;
-    let currentLeadId   = null;
-    let transcript      = [];
+    const ADMIN_EMAIL = "paolollenado@gmail.com";
+    let allBusinesses  = [];
+    let telnyxClient   = null;
+    let currentCall    = null;
+    let isMuted        = false;
+    let manualTimer    = null;
+    let manualSeconds  = 0;
+    let recognition    = null;
+    let currentLeadId  = null;
+    let transcript     = [];
 
     // ── INIT ──────────────────────────────────────────────────
     async function init() {
@@ -403,34 +391,27 @@
         const res = await fetch('/api/voice/token', { method: 'POST' });
         if (!res.ok) throw new Error('Token failed');
         const data = await res.json();
-        console.log('Token data:', JSON.stringify(data));
-
         let clientConfig;
         if (data.login_token) {
-        clientConfig = { login_token: data.login_token };
-          } else {
-            clientConfig = { login: data.login, password: data.token };
-          }
-          telnyxClient = new TelnyxWebRTC.TelnyxRTC(clientConfig);
-
+          clientConfig = { login_token: data.login_token };
+        } else {
+          clientConfig = { login: data.login, password: data.token };
+        }
+        telnyxClient = new TelnyxWebRTC.TelnyxRTC(clientConfig);
         telnyxClient.on('telnyx.ready', () => {
           setPanelStatus('ready', 'Ready');
           document.getElementById('callBtn').disabled = false;
-          console.log('Telnyx WebRTC ready');
         });
-
         telnyxClient.on('telnyx.error', (err) => {
           setPanelStatus('error', 'Setup required');
           console.error('Telnyx error:', err);
         });
-
         telnyxClient.on('telnyx.notification', (notification) => {
           const call = notification.call;
           if (!call) return;
           currentCall = call;
           if (notification.type === 'callUpdate') handleCallUpdate(call);
         });
-
         await telnyxClient.connect();
       } catch(e) {
         setPanelStatus('error', 'WebRTC unavailable');
@@ -467,15 +448,11 @@
       }
     }
 
-    // ── MANUAL CALL — opens side panel ────────────────────────
+    // ── MANUAL CALL PANEL ─────────────────────────────────────
     function openPhonePanel(phone, name, category, address, leadId) {
       currentLeadId = leadId;
       transcript    = [];
-
-      // Pre-fill number
       document.getElementById('panelNumber').textContent = phone || '+1';
-
-      // Show lead banner
       if (name) {
         document.getElementById('panelLead').classList.add('show');
         document.getElementById('panelLeadName').textContent = name;
@@ -483,18 +460,10 @@
       } else {
         document.getElementById('panelLead').classList.remove('show');
       }
-
-      // Clear transcript and notes
       document.getElementById('transcriptEntries').innerHTML = '<div class="empty-transcript">Start a call to see live transcript</div>';
       document.getElementById('callNotes').value = '';
-
-      // Open panel
       document.getElementById('phonePanel').classList.add('open');
-
-      // Auto-dial once panel opens and WebRTC is ready
-      if (telnyxClient && phone) {
-        setTimeout(() => makeCall(), 400);
-      }
+      if (telnyxClient && phone) setTimeout(() => makeCall(), 400);
     }
 
     function closePhonePanel() {
@@ -504,25 +473,16 @@
       stopSpeechRecognition();
     }
 
-    // ── WEBRTC CALL CONTROLS ──────────────────────────────────
     function makeCall() {
       if (!telnyxClient) { showToast('Dialer not connected', true); return; }
       const number = document.getElementById('panelNumber').textContent.trim();
       if (!number || number === '+1') { showToast('No number to dial', true); return; }
-
       transcript = [];
       document.getElementById('transcriptEntries').innerHTML = '';
-
-      currentCall = telnyxClient.newCall({
-        destinationNumber: number,
-        callerNumber: '+14485875551',
-      });
+      currentCall = telnyxClient.newCall({ destinationNumber: number, callerNumber: '+14485875551' });
     }
 
-    function hangUp() {
-      if (currentCall) currentCall.hangup();
-    }
-
+    function hangUp()    { if (currentCall) currentCall.hangup(); }
     function toggleMute() {
       if (!currentCall) return;
       isMuted = !isMuted;
@@ -531,26 +491,22 @@
       btn.classList.toggle('muted', isMuted);
       btn.textContent = isMuted ? '🔇' : '🎤';
     }
-
     function pressKey(key) {
       const display = document.getElementById('panelNumber');
       if (currentCall?.state === 'active') { currentCall.dtmf(key); return; }
       const cur = display.textContent;
       display.textContent = (cur === '+1' && /\d/.test(key)) ? cur + key : cur + key;
     }
-
     function deleteKey() {
       const display = document.getElementById('panelNumber');
       const cur = display.textContent;
       display.textContent = cur.length > 2 ? cur.slice(0, -1) : '+1';
     }
-
     function showHangup(show) {
       document.getElementById('callBtn').style.display    = show ? 'none' : 'flex';
       document.getElementById('hangupBtn').style.display  = show ? 'flex' : 'none';
       document.getElementById('callBtnLabel').textContent = show ? 'Hang up' : 'Call';
     }
-
     function setPanelStatus(state, text) {
       const dot = document.getElementById('panelStatusDot');
       dot.className = 'status-dot';
@@ -568,24 +524,16 @@
       }
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognition = new SR();
-      recognition.continuous     = true;
-      recognition.interimResults = true;
-      recognition.lang           = 'en-US';
-
+      recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
       let interimEl = null;
-
       recognition.onresult = (event) => {
         let interim = '', final = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const t = event.results[i][0].transcript;
-          if (event.results[i].isFinal) final += t;
-          else interim += t;
+          if (event.results[i].isFinal) final += t; else interim += t;
         }
         if (interimEl) { interimEl.remove(); interimEl = null; }
-        if (final) {
-          transcript.push({ role: 'you', text: final.trim() });
-          addTranscript('you', final.trim());
-        }
+        if (final) { transcript.push({ role: 'you', text: final.trim() }); addTranscript('you', final.trim()); }
         if (interim) {
           interimEl = document.createElement('div');
           interimEl.className = 't-entry you';
@@ -599,50 +547,31 @@
       recognition.onend   = () => { if (currentCall?.state === 'active') recognition.start(); };
       recognition.start();
     }
-
-    function stopSpeechRecognition() {
-      if (recognition) { recognition.stop(); recognition = null; }
-    }
-
+    function stopSpeechRecognition() { if (recognition) { recognition.stop(); recognition = null; } }
     function addTranscript(role, text) {
       const container = document.getElementById('transcriptEntries');
       const empty = container.querySelector('.empty-transcript');
       if (empty) empty.remove();
       const el = document.createElement('div');
-      if (role === 'system') {
-        el.className = 't-entry system';
-        el.textContent = text;
-      } else {
-        el.className = 't-entry you';
-        el.innerHTML = `<div class="t-label">You</div><div>${text}</div>`;
-      }
+      if (role === 'system') { el.className = 't-entry system'; el.textContent = text; }
+      else { el.className = 't-entry you'; el.innerHTML = `<div class="t-label">You</div><div>${text}</div>`; }
       container.appendChild(el);
       scrollTranscript();
     }
-
-    function scrollTranscript() {
-      const c = document.getElementById('transcriptEntries');
-      c.scrollTop = c.scrollHeight;
-    }
-
+    function scrollTranscript() { const c = document.getElementById('transcriptEntries'); c.scrollTop = c.scrollHeight; }
     function saveCallNotes() {
       const notes = document.getElementById('callNotes').value.trim();
       if (!notes) return;
       localStorage.setItem(`notes_${currentLeadId || Date.now()}`, JSON.stringify({ notes, transcript, savedAt: new Date().toISOString() }));
       const btn = document.querySelector('.btn-save-notes');
-      btn.textContent = 'Saved!';
-      btn.style.background = 'var(--green)';
-      btn.style.color = '#fff';
+      btn.textContent = 'Saved!'; btn.style.background = 'var(--green)'; btn.style.color = '#fff';
       setTimeout(() => { btn.textContent = 'Save Notes'; btn.style.background = ''; btn.style.color = ''; }, 2000);
     }
 
     // ── MANUAL TIMER ──────────────────────────────────────────
     function startManualTimer() {
       manualSeconds = 0;
-      manualTimer = setInterval(() => {
-        manualSeconds++;
-        document.getElementById('panelTimer').textContent = formatTime(manualSeconds);
-      }, 1000);
+      manualTimer = setInterval(() => { manualSeconds++; document.getElementById('panelTimer').textContent = formatTime(manualSeconds); }, 1000);
     }
     function stopManualTimer() { clearInterval(manualTimer); manualSeconds = 0; }
 
@@ -659,14 +588,7 @@
         const approved = (aData.businesses  || []).filter(b => b.status === 'approved');
         const rejected = (rData.businesses  || []).filter(b => b.status === 'rejected');
         allBusinesses  = [...pending, ...approved, ...rejected];
-        document.getElementById('statPending').textContent   = pending.length;
-        document.getElementById('statApproved').textContent  = approved.length;
-        document.getElementById('statRejected').textContent  = rejected.length;
-        document.getElementById('statTotal').textContent     = allBusinesses.length;
-        document.getElementById('countPending').textContent  = pending.length;
-        document.getElementById('countApproved').textContent = approved.length;
-        document.getElementById('countRejected').textContent = rejected.length;
-        document.getElementById('countAll').textContent      = allBusinesses.length;
+        refreshUI();
         renderTab('pending',  pending);
         renderTab('approved', approved);
         renderTab('rejected', rejected);
@@ -674,75 +596,54 @@
       } catch(e) { console.error('Failed to load listings', e); }
     }
 
-    function renderTab(name, businesses) {
-      const el = document.getElementById('tab-' + name);
-      if (!businesses.length) {
-        el.innerHTML = `<div class="empty"><div class="empty-icon">${name === 'pending' ? '🎉' : '📋'}</div><h3>${name === 'pending' ? 'All caught up!' : 'No listings here'}</h3><p>${name === 'pending' ? 'No listings pending review.' : 'Nothing to show.'}</p></div>`;
-        return;
-      }
-      el.innerHTML = businesses.map((b, i) => `
-      <div class="listing-card" id="card-${esc(b.id)}" style="animation-delay:${i*0.04}s">
-      <div style="display:flex;align-items:flex-start;gap:1.25rem">
-       <div class="listing-logo">
-            ${b.logoUrl ? `<img src="${esc(b.logoUrl)}" onerror="this.parentElement.textContent='${esc(b.name.charAt(0))}'"/>` : esc(b.name.charAt(0).toUpperCase())}
-          </div>
-          <div class="listing-info">
-            <div class="listing-name">${esc(b.name)}</div>
-            <div class="listing-meta">
-              <span>📁 ${esc(b.category)}</span>
-              <span>📍 ${esc(b.location)}</span>
-              ${b.phone && b.phone !== 'Not listed' ? `<span>📞 ${esc(String(b.phone))}</span>` : ''}
-            </div>
-            <div class="listing-desc">${esc(b.description)}</div>
-            <div class="listing-owner">Submitted by ${esc(b.ownerEmail||'—')} · ${formatDate(b.createdAt)}</div>
-          </div>
-          </div>
-          <div class="listing-actions">
-            ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ? `
-              <button class="btn btn-aicall"
-                data-id="${esc(b.id)}"
-                data-name="${esc(b.name)}"
-                data-phone="${esc(String(b.phone))}"
-                data-address="${esc(b.address||b.location||'')}"
-                data-category="${esc(b.category||'')}">
-                🤖 AI Call
-              </button>
-              <button class="btn btn-manual"
-                data-phone="${esc(String(b.phone))}"
-                data-name="${esc(b.name)}"
-                data-category="${esc(b.category||'')}"
-                data-address="${esc(b.address||b.location||'')}"
-                data-leadid="${esc(b.id)}">
-                📞 Call
-              </button>
-            ` : ''}
-            <span class="status-badge ${b.status}">${b.status}</span>
-            <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
-            <button class="btn btn-approve" data-id="${esc(b.id)}" data-status="approved" ${b.status === 'approved' ? 'style="display:none"' : ''}>✓ Approve</button>
-            <button class="btn btn-reject"  data-id="${esc(b.id)}" data-status="rejected" ${b.status === 'rejected' ? 'style="display:none"' : ''}>✕ Reject</button>
-            ${b.status === 'rejected' ? `<button class="btn btn-restore" data-id="${esc(b.id)}" data-status="pending">↺ Restore</button>` : ''}
-          </div>
-        </div>`).join('');
-
-      // Attach listeners
-      el.querySelectorAll('.btn-manual').forEach(btn => {
-        btn.addEventListener('click', () => {
-          openPhonePanel(btn.dataset.phone, btn.dataset.name, btn.dataset.category, btn.dataset.address, btn.dataset.leadid);
-        });
-      });
-      el.querySelectorAll('.btn-aicall').forEach(btn => {
-        btn.addEventListener('click', () => {
-          callLead(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.address, btn.dataset.category);
-        });
-      });
-      el.querySelectorAll('.btn-approve, .btn-reject, .btn-restore').forEach(btn => {
-        btn.addEventListener('click', () => updateStatus(btn.dataset.id, btn.dataset.status));
-      });
+    // ── REFRESH COUNTS & STATS (no re-render) ─────────────────
+    function refreshUI() {
+      const pending  = allBusinesses.filter(b => b.status === 'pending');
+      const approved = allBusinesses.filter(b => b.status === 'approved');
+      const rejected = allBusinesses.filter(b => b.status === 'rejected');
+      document.getElementById('statPending').textContent   = pending.length;
+      document.getElementById('statApproved').textContent  = approved.length;
+      document.getElementById('statRejected').textContent  = rejected.length;
+      document.getElementById('statTotal').textContent     = allBusinesses.length;
+      document.getElementById('countPending').textContent  = pending.length;
+      document.getElementById('countApproved').textContent = approved.length;
+      document.getElementById('countRejected').textContent = rejected.length;
+      document.getElementById('countAll').textContent      = allBusinesses.length;
     }
 
+    // ── OPTIMISTIC UPDATE — instant, no full reload ───────────
     async function updateStatus(id, status) {
+      const biz = allBusinesses.find(b => b.id === id);
+      if (!biz) return;
+
+      const prevStatus = biz.status;
+
+      // 1. Instantly update local state + fade out card
+      biz.status = status;
       const card = document.getElementById('card-' + id);
-      if (card) card.style.opacity = '0.5';
+      if (card) card.classList.add('removing');
+
+      // 2. Update counts immediately
+      refreshUI();
+
+      // Short delay so the CSS transition plays, then re-render affected tabs
+      setTimeout(() => {
+        const pending  = allBusinesses.filter(b => b.status === 'pending');
+        const approved = allBusinesses.filter(b => b.status === 'approved');
+        const rejected = allBusinesses.filter(b => b.status === 'rejected');
+
+        // Only re-render the tabs that changed (prev and new status)
+        const tabsToRefresh = new Set(['all', prevStatus, status]);
+        tabsToRefresh.forEach(tab => {
+          const data = tab === 'all' ? allBusinesses
+                     : tab === 'pending'  ? pending
+                     : tab === 'approved' ? approved
+                     : rejected;
+          renderTab(tab, data);
+        });
+      }, 180);
+
+      // 3. Fire API in background — rollback if it fails
       try {
         const res  = await fetch('/api/listing', {
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
@@ -750,16 +651,90 @@
         });
         const data = await res.json();
         if (data.success) {
-          showAlert({ approved:'✓ Approved and live!', rejected:'Listing rejected.', pending:'Restored to pending.' }[status] || 'Updated.', 'success');
-          await loadAllListings();
+          const msgs = { approved: '✓ Approved and live!', rejected: 'Listing rejected.', pending: 'Restored to pending.' };
+          showAlert(msgs[status] || 'Updated.', 'success');
         } else {
-          showAlert(data.error || 'Failed.', 'error');
-          if (card) card.style.opacity = '1';
+          // Rollback
+          biz.status = prevStatus;
+          refreshUI();
+          const p = allBusinesses.filter(b => b.status === 'pending');
+          const a = allBusinesses.filter(b => b.status === 'approved');
+          const r = allBusinesses.filter(b => b.status === 'rejected');
+          ['pending','approved','rejected','all'].forEach(t =>
+            renderTab(t, t === 'all' ? allBusinesses : t === 'pending' ? p : t === 'approved' ? a : r)
+          );
+          showAlert(data.error || 'Update failed. Please try again.', 'error');
         }
       } catch(e) {
-        showAlert('Something went wrong.', 'error');
-        if (card) card.style.opacity = '1';
+        // Rollback on network error
+        biz.status = prevStatus;
+        refreshUI();
+        const p = allBusinesses.filter(b => b.status === 'pending');
+        const a = allBusinesses.filter(b => b.status === 'approved');
+        const r = allBusinesses.filter(b => b.status === 'rejected');
+        ['pending','approved','rejected','all'].forEach(t =>
+          renderTab(t, t === 'all' ? allBusinesses : t === 'pending' ? p : t === 'approved' ? a : r)
+        );
+        showAlert('Network error. Please try again.', 'error');
       }
+    }
+
+    // ── RENDER TAB ────────────────────────────────────────────
+    function renderTab(name, businesses) {
+      const el = document.getElementById('tab-' + name);
+      if (!businesses.length) {
+        el.innerHTML = `<div class="empty"><div class="empty-icon">${name === 'pending' ? '🎉' : '📋'}</div><h3>${name === 'pending' ? 'All caught up!' : 'No listings here'}</h3><p>${name === 'pending' ? 'No listings pending review.' : 'Nothing to show.'}</p></div>`;
+        return;
+      }
+      el.innerHTML = businesses.map((b, i) => `
+        <div class="listing-card" id="card-${esc(b.id)}" style="animation-delay:${i*0.04}s">
+          <div style="display:flex;align-items:flex-start;gap:1.25rem">
+            <div class="listing-logo">
+              ${b.logoUrl ? `<img src="${esc(b.logoUrl)}" onerror="this.parentElement.textContent='${esc(b.name.charAt(0))}'"/>` : esc(b.name.charAt(0).toUpperCase())}
+            </div>
+            <div class="listing-info">
+              <div class="listing-name">${esc(b.name)}</div>
+              <div class="listing-meta">
+                <span>📁 ${esc(b.category)}</span>
+                <span>📍 ${esc(b.location)}</span>
+                ${b.phone && b.phone !== 'Not listed' ? `<span>📞 ${esc(String(b.phone))}</span>` : ''}
+              </div>
+              <div class="listing-desc">${esc(b.description)}</div>
+              <div class="listing-owner">Submitted by ${esc(b.ownerEmail||'—')} · ${formatDate(b.createdAt)}</div>
+            </div>
+          </div>
+          <div class="listing-actions">
+            ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ? `
+              <button class="btn btn-aicall"
+                data-id="${esc(b.id)}" data-name="${esc(b.name)}"
+                data-phone="${esc(String(b.phone))}" data-address="${esc(b.address||b.location||'')}"
+                data-category="${esc(b.category||'')}">
+                🤖 AI Call
+              </button>
+              <button class="btn btn-manual"
+                data-phone="${esc(String(b.phone))}" data-name="${esc(b.name)}"
+                data-category="${esc(b.category||'')}" data-address="${esc(b.address||b.location||'')}"
+                data-leadid="${esc(b.id)}">
+                📞 Call
+              </button>
+            ` : ''}
+            <span class="status-badge ${b.status}">${b.status}</span>
+            <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
+            ${b.status !== 'approved' ? `<button class="btn btn-approve" data-id="${esc(b.id)}" data-status="approved">✓ Approve</button>` : ''}
+            ${b.status !== 'rejected' ? `<button class="btn btn-reject"  data-id="${esc(b.id)}" data-status="rejected">✕ Reject</button>` : ''}
+            ${b.status === 'rejected' ? `<button class="btn btn-restore" data-id="${esc(b.id)}" data-status="pending">↺ Restore</button>` : ''}
+          </div>
+        </div>`).join('');
+
+      el.querySelectorAll('.btn-manual').forEach(btn => {
+        btn.addEventListener('click', () => openPhonePanel(btn.dataset.phone, btn.dataset.name, btn.dataset.category, btn.dataset.address, btn.dataset.leadid));
+      });
+      el.querySelectorAll('.btn-aicall').forEach(btn => {
+        btn.addEventListener('click', () => callLead(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.address, btn.dataset.category));
+      });
+      el.querySelectorAll('.btn-approve, .btn-reject, .btn-restore').forEach(btn => {
+        btn.addEventListener('click', () => updateStatus(btn.dataset.id, btn.dataset.status));
+      });
     }
 
     function switchTab(name) {
@@ -776,7 +751,7 @@
 
     function callLead(id, name, phone, address, category) {
       dialerLead = { id, name, phone, address, category };
-      aiActive   = false; aiSeconds = 0;
+      aiActive = false; aiSeconds = 0;
       document.getElementById('dialerAvatar').textContent     = (name||'?').charAt(0).toUpperCase();
       document.getElementById('dialerName').textContent       = name;
       document.getElementById('dialerPhone').textContent      = phone;
@@ -856,9 +831,18 @@
           if (!biz) return;
           if (biz.status === 'approved') {
             clearInterval(pollInterval);
+            // Optimistically update local state too
+            const local = allBusinesses.find(b => b.id === id);
+            if (local) { local.status = 'approved'; refreshUI(); }
             endAICallUI(id, 'approved');
             showToast('✅ ' + dialerLead.name + ' approved and live!');
-            await loadAllListings();
+            // Refresh only the affected tabs
+            const p = allBusinesses.filter(b => b.status === 'pending');
+            const a = allBusinesses.filter(b => b.status === 'approved');
+            const r = allBusinesses.filter(b => b.status === 'rejected');
+            ['pending','approved','all'].forEach(t =>
+              renderTab(t, t === 'all' ? allBusinesses : t === 'pending' ? p : a)
+            );
           }
         } catch(e) { console.error('Poll error:', e); }
       }, 5000);
@@ -888,27 +872,22 @@
 
     // ── HELPERS ───────────────────────────────────────────────
     function formatTime(s) { return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
-
     function formatDate(dateStr) {
       if (!dateStr) return '';
       try { return new Date(dateStr).toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' }); }
       catch { return dateStr; }
     }
-
     function showAlert(msg, type) {
       const el = document.getElementById('alert');
       el.textContent = msg; el.className = 'alert ' + type;
       setTimeout(() => { el.className = 'alert'; }, 4000);
     }
-
     function showToast(msg, isError) {
       const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.style.background = isError ? '#991b1b' : 'var(--ink)';
+      t.textContent = msg; t.style.background = isError ? '#991b1b' : 'var(--ink)';
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 3500);
     }
-
     function esc(s) {
       return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
