@@ -61,7 +61,7 @@ module.exports = async (req, res) => {
         from:                        TELNYX_PHONE_NUMBER,
         from_display_name:           "BizDir",
         client_state:                clientState,
-        webhook_url:                 "https://biz-dir.vercel.app/api/voice/webhook",
+        webhook_url:                 "https://yellow-pages.directory/api/voice/webhook",
         webhook_url_method:          "POST",
         timeout_secs:                30,
       }),
