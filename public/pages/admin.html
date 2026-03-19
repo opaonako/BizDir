@@ -298,15 +298,23 @@
             <div class="listing-desc">${esc(b.description)}</div>
             <div class="listing-owner">Submitted by ${esc(b.ownerEmail||'—')} · ${formatDate(b.createdAt)}</div>
           </div>
-          <div class="listing-actions">
-            ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ?
-              `<button class="btn btn-call" id="callbtn-${esc(b.id)}" onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}','${esc(b.address||b.location||'')}','${esc(b.category||'')}')">🤖 AI Call</button>` : ''}
-            <span class="status-badge ${b.status}">${b.status}</span>
-            <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
-            ${b.status !== 'approved' ? `<button class="btn btn-approve" onclick="updateStatus('${esc(b.id)}','approved')">✓ Approve</button>` : ''}
-            ${b.status !== 'rejected' ? `<button class="btn btn-reject"  onclick="updateStatus('${esc(b.id)}','rejected')">✕ Reject</button>`  : ''}
-            ${b.status === 'rejected' ? `<button class="btn btn-restore" onclick="updateStatus('${esc(b.id)}','pending')">↺ Restore</button>` : ''}
-          </div>
+          `<div class="listing-actions">
+            ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ? `
+            <button class="btn btn-call" id="callbtn-${esc(b.id)}"
+            onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}','${esc(b.address||b.location||'')}','${esc(b.category||'')}')">
+             🤖 AI Call
+              </button>
+            <button class="btn btn-manual"
+              onclick="manualCall('${esc(String(b.phone))}','${esc(b.name)}','${esc(b.category||'')}','${esc(b.address||b.location||'')}','${esc(b.id)}')">
+              📞 Call
+            </button>
+          ` : ''}
+  <span class="status-badge ${b.status}">${b.status}</span>
+  <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
+  ${b.status !== 'approved' ? `<button class="btn btn-approve" onclick="updateStatus('${esc(b.id)}','approved')">✓ Approve</button>` : ''}
+  ${b.status !== 'rejected' ? `<button class="btn btn-reject"  onclick="updateStatus('${esc(b.id)}','rejected')">✕ Reject</button>`  : ''}
+  ${b.status === 'rejected' ? `<button class="btn btn-restore" onclick="updateStatus('${esc(b.id)}','pending')">↺ Restore</button>` : ''}
+</div>`
         </div>`).join('');
     }
 
@@ -526,6 +534,22 @@
     function esc(s) {
       return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
+    // ── ADD THIS FUNCTION to admin.html <script> block ────────
+function manualCall(phone, name, category, address, leadId) {
+  const params = new URLSearchParams({
+    phone:    phone,
+    name:     name     || '',
+    category: category || '',
+    address:  address  || '',
+    leadId:   leadId   || '',
+  });
+  // Open webphone in popup window, pre-dialed to this lead
+  window.open(
+    `/pages/webphone?${params.toString()}`,
+    'dialer',
+    'width=740,height=640,resizable=yes,scrollbars=yes'
+  );
+}
 
     init();
   </script>
