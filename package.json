@@ -9,3 +9,8 @@
     "node": ">=18"
   }
 }
+{
+  "dependencies": {
+    "@telnyx/webrtc": "^2.17.0"
+  }
+}
