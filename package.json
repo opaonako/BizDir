@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "Business directory web app",
   "scripts": {
-    "dev": "vercel dev"
+    "dev": "vercel dev",
+    "build": "cp node_modules/@telnyx/webrtc/lib/index.umd.js public/js/telnyx.js"
   },
   "engines": {
     "node": ">=18"
-  }
-}
-{
+  },
   "dependencies": {
     "@telnyx/webrtc": "^2.17.0"
   }
