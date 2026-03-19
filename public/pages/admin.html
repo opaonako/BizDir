@@ -406,7 +406,7 @@
         if (!res.ok) throw new Error('Token failed');
         const { token, login } = await res.json();
 
-        telnyxClient = new TelnyxWebRTC.TelnyxRTC({ login, password: token });
+        telnyxClient = new TelnyxWebRTC.TelnyxRTC({ login_token: login });
 
         telnyxClient.on('telnyx.ready', () => {
           setPanelStatus('ready', 'Ready');
