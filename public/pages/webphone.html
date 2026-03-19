@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dialer — BizDir</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0f0f0f; --ink-2: #3a3a3a; --ink-3: #888;
+      --paper: #faf9f6; --surface: #f0ede6; --accent: #e84c1e;
+      --border: #e2ddd6; --card: #ffffff;
+      --green: #16a34a; --green-bg: #dcfce7;
+      --red: #dc2626; --red-bg: #fee2e2;
+      --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+    nav { background: var(--ink); padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .nav-logo span { background: var(--accent); padding: 1px 7px 2px; border-radius: 4px; }
+    .nav-badge { background: var(--green); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: 6px; }
+    .nav-right a { font-size: 0.85rem; color: #aaa; text-decoration: none; margin-left: 1.5rem; }
+    .nav-right a:hover { color: #fff; }
+
+    .page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; gap: 2rem; flex-wrap: wrap; }
+
+    /* DIALER */
+    .dialer { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 2rem; width: 340px; }
+    .dialer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .dialer-title { font-family: var(--font-head); font-size: 1.1rem; font-weight: 800; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #ccc; display: inline-block; margin-right: 6px; }
+    .status-dot.connected { background: var(--green); animation: pulse 2s infinite; }
+    .status-dot.calling { background: #f59e0b; animation: pulse 0.8s infinite; }
+    .status-dot.active { background: var(--green); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    .status-text { font-size: 0.78rem; color: var(--ink-3); display: flex; align-items: center; }
+
+    /* DISPLAY */
+    .display { background: var(--surface); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.25rem; min-height: 80px; display: flex; flex-direction: column; justify-content: center; }
+    .display-number { font-family: var(--font-head); font-size: 1.8rem; font-weight: 700; letter-spacing: 0.05em; color: var(--ink); min-height: 40px; word-break: break-all; }
+    .display-status { font-size: 0.8rem; color: var(--ink-3); margin-top: 4px; height: 18px; }
+    .display-timer { font-size: 0.8rem; color: var(--green); margin-top: 4px; font-weight: 500; display: none; }
+
+    /* KEYPAD */
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+    .key { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all 0.12s; user-select: none; }
+    .key:hover { background: #e8e4dc; border-color: #ccc; }
+    .key:active { transform: scale(0.95); }
+    .key-num { font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; line-height: 1; }
+    .key-sub { font-size: 0.6rem; color: var(--ink-3); letter-spacing: 0.12em; margin-top: 2px; }
+
+    /* ACTIONS */
+    .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .btn-action { border: none; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.18s; margin: 0 auto; font-size: 1.4rem; }
+    .btn-call { background: var(--green); color: #fff; }
+    .btn-call:hover { background: #15803d; transform: scale(1.05); }
+    .btn-call:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+    .btn-hangup { background: var(--red); color: #fff; display: none; }
+    .btn-hangup:hover { background: #b91c1c; transform: scale(1.05); }
+    .btn-mute { background: var(--surface); border: 1.5px solid var(--border); color: var(--ink-2); }
+    .btn-mute:hover { background: #e8e4dc; }
+    .btn-mute.muted { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
+    .btn-del { background: var(--surface); border: 1.5px solid var(--border); color: var(--ink-2); font-size: 1rem; }
+    .btn-del:hover { background: #e8e4dc; }
+    .btn-label { font-size: 0.7rem; color: var(--ink-3); text-align: center; margin-top: 4px; }
+
+    /* CALL LOG */
+    .call-log { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem; width: 340px; max-height: 500px; display: flex; flex-direction: column; }
+    .call-log h3 { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+    .log-entries { flex: 1; overflow-y: auto; }
+    .log-entry { padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; font-size: 0.82rem; line-height: 1.5; }
+    .log-entry.outgoing { background: var(--surface); }
+    .log-entry.incoming { background: #e6f4ea; }
+    .log-entry.missed { background: #fee2e2; }
+    .log-meta { font-size: 0.72rem; color: var(--ink-3); margin-top: 3px; }
+    .log-number { font-weight: 500; color: var(--ink); }
+
+    /* QUICK DIAL */
+    .quick-dial { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .quick-dial h4 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .quick-btn { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
+    .quick-btn:hover { background: var(--surface); }
+    .quick-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+    .quick-info { flex: 1; }
+    .quick-name { font-size: 0.82rem; font-weight: 500; }
+    .quick-number { font-size: 0.72rem; color: var(--ink-3); }
+    .quick-call { font-size: 0.75rem; color: var(--green); cursor: pointer; }
+
+    .setup-notice { background: #fef9c3; border: 1px solid #fde68a; border-radius: 12px; padding: 1rem; font-size: 0.82rem; color: #854d0e; margin-bottom: 1.25rem; line-height: 1.6; }
+    .setup-notice strong { display: block; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="nav-logo"><span>Biz</span>Dir <span class="nav-badge">Dialer</span></a>
+    <div class="nav-right">
+      <a href="/pages/caller">AI Caller</a>
+      <a href="/pages/admin">Admin</a>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- DIALER -->
+    <div class="dialer">
+      <div class="dialer-header">
+        <div class="dialer-title">Phone dialer</div>
+        <div class="status-text">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Connecting...</span>
+        </div>
+      </div>
+
+      <div class="setup-notice" id="setupNotice">
+        <strong>Setup required</strong>
+        Add <code>TELNYX_API_KEY</code> and enable WebRTC in your Telnyx account to use the browser dialer.
+      </div>
+
+      <div class="display">
+        <div class="display-number" id="displayNumber">+1</div>
+        <div class="display-status" id="displayStatus">Enter a number to call</div>
+        <div class="display-timer" id="displayTimer">00:00</div>
+      </div>
+
+      <div class="keypad">
+        <div class="key" onclick="pressKey('1')"><div class="key-num">1</div><div class="key-sub"></div></div>
+        <div class="key" onclick="pressKey('2')"><div class="key-num">2</div><div class="key-sub">ABC</div></div>
+        <div class="key" onclick="pressKey('3')"><div class="key-num">3</div><div class="key-sub">DEF</div></div>
+        <div class="key" onclick="pressKey('4')"><div class="key-num">4</div><div class="key-sub">GHI</div></div>
+        <div class="key" onclick="pressKey('5')"><div class="key-num">5</div><div class="key-sub">JKL</div></div>
+        <div class="key" onclick="pressKey('6')"><div class="key-num">6</div><div class="key-sub">MNO</div></div>
+        <div class="key" onclick="pressKey('7')"><div class="key-num">7</div><div class="key-sub">PQRS</div></div>
+        <div class="key" onclick="pressKey('8')"><div class="key-num">8</div><div class="key-sub">TUV</div></div>
+        <div class="key" onclick="pressKey('9')"><div class="key-num">9</div><div class="key-sub">WXYZ</div></div>
+        <div class="key" onclick="pressKey('*')"><div class="key-num">*</div><div class="key-sub"></div></div>
+        <div class="key" onclick="pressKey('0')"><div class="key-num">0</div><div class="key-sub">+</div></div>
+        <div class="key" onclick="pressKey('#')"><div class="key-num">#</div><div class="key-sub"></div></div>
+      </div>
+
+      <div class="actions">
+        <div>
+          <button class="btn-action btn-mute" id="muteBtn" onclick="toggleMute()" title="Mute">
+            🎤
+          </button>
+          <div class="btn-label">Mute</div>
+        </div>
+        <div>
+          <button class="btn-action btn-call" id="callBtn" onclick="makeCall()" title="Call">
+            📞
+          </button>
+          <button class="btn-action btn-hangup" id="hangupBtn" onclick="hangUp()" title="Hang up">
+            📵
+          </button>
+          <div class="btn-label" id="callBtnLabel">Call</div>
+        </div>
+        <div>
+          <button class="btn-action btn-del" onclick="deleteKey()" title="Delete">
+            ⌫
+          </button>
+          <div class="btn-label">Delete</div>
+        </div>
+      </div>
+
+      <!-- Quick dial -->
+      <div class="quick-dial">
+        <h4>Quick dial</h4>
+        <div class="quick-btn" onclick="dialNumber('+14485875551')">
+          <div class="quick-avatar">TD</div>
+          <div class="quick-info">
+            <div class="quick-name">Test — Telnyx number</div>
+            <div class="quick-number">+1 448 587 5551</div>
+          </div>
+          <div class="quick-call">Call →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALL LOG -->
+    <div class="call-log">
+      <h3>Recent calls</h3>
+      <div class="log-entries" id="logEntries">
+        <div style="text-align:center;padding:2rem;color:var(--ink-3);font-size:0.85rem;">No calls yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Telnyx WebRTC SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@telnyx/webrtc@2.17.0/lib/index.js"></script>
+
+  <script>
+    let telnyxClient = null;
+    let currentCall = null;
+    let isMuted = false;
+    let callTimer = null;
+    let callSeconds = 0;
+    let callLog = [];
+    const TELNYX_NUMBER = '+14485875551';
+
+    // ── Init Telnyx WebRTC ───────────────────────────────
+    async function initTelnyx() {
+      try {
+        // Get WebRTC token from our API
+        const res = await fetch('/api/voice/token', { method: 'POST' });
+        if (!res.ok) throw new Error('Failed to get token');
+        const { token, login } = await res.json();
+
+        telnyxClient = new TelnyxRTC({
+          login: login,
+          password: token,
+        });
+
+        telnyxClient.on('telnyx.ready', () => {
+          setStatus('ready', 'Ready');
+          document.getElementById('setupNotice').style.display = 'none';
+          document.getElementById('callBtn').disabled = false;
+          console.log('Telnyx WebRTC ready');
+        });
+
+        telnyxClient.on('telnyx.error', (err) => {
+          console.error('Telnyx error:', err);
+          setStatus('error', 'Error — check setup');
+        });
+
+        telnyxClient.on('telnyx.notification', (notification) => {
+          const call = notification.call;
+          if (!call) return;
+          currentCall = call;
+
+          switch(notification.type) {
+            case 'callUpdate':
+              handleCallUpdate(call);
+              break;
+          }
+        });
+
+        await telnyxClient.connect();
+
+      } catch(e) {
+        console.error('Init error:', e.message);
+        setStatus('error', 'Setup required');
+      }
+    }
+
+    function handleCallUpdate(call) {
+      const state = call.state;
+      console.log('Call state:', state);
+
+      switch(state) {
+        case 'ringing':
+          setStatus('calling', `Calling ${call.remoteCallerNumber || '...'}...`);
+          document.getElementById('displayStatus').textContent = 'Ringing...';
+          showHangup(true);
+          break;
+        case 'active':
+          setStatus('active', 'On call');
+          document.getElementById('displayStatus').style.display = 'none';
+          document.getElementById('displayTimer').style.display = 'block';
+          startTimer();
+          addLog(call.remoteCallerNumber || currentNumber, 'outgoing');
+          break;
+        case 'hangup':
+        case 'destroy':
+          setStatus('ready', 'Ready');
+          document.getElementById('displayStatus').style.display = 'block';
+          document.getElementById('displayStatus').textContent = 'Call ended';
+          document.getElementById('displayTimer').style.display = 'none';
+          showHangup(false);
+          stopTimer();
+          currentCall = null;
+          setTimeout(() => {
+            document.getElementById('displayStatus').textContent = 'Enter a number to call';
+          }, 2000);
+          break;
+      }
+    }
+
+    // ── Make call ────────────────────────────────────────
+    let currentNumber = '';
+    function makeCall() {
+      if (!telnyxClient) { alert('Dialer not connected. Check setup.'); return; }
+      const number = document.getElementById('displayNumber').textContent.trim();
+      if (!number || number === '+1') { alert('Please enter a phone number'); return; }
+
+      currentNumber = number;
+      currentCall = telnyxClient.newCall({
+        destinationNumber: number,
+        callerNumber: TELNYX_NUMBER,
+      });
+    }
+
+    function hangUp() {
+      if (currentCall) {
+        currentCall.hangup();
+      }
+    }
+
+    function dialNumber(number) {
+      document.getElementById('displayNumber').textContent = number;
+      if (telnyxClient) makeCall();
+    }
+
+    // ── Keypad ───────────────────────────────────────────
+    function pressKey(key) {
+      const display = document.getElementById('displayNumber');
+      if (currentCall?.state === 'active') {
+        currentCall.dtmf(key);
+        return;
+      }
+      let current = display.textContent;
+      if (current === '+1' && key !== '+') {
+        display.textContent = current + key;
+      } else {
+        display.textContent = current + key;
+      }
+    }
+
+    function deleteKey() {
+      const display = document.getElementById('displayNumber');
+      const current = display.textContent;
+      if (current.length > 2) {
+        display.textContent = current.slice(0, -1);
+      } else {
+        display.textContent = '+1';
+      }
+    }
+
+    // ── Mute ─────────────────────────────────────────────
+    function toggleMute() {
+      if (!currentCall) return;
+      isMuted = !isMuted;
+      if (isMuted) {
+        currentCall.muteAudio();
+      } else {
+        currentCall.unmuteAudio();
+      }
+      const btn = document.getElementById('muteBtn');
+      btn.classList.toggle('muted', isMuted);
+      btn.textContent = isMuted ? '🔇' : '🎤';
+    }
+
+    // ── Timer ─────────────────────────────────────────────
+    function startTimer() {
+      callSeconds = 0;
+      callTimer = setInterval(() => {
+        callSeconds++;
+        const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+        const s = String(callSeconds % 60).padStart(2, '0');
+        document.getElementById('displayTimer').textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(callTimer);
+      callSeconds = 0;
+    }
+
+    // ── Call log ──────────────────────────────────────────
+    function addLog(number, type) {
+      const now = new Date();
+      callLog.unshift({ number, type, time: now });
+
+      const container = document.getElementById('logEntries');
+      const icons = { outgoing: '↗', incoming: '↙', missed: '✕' };
+      const labels = { outgoing: 'Outgoing', incoming: 'Incoming', missed: 'Missed' };
+
+      container.innerHTML = callLog.slice(0, 20).map(entry => `
+        <div class="log-entry ${entry.type}" onclick="document.getElementById('displayNumber').textContent='${entry.number}'">
+          <div class="log-number">${icons[entry.type]} ${entry.number}</div>
+          <div class="log-meta">${labels[entry.type]} · ${entry.time.toLocaleTimeString()}</div>
+        </div>
+      `).join('');
+    }
+
+    // ── UI helpers ────────────────────────────────────────
+    function setStatus(state, text) {
+      const dot = document.getElementById('statusDot');
+      const label = document.getElementById('statusText');
+      dot.className = 'status-dot';
+      if (state === 'ready' || state === 'active') dot.classList.add('connected');
+      if (state === 'calling') dot.classList.add('calling');
+      label.textContent = text;
+    }
+
+    function showHangup(show) {
+      document.getElementById('callBtn').style.display = show ? 'none' : 'flex';
+      document.getElementById('hangupBtn').style.display = show ? 'flex' : 'none';
+      document.getElementById('callBtnLabel').textContent = show ? 'Hang up' : 'Call';
+    }
+
+    // ── Keyboard support ─────────────────────────────────
+    document.addEventListener('keydown', (e) => {
+      if (e.key >= '0' && e.key <= '9') pressKey(e.key);
+      if (e.key === '+') pressKey('+');
+      if (e.key === '#') pressKey('#');
+      if (e.key === '*') pressKey('*');
+      if (e.key === 'Backspace') deleteKey();
+      if (e.key === 'Enter') makeCall();
+    });
+
+    // ── Start ─────────────────────────────────────────────
+    setStatus('connecting', 'Connecting...');
+    initTelnyx();
+  </script>
+</body>
+</html>
