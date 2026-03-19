@@ -19,7 +19,6 @@
       --font-head: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
     }
     body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; }
-
     nav { background: var(--ink); border-bottom: 3px solid var(--accent); padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
     .nav-logo { display: flex; align-items: center; text-decoration: none; line-height: 1; gap: 8px; }
     .nav-logo .logo-yellow { background: var(--accent); color: var(--ink); font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 0.02em; padding: 3px 9px 1px; border-radius: 4px 0 0 4px; }
@@ -30,12 +29,10 @@
     .nav-link:hover { color: var(--accent); }
     .btn-logout { font-size: 0.82rem; color: #aaa; background: none; border: 1.5px solid #333; padding: 6px 14px; border-radius: 7px; cursor: pointer; font-family: var(--font-body); transition: all 0.18s; }
     .btn-logout:hover { border-color: var(--accent); color: var(--accent); }
-
     .page { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
     .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
     .page-header h1 { font-family: var(--font-head); font-size: 2.4rem; letter-spacing: 0.03em; }
     .page-header p { color: var(--ink-3); font-size: 0.875rem; margin-top: 3px; }
-
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
     .stat { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
     .stat-value { font-family: var(--font-head); font-size: 2rem; letter-spacing: 0.03em; }
@@ -44,14 +41,12 @@
     .stat-value.rejected { color: #dc2626; }
     .stat-value.total    { color: var(--accent-dark); }
     .stat-label { font-size: 0.8rem; color: var(--ink-3); margin-top: 3px; }
-
     .tabs { display: flex; gap: 4px; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
     .tab { padding: 10px 18px; font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; color: var(--ink-3); background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.18s; display: flex; align-items: center; gap: 6px; }
     .tab:hover { color: var(--ink); }
     .tab.active { color: var(--accent-dark); border-bottom-color: var(--accent); }
     .tab-count { background: var(--surface); color: var(--ink-2); font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
     .tab.active .tab-count { background: #fff3cd; color: var(--accent-dark); }
-
     .listing-card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 1.25rem; animation: fadeUp 0.3s both; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .listing-logo { width: 52px; height: 52px; border-radius: 10px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 1.3rem; color: var(--ink-2); flex-shrink: 0; overflow: hidden; border: 1.5px solid var(--border); }
@@ -62,12 +57,10 @@
     .listing-desc { font-size: 0.85rem; color: var(--ink-2); font-weight: 300; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .listing-owner { font-size: 0.78rem; color: var(--ink-3); margin-top: 6px; }
     .listing-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-
     .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
     .status-badge.pending  { background: var(--yellow-bg); color: var(--yellow); }
     .status-badge.approved { background: var(--green-bg);  color: var(--green); }
     .status-badge.rejected { background: var(--red-bg);    color: var(--red); }
-
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-family: var(--font-body); font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; text-decoration: none; white-space: nowrap; }
     .btn-approve { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
     .btn-approve:hover { background: #bbf7d0; }
@@ -82,7 +75,6 @@
     .btn-call.calling  { background: var(--accent-2); opacity: 0.7; cursor: not-allowed; }
     .btn-manual  { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; font-weight: 700; }
     .btn-manual:hover  { background: #bbf7d0; }
-
     .empty { text-align: center; padding: 4rem 2rem; color: var(--ink-3); }
     .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .empty h3 { font-family: var(--font-head); font-size: 1.4rem; letter-spacing: 0.04em; color: var(--ink); margin-bottom: 0.4rem; }
@@ -94,11 +86,9 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
     .modal-overlay.open { display: flex; }
     @keyframes modalIn { from { opacity:0; transform: scale(0.95) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
-
     .dialer-modal { background: var(--card-bg); border-radius: 20px; border: 1.5px solid var(--border); padding: 2rem; width: 320px; max-width: 94vw; box-shadow: 0 24px 64px rgba(0,0,0,0.15); animation: modalIn 0.22s ease; text-align: center; }
     .dialer-avatar-wrap { position: relative; display: inline-block; margin-bottom: 1rem; }
     .dialer-avatar { width: 68px; height: 68px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 1.7rem; color: var(--ink); margin: 0 auto; border: 2px solid var(--border); }
@@ -129,10 +119,8 @@
     .dialer-notes-save:hover { background: var(--accent-2); }
     .dialer-close { margin-top: 8px; width: 100%; padding: 8px; background: none; color: var(--ink-3); border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.82rem; cursor: pointer; transition: all 0.18s; }
     .dialer-close:hover { border-color: var(--ink-3); color: var(--ink); }
-
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; z-index: 999; transition: transform 0.3s ease; pointer-events: none; white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
-
     @media (max-width: 640px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .listing-card { flex-direction: column; }
@@ -266,45 +254,78 @@
     }
 
     function renderTab(name, businesses) {
-      const el = document.getElementById('tab-' + name);
-      if (!businesses.length) {
-        el.innerHTML = `<div class="empty"><div class="empty-icon">${name === 'pending' ? '🎉' : '📋'}</div><h3>${name === 'pending' ? 'All caught up!' : 'No listings here'}</h3><p>${name === 'pending' ? 'No listings pending review.' : 'Nothing to show.'}</p></div>`;
-        return;
-      }
-      el.innerHTML = businesses.map((b, i) => `
-        <div class="listing-card" id="card-${esc(b.id)}" style="animation-delay:${i*0.04}s">
-          <div class="listing-logo">
-            ${b.logoUrl ? `<img src="${esc(b.logoUrl)}" onerror="this.parentElement.textContent='${esc(b.name.charAt(0))}'"/>` : esc(b.name.charAt(0).toUpperCase())}
-          </div>
-          <div class="listing-info">
-            <div class="listing-name">${esc(b.name)}</div>
-            <div class="listing-meta">
-              <span>📁 ${esc(b.category)}</span>
-              <span>📍 ${esc(b.location)}</span>
-              ${b.phone && b.phone !== 'Not listed' ? `<span>📞 ${esc(String(b.phone))}</span>` : ''}
-            </div>
-            <div class="listing-desc">${esc(b.description)}</div>
-            <div class="listing-owner">Submitted by ${esc(b.ownerEmail||'—')} · ${formatDate(b.createdAt)}</div>
-          </div>
-          <div class="listing-actions">
-            ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ? `
-              <button class="btn btn-call" id="callbtn-${esc(b.id)}"
-                onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}','${esc(b.address||b.location||'')}','${esc(b.category||'')}')">
-                🤖 AI Call
-              </button>
-              <button class="btn btn-manual"
-                onclick="manualCall('${esc(String(b.phone))}','${esc(b.name)}','${esc(b.category||'')}','${esc(b.address||b.location||'')}','${esc(b.id)}')">
-                📞 Call
-              </button>
-            ` : ''}
-            <span class="status-badge ${b.status}">${b.status}</span>
-            <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
-            ${b.status !== 'approved' ? `<button class="btn btn-approve" onclick="updateStatus('${esc(b.id)}','approved')">✓ Approve</button>` : ''}
-            ${b.status !== 'rejected' ? `<button class="btn btn-reject"  onclick="updateStatus('${esc(b.id)}','rejected')">✕ Reject</button>`  : ''}
-            ${b.status === 'rejected' ? `<button class="btn btn-restore" onclick="updateStatus('${esc(b.id)}','pending')">↺ Restore</button>` : ''}
-          </div>
-        </div>`).join('');
-    }
+  const el = document.getElementById('tab-' + name);
+  if (!businesses.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">${name === 'pending' ? '🎉' : '📋'}</div><h3>${name === 'pending' ? 'All caught up!' : 'No listings here'}</h3><p>${name === 'pending' ? 'No listings pending review.' : 'Nothing to show.'}</p></div>`;
+    return;
+  }
+
+  el.innerHTML = businesses.map((b, i) => `
+    <div class="listing-card" id="card-${esc(b.id)}" style="animation-delay:${i*0.04}s">
+      <div class="listing-logo">
+        ${b.logoUrl ? `<img src="${esc(b.logoUrl)}" onerror="this.parentElement.textContent='${esc(b.name.charAt(0))}'"/>` : esc(b.name.charAt(0).toUpperCase())}
+      </div>
+      <div class="listing-info">
+        <div class="listing-name">${esc(b.name)}</div>
+        <div class="listing-meta">
+          <span>📁 ${esc(b.category)}</span>
+          <span>📍 ${esc(b.location)}</span>
+          ${b.phone && b.phone !== 'Not listed' ? `<span>📞 ${esc(String(b.phone))}</span>` : ''}
+        </div>
+        <div class="listing-desc">${esc(b.description)}</div>
+        <div class="listing-owner">Submitted by ${esc(b.ownerEmail||'—')} · ${formatDate(b.createdAt)}</div>
+      </div>
+      <div class="listing-actions">
+        ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ? `
+          <button class="btn btn-call"
+            data-id="${esc(b.id)}"
+            data-name="${esc(b.name)}"
+            data-phone="${esc(String(b.phone))}"
+            data-address="${esc(b.address||b.location||'')}"
+            data-category="${esc(b.category||'')}">
+            🤖 AI Call
+          </button>
+          <button class="btn btn-manual"
+            data-phone="${esc(String(b.phone))}"
+            data-name="${esc(b.name)}"
+            data-category="${esc(b.category||'')}"
+            data-address="${esc(b.address||b.location||'')}"
+            data-leadid="${esc(b.id)}">
+            📞 Call
+          </button>
+        ` : ''}
+        <span class="status-badge ${b.status}">${b.status}</span>
+        <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
+        <button class="btn btn-approve" data-id="${esc(b.id)}" data-status="approved" style="${b.status === 'approved' ? 'display:none' : ''}">✓ Approve</button>
+        <button class="btn btn-reject"  data-id="${esc(b.id)}" data-status="rejected" style="${b.status === 'rejected' ? 'display:none' : ''}">✕ Reject</button>
+        ${b.status === 'rejected' ? `<button class="btn btn-restore" data-id="${esc(b.id)}" data-status="pending">↺ Restore</button>` : ''}
+      </div>
+    </div>`).join('');
+
+  // ── Attach all button listeners after HTML renders ──
+  el.querySelectorAll('.btn-manual').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const params = new URLSearchParams({
+        phone:    btn.dataset.phone,
+        name:     btn.dataset.name,
+        category: btn.dataset.category,
+        address:  btn.dataset.address,
+        leadId:   btn.dataset.leadid,
+      });
+      window.open(`/pages/webphone?${params.toString()}`, '_blank');
+    });
+  });
+
+  el.querySelectorAll('.btn-call').forEach(btn => {
+    btn.addEventListener('click', () => {
+      callLead(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.address, btn.dataset.category);
+    });
+  });
+
+  el.querySelectorAll('.btn-approve, .btn-reject, .btn-restore').forEach(btn => {
+    btn.addEventListener('click', () => updateStatus(btn.dataset.id, btn.dataset.status));
+  });
+}
 
     async function updateStatus(id, status) {
       const card = document.getElementById('card-' + id);
@@ -332,12 +353,6 @@
       const tabs = ['pending','approved','rejected','all'];
       document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', tabs[i] === name));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
-    }
-
-    // ── MANUAL CALL — opens webphone popup pre-dialed ─────────
-    function manualCall(phone, name, category, address, leadId) {
-      const params = new URLSearchParams({ phone, name: name||'', category: category||'', address: address||'', leadId: leadId||'' });
-      window.open(`/pages/webphone?${params.toString()}`, 'dialer', 'width=760,height=660,resizable=yes,scrollbars=yes');
     }
 
     // ── AI DIALER ─────────────────────────────────────────────
@@ -398,7 +413,7 @@
       const cardBtn = document.getElementById('callbtn-' + dialerLead.id);
       if (cardBtn) { cardBtn.disabled = true; cardBtn.classList.add('calling'); cardBtn.textContent = '📞 Calling…'; }
       try {
-        const res  = await fetch('/api/voice/call', {
+        const res = await fetch('/api/voice/call', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone: dialerLead.phone, businessName: dialerLead.name, address: dialerLead.address||'', category: dialerLead.category||'', leadId: dialerLead.id, callType: 'ai' }),
         });
