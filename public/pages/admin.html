@@ -20,7 +20,6 @@
     }
     body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; }
 
-    /* NAV */
     nav { background: var(--ink); border-bottom: 3px solid var(--accent); padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
     .nav-logo { display: flex; align-items: center; text-decoration: none; line-height: 1; gap: 8px; }
     .nav-logo .logo-yellow { background: var(--accent); color: var(--ink); font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 0.02em; padding: 3px 9px 1px; border-radius: 4px 0 0 4px; }
@@ -32,13 +31,11 @@
     .btn-logout { font-size: 0.82rem; color: #aaa; background: none; border: 1.5px solid #333; padding: 6px 14px; border-radius: 7px; cursor: pointer; font-family: var(--font-body); transition: all 0.18s; }
     .btn-logout:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* PAGE */
     .page { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
     .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
     .page-header h1 { font-family: var(--font-head); font-size: 2.4rem; letter-spacing: 0.03em; }
     .page-header p { color: var(--ink-3); font-size: 0.875rem; margin-top: 3px; }
 
-    /* STATS */
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
     .stat { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
     .stat-value { font-family: var(--font-head); font-size: 2rem; letter-spacing: 0.03em; }
@@ -48,7 +45,6 @@
     .stat-value.total    { color: var(--accent-dark); }
     .stat-label { font-size: 0.8rem; color: var(--ink-3); margin-top: 3px; }
 
-    /* TABS */
     .tabs { display: flex; gap: 4px; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
     .tab { padding: 10px 18px; font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; color: var(--ink-3); background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.18s; display: flex; align-items: center; gap: 6px; }
     .tab:hover { color: var(--ink); }
@@ -56,7 +52,6 @@
     .tab-count { background: var(--surface); color: var(--ink-2); font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
     .tab.active .tab-count { background: #fff3cd; color: var(--accent-dark); }
 
-    /* LISTING CARDS */
     .listing-card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 1.25rem; animation: fadeUp 0.3s both; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .listing-logo { width: 52px; height: 52px; border-radius: 10px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 1.3rem; color: var(--ink-2); flex-shrink: 0; overflow: hidden; border: 1.5px solid var(--border); }
@@ -68,13 +63,11 @@
     .listing-owner { font-size: 0.78rem; color: var(--ink-3); margin-top: 6px; }
     .listing-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
 
-    /* STATUS BADGES */
     .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
     .status-badge.pending  { background: var(--yellow-bg); color: var(--yellow); }
     .status-badge.approved { background: var(--green-bg);  color: var(--green); }
     .status-badge.rejected { background: var(--red-bg);    color: var(--red); }
 
-    /* BUTTONS */
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-family: var(--font-body); font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; text-decoration: none; white-space: nowrap; }
     .btn-approve { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
     .btn-approve:hover { background: #bbf7d0; }
@@ -87,8 +80,9 @@
     .btn-call    { background: var(--accent); color: var(--ink); border: 1px solid var(--accent); font-weight: 700; }
     .btn-call:hover    { background: var(--accent-2); }
     .btn-call.calling  { background: var(--accent-2); opacity: 0.7; cursor: not-allowed; }
+    .btn-manual  { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; font-weight: 700; }
+    .btn-manual:hover  { background: #bbf7d0; }
 
-    /* EMPTY / LOADING */
     .empty { text-align: center; padding: 4rem 2rem; color: var(--ink-3); }
     .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .empty h3 { font-family: var(--font-head); font-size: 1.4rem; letter-spacing: 0.04em; color: var(--ink); margin-bottom: 0.4rem; }
@@ -101,12 +95,10 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* MODAL */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
     .modal-overlay.open { display: flex; }
     @keyframes modalIn { from { opacity:0; transform: scale(0.95) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
 
-    /* DIALER */
     .dialer-modal { background: var(--card-bg); border-radius: 20px; border: 1.5px solid var(--border); padding: 2rem; width: 320px; max-width: 94vw; box-shadow: 0 24px 64px rgba(0,0,0,0.15); animation: modalIn 0.22s ease; text-align: center; }
     .dialer-avatar-wrap { position: relative; display: inline-block; margin-bottom: 1rem; }
     .dialer-avatar { width: 68px; height: 68px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 1.7rem; color: var(--ink); margin: 0 auto; border: 2px solid var(--border); }
@@ -138,7 +130,6 @@
     .dialer-close { margin-top: 8px; width: 100%; padding: 8px; background: none; color: var(--ink-3); border: 1.5px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 0.82rem; cursor: pointer; transition: all 0.18s; }
     .dialer-close:hover { border-color: var(--ink-3); color: var(--ink); }
 
-    /* TOAST */
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; z-index: 999; transition: transform 0.3s ease; pointer-events: none; white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
@@ -217,14 +208,12 @@
     </div>
   </div>
 
-  <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
   <script>
     const ADMIN_EMAIL = "paolollenado@gmail.com";
     let allBusinesses = [];
 
-    // ── INIT ──────────────────────────────────────────────────
     async function init() {
       const token = localStorage.getItem('bizdir_token');
       if (!token) { window.location.href = '/pages/login'; return; }
@@ -249,7 +238,6 @@
       window.location.href = '/pages/login';
     }
 
-    // ── LOAD LISTINGS ─────────────────────────────────────────
     async function loadAllListings() {
       try {
         const [pRes, aRes, rRes] = await Promise.all([
@@ -298,23 +286,23 @@
             <div class="listing-desc">${esc(b.description)}</div>
             <div class="listing-owner">Submitted by ${esc(b.ownerEmail||'—')} · ${formatDate(b.createdAt)}</div>
           </div>
-          `<div class="listing-actions">
+          <div class="listing-actions">
             ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ? `
-            <button class="btn btn-call" id="callbtn-${esc(b.id)}"
-            onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}','${esc(b.address||b.location||'')}','${esc(b.category||'')}')">
-             🤖 AI Call
+              <button class="btn btn-call" id="callbtn-${esc(b.id)}"
+                onclick="callLead('${esc(b.id)}','${esc(b.name)}','${esc(String(b.phone))}','${esc(b.address||b.location||'')}','${esc(b.category||'')}')">
+                🤖 AI Call
               </button>
-            <button class="btn btn-manual"
-              onclick="manualCall('${esc(String(b.phone))}','${esc(b.name)}','${esc(b.category||'')}','${esc(b.address||b.location||'')}','${esc(b.id)}')">
-              📞 Call
-            </button>
-          ` : ''}
-  <span class="status-badge ${b.status}">${b.status}</span>
-  <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
-  ${b.status !== 'approved' ? `<button class="btn btn-approve" onclick="updateStatus('${esc(b.id)}','approved')">✓ Approve</button>` : ''}
-  ${b.status !== 'rejected' ? `<button class="btn btn-reject"  onclick="updateStatus('${esc(b.id)}','rejected')">✕ Reject</button>`  : ''}
-  ${b.status === 'rejected' ? `<button class="btn btn-restore" onclick="updateStatus('${esc(b.id)}','pending')">↺ Restore</button>` : ''}
-</div>`
+              <button class="btn btn-manual"
+                onclick="manualCall('${esc(String(b.phone))}','${esc(b.name)}','${esc(b.category||'')}','${esc(b.address||b.location||'')}','${esc(b.id)}')">
+                📞 Call
+              </button>
+            ` : ''}
+            <span class="status-badge ${b.status}">${b.status}</span>
+            <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
+            ${b.status !== 'approved' ? `<button class="btn btn-approve" onclick="updateStatus('${esc(b.id)}','approved')">✓ Approve</button>` : ''}
+            ${b.status !== 'rejected' ? `<button class="btn btn-reject"  onclick="updateStatus('${esc(b.id)}','rejected')">✕ Reject</button>`  : ''}
+            ${b.status === 'rejected' ? `<button class="btn btn-restore" onclick="updateStatus('${esc(b.id)}','pending')">↺ Restore</button>` : ''}
+          </div>
         </div>`).join('');
     }
 
@@ -346,7 +334,13 @@
       document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
     }
 
-    // ── DIALER ────────────────────────────────────────────────
+    // ── MANUAL CALL — opens webphone popup pre-dialed ─────────
+    function manualCall(phone, name, category, address, leadId) {
+      const params = new URLSearchParams({ phone, name: name||'', category: category||'', address: address||'', leadId: leadId||'' });
+      window.open(`/pages/webphone?${params.toString()}`, 'dialer', 'width=760,height=660,resizable=yes,scrollbars=yes');
+    }
+
+    // ── AI DIALER ─────────────────────────────────────────────
     let dialerLead  = null;
     let callTimer   = null;
     let callSeconds = 0;
@@ -356,7 +350,6 @@
       dialerLead  = { id, name, phone, address, category };
       callActive  = false;
       callSeconds = 0;
-
       document.getElementById('dialerAvatar').textContent     = (name||'?').charAt(0).toUpperCase();
       document.getElementById('dialerName').textContent       = name;
       document.getElementById('dialerPhone').textContent      = phone;
@@ -398,43 +391,28 @@
 
     async function startAICall() {
       if (!dialerLead) return;
-
       setDialerStatus('Initiating AI call…', 'calling');
       setDialerBtns('calling');
       document.getElementById('dialerAvatarWrap').classList.add('ringing');
       document.getElementById('dialerCloseBtn').style.display = 'none';
-
       const cardBtn = document.getElementById('callbtn-' + dialerLead.id);
       if (cardBtn) { cardBtn.disabled = true; cardBtn.classList.add('calling'); cardBtn.textContent = '📞 Calling…'; }
-
       try {
         const res  = await fetch('/api/voice/call', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({
-            phone:        dialerLead.phone,
-            businessName: dialerLead.name,
-            address:      dialerLead.address  || '',
-            category:     dialerLead.category || '',
-            leadId:       dialerLead.id,
-            callType:     'ai',
-          }),
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: dialerLead.phone, businessName: dialerLead.name, address: dialerLead.address||'', category: dialerLead.category||'', leadId: dialerLead.id, callType: 'ai' }),
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Call failed');
-
-        callActive  = true;
+        callActive = true;
         document.getElementById('dialerTimer').style.display = 'block';
         document.getElementById('dialerStage').style.display = 'block';
         document.getElementById('dialerStage').textContent   = 'Stage: verify_name';
         startTimer();
-
         setDialerStatus('Sarah is calling ' + dialerLead.name + '…', 'calling');
         setDialerBtns('calling');
         showToast('🤖 Sarah is calling ' + dialerLead.name);
-
         startStatusPolling(dialerLead.id);
-
       } catch(e) {
         callActive = false;
         document.getElementById('dialerAvatarWrap').classList.remove('ringing');
@@ -474,9 +452,7 @@
       callActive = false;
       stopTimer();
       document.getElementById('dialerAvatarWrap').classList.remove('ringing');
-      const msg = outcome === 'approved'
-        ? '✅ Listing approved — Sarah got the info!'
-        : 'Call ended · ' + formatTime(callSeconds);
+      const msg = outcome === 'approved' ? '✅ Listing approved — Sarah got the info!' : 'Call ended · ' + formatTime(callSeconds);
       setDialerStatus(msg, outcome === 'approved' ? 'connected' : 'ended');
       setDialerBtns('ended');
       document.getElementById('dialerNotes').style.display    = 'block';
@@ -489,11 +465,7 @@
       const note = document.getElementById('dialerNoteText').value.trim();
       if (note && dialerLead) {
         try {
-          await fetch('/api/leads', {
-            method:  'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ id: dialerLead.id, transcript: note }),
-          });
+          await fetch('/api/leads', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: dialerLead.id, transcript: note }) });
           showToast('Note saved!');
         } catch(e) { showToast('Could not save note', true); }
       }
@@ -503,10 +475,7 @@
 
     function startTimer() {
       callSeconds = 0;
-      callTimer   = setInterval(() => {
-        callSeconds++;
-        document.getElementById('dialerTimer').textContent = formatTime(callSeconds);
-      }, 1000);
+      callTimer = setInterval(() => { callSeconds++; document.getElementById('dialerTimer').textContent = formatTime(callSeconds); }, 1000);
     }
     function stopTimer()   { clearInterval(callTimer); callTimer = null; }
     function formatTime(s) { return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
@@ -534,22 +503,6 @@
     function esc(s) {
       return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
-    // ── ADD THIS FUNCTION to admin.html <script> block ────────
-function manualCall(phone, name, category, address, leadId) {
-  const params = new URLSearchParams({
-    phone:    phone,
-    name:     name     || '',
-    category: category || '',
-    address:  address  || '',
-    leadId:   leadId   || '',
-  });
-  // Open webphone in popup window, pre-dialed to this lead
-  window.open(
-    `/pages/webphone?${params.toString()}`,
-    'dialer',
-    'width=740,height=640,resizable=yes,scrollbars=yes'
-  );
-}
 
     init();
   </script>
