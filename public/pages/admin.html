@@ -136,8 +136,7 @@
     .tab.active { color: var(--accent-dark); border-bottom-color: var(--accent); }
     .tab-count { background: var(--surface); color: var(--ink-2); font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
     .tab.active .tab-count { background: #fff3cd; color: var(--accent-dark); }
-    .listing-card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 1.25rem; animation: fadeUp 0.3s both; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .listing-card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.75rem; animation: fadeUp 0.3s both; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .listing-logo { width: 52px; height: 52px; border-radius: 10px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 1.3rem; color: var(--ink-2); flex-shrink: 0; overflow: hidden; border: 1.5px solid var(--border); }
     .listing-logo img { width: 100%; height: 100%; object-fit: cover; }
     .listing-info { flex: 1; min-width: 0; }
@@ -145,8 +144,7 @@
     .listing-meta { font-size: 0.8rem; color: var(--ink-3); margin-bottom: 6px; display: flex; gap: 12px; flex-wrap: wrap; }
     .listing-desc { font-size: 0.85rem; color: var(--ink-2); font-weight: 300; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .listing-owner { font-size: 0.78rem; color: var(--ink-3); margin-top: 6px; }
-    .listing-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-    .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+    .listing-actions { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; padding-top: 0.75rem; border-top: 1px solid var(--border); }    .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
     .status-badge.pending  { background: var(--yellow-bg); color: var(--yellow); }
     .status-badge.approved { background: var(--green-bg);  color: var(--green); }
     .status-badge.rejected { background: var(--red-bg);    color: var(--red); }
@@ -683,8 +681,9 @@
         return;
       }
       el.innerHTML = businesses.map((b, i) => `
-        <div class="listing-card" id="card-${esc(b.id)}" style="animation-delay:${i*0.04}s">
-          <div class="listing-logo">
+      <div class="listing-card" id="card-${esc(b.id)}" style="animation-delay:${i*0.04}s">
+      <div style="display:flex;align-items:flex-start;gap:1.25rem">
+       <div class="listing-logo">
             ${b.logoUrl ? `<img src="${esc(b.logoUrl)}" onerror="this.parentElement.textContent='${esc(b.name.charAt(0))}'"/>` : esc(b.name.charAt(0).toUpperCase())}
           </div>
           <div class="listing-info">
@@ -696,6 +695,7 @@
             </div>
             <div class="listing-desc">${esc(b.description)}</div>
             <div class="listing-owner">Submitted by ${esc(b.ownerEmail||'—')} · ${formatDate(b.createdAt)}</div>
+          </div>
           </div>
           <div class="listing-actions">
             ${b.phone && b.phone !== 'Not listed' && String(b.phone).trim().length >= 7 ? `
