@@ -1,5 +1,6 @@
 // api/voice/webhook.js
 // BizDir AI Sales Agent — ElevenLabs voice + Cloudflare R2 storage
+export const config = { runtime: 'nodejs' };
 
 const TELNYX_API_KEY      = process.env.TELNYX_API_KEY;
 const ELEVENLABS_API_KEY  = process.env.ELEVENLABS_API_KEY;
@@ -549,3 +550,4 @@ function decodeState(str) {
   try { return JSON.parse(Buffer.from(str, "base64").toString("utf8")); }
   catch { return {}; }
 }
+module.exports.config = { maxDuration: 60 };
