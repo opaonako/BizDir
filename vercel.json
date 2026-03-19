@@ -5,9 +5,13 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "functions": {
-    "api/voice/webhook.js": { "maxDuration": 60 },
-    "api/voice/call.js":    { "maxDuration": 30 },
-    "api/voice/token.js":   { "maxDuration": 15 }
+    "api/voice/webhook.js": { "runtime": "nodejs20.x", "maxDuration": 60 },
+    "api/voice/call.js":    { "runtime": "nodejs20.x", "maxDuration": 30 },
+    "api/voice/token.js":   { "runtime": "nodejs20.x", "maxDuration": 15 },
+    "api/auth.js":          { "runtime": "nodejs20.x", "maxDuration": 30 },
+    "api/listings.js":      { "runtime": "nodejs20.x", "maxDuration": 30 },
+    "api/listing.js":       { "runtime": "nodejs20.x", "maxDuration": 30 },
+    "api/categories.js":    { "runtime": "nodejs20.x", "maxDuration": 30 }
   },
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/:path*" },
