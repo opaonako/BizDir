@@ -18,4 +18,9 @@
     { "source": "/pages/:page", "destination": "/pages/:page.html" },
     { "source": "/:path*", "destination": "/index.html" }
   ]
+  {
+  "dependencies": {
+    "@telnyx/webrtc": "^2.17.0"
+  }
+}
 }
