@@ -185,8 +185,7 @@
             <input type="url" id="bizAffiliate" placeholder="https://...your-affiliate-link">
           </div>
         </div>
-        <div class="form-actions">
-          <button class="btn btn-danger" onclick="confirmDelete()" id="deleteBtn" style="display:none">Delete listing</button>
+        <div class="form-actions" style="justify-content:flex-end">
           <button class="btn btn-primary" id="saveBtn" onclick="saveListing()">Save changes</button>
         </div>
       </div>
@@ -253,7 +252,6 @@
           currentBusiness = data.businesses[0];
           renderOverview(currentBusiness);
           populateEditForm(currentBusiness);
-          document.getElementById('deleteBtn').style.display = 'inline-flex';
         } else {
           renderNoListing();
         }
