@@ -230,7 +230,14 @@
     .empty p { color: var(--ink-3); font-size: 0.9rem; }
 
     /* PAGINATION */
-    .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 3rem; }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+    }
     .page-btn {
       width: 38px; height: 38px; border-radius: 8px;
       border: 1.5px solid var(--border); background: var(--card-bg);
@@ -240,6 +247,11 @@
     }
     .page-btn:hover, .page-btn.active { background: var(--accent); border-color: var(--accent); color: var(--ink); font-weight: 700; }
     .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .page-ellipsis {
+      width: 38px; height: 38px; display: flex;
+      align-items: center; justify-content: center;
+      color: var(--ink-3); font-weight: 700;
+    }
 
     /* CTA */
     .cta-banner { max-width: 1140px; margin: 0 auto 3rem; padding: 0 2rem; }
@@ -494,12 +506,39 @@ function showSkeleton(grid) {
 }
      
 
+    function getPaginationItems(page, total) {
+      if (total <= 7) {
+        return Array.from({ length: total }, (_, index) => index + 1);
+      }
+
+      const items = [1];
+      const start = Math.max(2, page - 1);
+      const end = Math.min(total - 1, page + 1);
+
+      if (start > 2) items.push('ellipsis-left');
+      for (let i = start; i <= end; i++) items.push(i);
+      if (end < total - 1) items.push('ellipsis-right');
+
+      items.push(total);
+      return items;
+    }
+
     function renderPagination(page, total) {
       const el = document.getElementById('pagination');
       if (total <= 1) { el.innerHTML = ''; return; }
-      let html = `<button class="page-btn" onclick="goPage(${page-1})" ${page<=1?'disabled':''}>←</button>`;
-      for (let i = 1; i <= total; i++) html += `<button class="page-btn ${i===page?'active':''}" onclick="goPage(${i})">${i}</button>`;
-      html += `<button class="page-btn" onclick="goPage(${page+1})" ${page>=total?'disabled':''}>→</button>`;
+
+      const items = getPaginationItems(page, total);
+      let html = `<button class="page-btn" onclick="goPage(${page - 1})" ${page <= 1 ? 'disabled' : ''} aria-label="Previous page">←</button>`;
+
+      items.forEach(item => {
+        if (typeof item === 'number') {
+          html += `<button class="page-btn ${item === page ? 'active' : ''}" onclick="goPage(${item})">${item}</button>`;
+        } else {
+          html += `<span class="page-ellipsis" aria-hidden="true">…</span>`;
+        }
+      });
+
+      html += `<button class="page-btn" onclick="goPage(${page + 1})" ${page >= total ? 'disabled' : ''} aria-label="Next page">→</button>`;
       el.innerHTML = html;
     }
 
