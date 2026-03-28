@@ -237,6 +237,132 @@
     }
     .map-link-row svg { opacity: 0.6; }
 
+    /* ── OWNER WALL ── */
+    .wall-card { animation: fadeUp 0.5s both; }
+    .wall-compose {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 1.2rem;
+    }
+    .wall-compose textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0.95rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      color: var(--ink);
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .wall-compose textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255,215,0,0.18);
+      background: #fff;
+    }
+    .wall-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .wall-hint {
+      font-size: 0.8rem;
+      color: var(--ink-3);
+    }
+    .wall-auth-note,
+    .wall-empty {
+      border: 1.5px dashed var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      background: var(--surface);
+      color: var(--ink-3);
+      font-size: 0.88rem;
+    }
+    .wall-alert {
+      display: none;
+      padding: 0.8rem 0.95rem;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      margin-bottom: 1rem;
+    }
+    .wall-alert.error {
+      display: block;
+      background: #fff3cd;
+      border: 1px solid #ffe082;
+      color: #7a5c00;
+    }
+    .wall-alert.success {
+      display: block;
+      background: #e6f4ea;
+      border: 1px solid #b7dfc2;
+      color: #1a6e2e;
+    }
+    .wall-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+    .wall-post {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fffdfa;
+      padding: 1rem 1.1rem;
+    }
+    .wall-post-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.55rem;
+    }
+    .wall-post-author {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .wall-post-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .wall-post-biz {
+      font-size: 0.78rem;
+      color: var(--accent-dark);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .wall-post-time {
+      font-size: 0.77rem;
+      color: var(--ink-3);
+      white-space: nowrap;
+    }
+    .wall-post-body {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--ink-2);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .wall-delete {
+      border: 1px solid #f5b5b5;
+      background: transparent;
+      color: #c62828;
+      border-radius: 8px;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    .wall-delete:hover { background: #fff0f0; }
+
     /* ── LOADING / ERROR ── */
     .page-loading {
       display: flex; flex-direction: column; align-items: center;
@@ -394,6 +520,15 @@
               <div class="hours-grid" id="hoursGrid"></div>
             </div>
           </div>
+
+          <div class="section-card wall-card">
+            <div class="section-card-header">OWNER WALL</div>
+            <div class="section-card-body">
+              <div class="wall-alert" id="wallAlert"></div>
+              <div id="wallComposer"></div>
+              <div class="wall-list" id="wallList"></div>
+            </div>
+          </div>
         </div>
 
         <!-- RIGHT: Contact + Actions -->
@@ -430,6 +565,9 @@
   <footer>&copy; 2025 Yellow Pages. All rights reserved.</footer>
 
   <script>
+    let currentBusiness = null;
+    let currentViewer = null;
+
     // ── Category colour (matches homepage logic) ──
     const CAT_COLORS = ['#e84c1e','#2563eb','#16a34a','#9333ea','#ea580c','#0891b2','#0d9488'];
     function catColor(cat) {
@@ -503,6 +641,188 @@
       email:    `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
     };
 
+    function setWallAlert(message = '', type = '') {
+      const el = document.getElementById('wallAlert');
+      el.textContent = message;
+      el.className = type ? `wall-alert ${type}` : 'wall-alert';
+    }
+
+    function formatWallDate(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      return date.toLocaleString([], {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      });
+    }
+
+    function canDeleteWallPost(post) {
+      if (!currentViewer) return false;
+      return currentViewer.email === post.authorEmail || currentViewer.email === ADMIN_EMAIL;
+    }
+
+    function renderWallComposer() {
+      const composer = document.getElementById('wallComposer');
+      if (!currentViewer) {
+        composer.innerHTML = `<div class="wall-auth-note">Log in as a business owner to leave a message on this wall.</div>`;
+        return;
+      }
+
+      composer.innerHTML = `
+        <div class="wall-compose">
+          <textarea id="wallMessage" maxlength="500" placeholder="Leave a note for this business owner..."></textarea>
+          <div class="wall-actions">
+            <div class="wall-hint">Visible to other visitors and owners on this business page.</div>
+            <button class="btn btn-primary" id="wallSubmitBtn" onclick="submitWallPost()">Post message</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderWallPosts(posts) {
+      const list = document.getElementById('wallList');
+      if (!posts.length) {
+        list.innerHTML = `<div class="wall-empty">No messages yet. Be the first business owner to say hello.</div>`;
+        return;
+      }
+
+      list.innerHTML = posts.map(post => `
+        <div class="wall-post">
+          <div class="wall-post-head">
+            <div class="wall-post-author">
+              <span class="wall-post-name">${esc(post.authorName || 'Business owner')}</span>
+              <span class="wall-post-biz">${esc(post.authorBusinessName || 'Listed business')}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.6rem">
+              <span class="wall-post-time">${esc(formatWallDate(post.createdAt))}</span>
+              ${canDeleteWallPost(post) ? `<button class="wall-delete" onclick="deleteWallPost('${esc(post.id)}')">Delete</button>` : ''}
+            </div>
+          </div>
+          <div class="wall-post-body">${esc(post.message || '')}</div>
+        </div>
+      `).join('');
+    }
+
+    async function initViewer() {
+      const token = localStorage.getItem('bizdir_token');
+      if (!token) {
+        renderWallComposer();
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth?action=validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.email) {
+          renderWallComposer();
+          return;
+        }
+
+        currentViewer = {
+          token,
+          email: data.email,
+          name: data.name || localStorage.getItem('bizdir_name') || '',
+          userId: data.userId || '',
+        };
+      } catch (e) {
+        console.error('viewer init failed', e);
+      }
+
+      renderWallComposer();
+      if (currentBusiness?.id) loadWallPosts(currentBusiness.id);
+    }
+
+    async function loadWallPosts(businessId) {
+      try {
+        const res = await fetch(`/api/wall?businessId=${encodeURIComponent(businessId)}`);
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          document.getElementById('wallList').innerHTML = `<div class="wall-empty">Wall messages could not be loaded right now.</div>`;
+          return;
+        }
+        renderWallPosts(data.posts || []);
+      } catch (e) {
+        console.error('wall load failed', e);
+        document.getElementById('wallList').innerHTML = `<div class="wall-empty">Wall messages could not be loaded right now.</div>`;
+      }
+    }
+
+    async function submitWallPost() {
+      if (!currentViewer || !currentBusiness?.id) return;
+
+      const input = document.getElementById('wallMessage');
+      const btn = document.getElementById('wallSubmitBtn');
+      const message = input.value.trim();
+
+      if (!message) {
+        setWallAlert('Please enter a short message first.', 'error');
+        return;
+      }
+
+      setWallAlert();
+      btn.disabled = true;
+      btn.textContent = 'Posting...';
+
+      try {
+        const res = await fetch('/api/wall', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token: currentViewer.token,
+            businessId: currentBusiness.id,
+            message,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Could not post your message.');
+        }
+
+        input.value = '';
+        setWallAlert('Message posted.', 'success');
+        await loadWallPosts(currentBusiness.id);
+      } catch (e) {
+        setWallAlert(e.message || 'Could not post your message.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Post message';
+      }
+    }
+
+    async function deleteWallPost(postId) {
+      if (!currentViewer || !postId) return;
+      if (!confirm('Delete this wall message?')) return;
+
+      setWallAlert();
+      try {
+        const res = await fetch('/api/wall', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token: currentViewer.token,
+            postId,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Could not delete the message.');
+        }
+
+        setWallAlert('Message deleted.', 'success');
+        await loadWallPosts(currentBusiness.id);
+      } catch (e) {
+        setWallAlert(e.message || 'Could not delete the message.', 'error');
+      }
+    }
+
     // ── Main loader ──
     async function loadBusiness() {
       const params = new URLSearchParams(window.location.search);
@@ -545,6 +865,7 @@
     }
 
     function renderBusiness(b) {
+      currentBusiness = b;
       document.title = `${b.name} — Yellow Pages`;
       document.getElementById('bcName').textContent = b.name;
 
@@ -624,9 +945,12 @@
       // Show content
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('bizContent').style.display = '';
+      renderWallComposer();
+      loadWallPosts(b.id);
     }
 
     loadBusiness();
+    initViewer();
   </script>
 
   <script>
