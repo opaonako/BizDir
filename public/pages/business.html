@@ -536,7 +536,7 @@
             </div>
           </div>
 
-          <div class="section-card wall-card">
+          <div class="section-card wall-card" id="wallSection" style="display:none">
             <div class="section-card-header">OWNER WALL</div>
             <div class="section-card-body">
               <div class="wall-alert" id="wallAlert"></div>
@@ -819,10 +819,20 @@
       }
 
       renderWallComposer();
+    }
+
+    function showWallSection() {
+      const section = document.getElementById('wallSection');
+      if (section) {
+        section.style.display = 'block';
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
       if (currentBusiness?.id) loadWallPosts(currentBusiness.id);
     }
 
     async function loadWallPosts(businessId) {
+      const section = document.getElementById('wallSection');
+      if (section) section.style.display = 'block';
       try {
         const res = await fetch(`/api/wall?businessId=${encodeURIComponent(businessId)}`);
         const data = await res.json();
@@ -996,7 +1006,7 @@
 
       // Action buttons
       const actions = [];
-      if (b.phone)   actions.push(`<a href="tel:${esc(b.phone)}" class="btn-action btn-action-primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.75a16 16 0 006.29 6.29l1.28-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg> Call Now</a>`);
+      if (b.phone)   actions.push(`<a href="#" onclick="showWallSection(); return false;" class="btn-action btn-action-primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Message Us</a>`);
       if (b.website) actions.push(`<a href="${esc(b.website)}" target="_blank" rel="noopener" class="btn-action btn-action-secondary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> Visit Website</a>`);
       if (b.email)   actions.push(`<a href="mailto:${esc(b.email)}" class="btn-action btn-action-secondary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Send Email</a>`);
       document.getElementById('actionButtons').innerHTML = actions.join('');
