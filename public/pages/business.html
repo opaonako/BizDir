@@ -203,18 +203,39 @@
       color: var(--ink);
     }
 
-    /* ── MAP PLACEHOLDER ── */
-    .map-block {
-      background: var(--surface); border-radius: 10px;
-      height: 160px; display: flex; align-items: center;
-      justify-content: center; color: var(--ink-3);
-      font-size: 0.85rem; gap: 6px;
-      border: 1.5px dashed var(--border);
-      text-decoration: none;
-      transition: border-color 0.18s, background 0.18s;
+    /* ── MAP ── */
+    .map-embed-wrap {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
     }
-    .map-block:hover { border-color: var(--accent); background: #fef9d0; }
-    .map-block svg { opacity: 0.5; }
+    .map-embed {
+      width: 100%;
+      height: 220px;
+      border: 0;
+      display: block;
+      background: #f7f2df;
+    }
+    .map-link-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0.9rem 1rem;
+      text-decoration: none;
+      color: var(--ink-2);
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-top: 1px solid var(--border);
+      background: #fffdfa;
+      transition: background 0.18s, color 0.18s;
+    }
+    .map-link-row:hover {
+      background: #fef9d0;
+      color: var(--ink);
+    }
+    .map-link-row svg { opacity: 0.6; }
 
     /* ── LOADING / ERROR ── */
     .page-loading {
@@ -577,14 +598,27 @@
       if (b.email)   actions.push(`<a href="mailto:${esc(b.email)}" class="btn-action btn-action-secondary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Send Email</a>`);
       document.getElementById('actionButtons').innerHTML = actions.join('');
 
-      // Map link (Google Maps)
-      if (b.location) {
-        const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(b.location)}`;
+      // Map embed (Google Maps)
+      if (b.location && b.location.trim()) {
+        const mapQuery = b.location.trim();
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+        const embedUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=15&output=embed`;
         document.getElementById('mapWrap').innerHTML = `
-          <a href="${mapsUrl}" target="_blank" rel="noopener" class="map-block">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            View on Google Maps
-          </a>`;
+          <div class="map-embed-wrap">
+            <iframe
+              class="map-embed"
+              src="${embedUrl}"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Map location for ${esc(b.name || 'business')}"
+            ></iframe>
+            <a href="${mapsUrl}" target="_blank" rel="noopener" class="map-link-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              View on Google Maps
+            </a>
+          </div>`;
+      } else {
+        document.getElementById('mapWrap').innerHTML = '';
       }
 
       // Show content
