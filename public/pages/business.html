@@ -362,6 +362,21 @@
       transition: background 0.18s;
     }
     .wall-delete:hover { background: #fff0f0; }
+    .wall-reply-btn { border: 1px solid var(--border); background: transparent; color: var(--ink-3); border-radius: 8px; padding: 0.35rem 0.65rem; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: background 0.18s, color 0.18s; }
+    .wall-reply-btn:hover { background: var(--surface); color: var(--ink); }
+    .wall-replies { margin-top: 0.75rem; padding-left: 1.2rem; border-left: 2px solid var(--border); display: flex; flex-direction: column; gap: 0.6rem; }
+    .wall-reply { background: var(--surface); border-radius: 10px; padding: 0.75rem 0.9rem; }
+    .wall-reply-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; }
+    .wall-reply-author { font-size: 0.82rem; font-weight: 700; color: var(--ink); }
+    .wall-reply-biz { font-size: 0.72rem; color: var(--accent-dark); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .wall-reply-time { font-size: 0.72rem; color: var(--ink-3); }
+    .wall-reply-body { font-size: 0.85rem; line-height: 1.55; color: var(--ink-2); white-space: pre-wrap; word-break: break-word; }
+    .wall-reply-form { margin-top: 0.6rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .wall-reply-form textarea { width: 100%; min-height: 70px; resize: vertical; border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.8rem; font-family: var(--font-body); font-size: 0.85rem; outline: none; transition: border-color 0.18s; }
+    .wall-reply-form textarea:focus { border-color: var(--accent); }
+    .wall-reply-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+    .wall-reply-cancel { border: 1px solid var(--border); background: transparent; color: var(--ink-3); border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: pointer; }
+    .wall-reply-submit { border: none; background: var(--accent); color: #fff; border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
 
     /* ── LOADING / ERROR ── */
     .page-loading {
@@ -690,7 +705,33 @@
         return;
       }
 
-      list.innerHTML = posts.map(post => `
+      const mainPosts = posts.filter(p => !p.parentId);
+      const replies = posts.filter(p => p.parentId);
+      const repliesByParent = {};
+      replies.forEach(r => {
+        if (!repliesByParent[r.parentId]) repliesByParent[r.parentId] = [];
+        repliesByParent[r.parentId].push(r);
+      });
+
+      list.innerHTML = mainPosts.map(post => {
+        const postReplies = repliesByParent[post.id] || [];
+        const replyForms = postReplies.map(r => `
+          <div class="wall-reply" id="reply-form-${esc(r.id)}">
+            <div class="wall-reply-head">
+              <div>
+                <span class="wall-reply-author">${esc(r.authorName || 'Business owner')}</span>
+                <span class="wall-reply-biz">${esc(r.authorBusinessName || '')}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.5rem">
+                <span class="wall-reply-time">${esc(formatWallDate(r.createdAt))}</span>
+                ${canDeleteWallPost(r) ? `<button class="wall-delete" onclick="deleteWallPost('${esc(r.id)}')">Delete</button>` : ''}
+              </div>
+            </div>
+            <div class="wall-reply-body">${esc(r.message || '')}</div>
+          </div>
+        `).join('');
+
+        return `
         <div class="wall-post">
           <div class="wall-post-head">
             <div class="wall-post-author">
@@ -699,12 +740,53 @@
             </div>
             <div style="display:flex;align-items:center;gap:0.6rem">
               <span class="wall-post-time">${esc(formatWallDate(post.createdAt))}</span>
+              ${currentViewer ? `<button class="wall-reply-btn" onclick="toggleReplyForm('${esc(post.id)}')">Reply</button>` : ''}
               ${canDeleteWallPost(post) ? `<button class="wall-delete" onclick="deleteWallPost('${esc(post.id)}')">Delete</button>` : ''}
             </div>
           </div>
           <div class="wall-post-body">${esc(post.message || '')}</div>
+          <div id="reply-form-${esc(post.id)}" style="display:none" class="wall-reply-form">
+            <textarea id="reply-input-${esc(post.id)}" placeholder="Write a reply..." maxlength="500"></textarea>
+            <div class="wall-reply-actions">
+              <button class="wall-reply-cancel" onclick="toggleReplyForm('${esc(post.id)}')">Cancel</button>
+              <button class="wall-reply-submit" onclick="submitReply('${esc(post.id)}')">Reply</button>
+            </div>
+          </div>
+          ${postReplies.length ? `<div class="wall-replies">${replyForms}</div>` : ''}
         </div>
-      `).join('');
+      `}).join('');
+    }
+
+    function toggleReplyForm(postId) {
+      const form = document.getElementById('reply-form-' + postId);
+      if (!form) return;
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function submitReply(parentId) {
+      if (!currentViewer || !currentBusiness?.id) return;
+      const input = document.getElementById('reply-input-' + parentId);
+      const message = input.value.trim();
+      if (!message) return;
+
+      try {
+        const res = await fetch('/api/wall', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token: currentViewer.token,
+            businessId: currentBusiness.id,
+            message,
+            parentId,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Could not post reply.');
+        toggleReplyForm(parentId);
+        await loadWallPosts(currentBusiness.id);
+      } catch (e) {
+        alert(e.message || 'Could not post reply.');
+      }
     }
 
     async function initViewer() {

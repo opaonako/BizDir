@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
   }
 
   if (req.method === "POST") {
-    const { token, businessId, message } = req.body || {};
+    const { token, businessId, message, parentId } = req.body || {};
     if (!businessId) return err(res, "Business ID is required");
     if (!message?.trim()) return err(res, "Message is required");
 
@@ -51,6 +51,7 @@ module.exports = async (req, res) => {
         authorName: viewer.name || "",
         authorBusinessId: ownerBusiness.id || "",
         authorBusinessName: ownerBusiness.name || "",
+        parentId: parentId || "",
       }, "POST");
 
       return ok(res, { post: data.post || null }, 201);
