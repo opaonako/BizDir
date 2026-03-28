@@ -6,7 +6,7 @@ const CACHE_TTL = 30 * 1000;
 module.exports = async (req, res) => {
   if (req.method === "GET") {
     // ── Destructure status from query ──────────────────────
-    const { id, category, search, page = "1", limit = "12", status } = req.query;
+    const { id, category, search, page = "1", limit = "50", status } = req.query;
 
     // Single business lookup — bypass cache
     if (id) {

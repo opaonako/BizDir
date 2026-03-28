@@ -385,7 +385,7 @@ function renderCategories(categories, scroll) {
   const grid = document.getElementById('grid');
   const countEl = document.getElementById('resultsCount');
 
-  const params = new URLSearchParams({ page: currentPage, limit: 12 });
+  const params = new URLSearchParams({ page: currentPage, limit: 50 });
   if (currentCategory) params.set('category', currentCategory);
   if (currentSearch) params.set('search', currentSearch);
   const cacheKey = 'bizdir_listings_' + params.toString();
