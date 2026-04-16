@@ -2,6 +2,7 @@
 const TELNYX_API_KEY      = process.env.TELNYX_API_KEY;
 const TELNYX_PHONE_NUMBER = process.env.TELNYX_PHONE_NUMBER;
 const TELNYX_APP_ID       = process.env.TELNYX_APP_ID;
+const ORCHESTRATOR_URL    = process.env.ORCHESTRATOR_URL; // e.g. https://abc123.ngrok-free.app
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
@@ -31,6 +32,43 @@ module.exports = async (req, res) => {
   }
 
   console.log("Calling:", phone, "| Business:", businessName, "| Type:", callType);
+
+  // ── Route AI calls to local orchestrator (via ngrok) if ORCHESTRATOR_URL is set ──
+  if (callType === "ai" && ORCHESTRATOR_URL) {
+    console.log("Routing to local orchestrator:", ORCHESTRATOR_URL);
+    try {
+      const orchRes = await fetch(`${ORCHESTRATOR_URL}/dialer/call-now`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone,
+          name:          businessName || "",
+          city:          address      || "",
+          business_type: category     || "",
+        }),
+      });
+
+      const orchData = await orchRes.json();
+      console.log("Orchestrator response:", JSON.stringify(orchData));
+
+      if (!orchRes.ok) {
+        return res.status(500).json({
+          success: false,
+          error:   orchData.detail || orchData.message || "Orchestrator error",
+        });
+      }
+
+      return res.status(200).json({
+        success:    true,
+        callId:     orchData.channel_id,
+        message:    orchData.message || `Calling ${businessName} at ${phone}`,
+        via:        "local_orchestrator",
+      });
+    } catch (e) {
+      console.error("Orchestrator error:", e.message);
+      return res.status(500).json({ success: false, error: `Orchestrator unreachable: ${e.message}` });
+    }
+  }
 
   const clientState = Buffer.from(JSON.stringify({
     leadId:       leadId       || "",
@@ -85,24 +123,7 @@ module.exports = async (req, res) => {
     });
 
   } catch(e) {
-    console.error("Call error:", e.message);
+    console.error("Telnyx call error:", e.message);
     return res.status(500).json({ success: false, error: e.message });
   }
-  if (!response.ok) {
-  console.error("Telnyx full error:", JSON.stringify(data, null, 2));
-  return res.status(500).json({
-    success: false,
-    error:   data?.errors?.[0]?.detail || "Failed to initiate call",
-    code:    data?.errors?.[0]?.code,
-    title:   data?.errors?.[0]?.title,
-    debug:   { 
-      phone, 
-      from:  TELNYX_PHONE_NUMBER, 
-      appId: TELNYX_APP_ID,
-      keySet: !!TELNYX_API_KEY,
-      numSet: !!TELNYX_PHONE_NUMBER,
-      appSet: !!TELNYX_APP_ID,
-    },
-  });
-}
 };
