@@ -477,7 +477,7 @@
     }
 
     // ── MANUAL CALL PANEL ─────────────────────────────────────
-    function openPhonePanel(phone, name, category, address, leadId) {
+    function openPhonePanel(phone, name, category, address, leadId, mode = 'manual') {
       currentLeadId = leadId;
       transcript    = [];
       document.getElementById('panelNumber').textContent = phone || '+1';
@@ -491,7 +491,17 @@
       document.getElementById('transcriptEntries').innerHTML = '<div class="empty-transcript">Start a call to see live transcript</div>';
       document.getElementById('callNotes').value = '';
       document.getElementById('phonePanel').classList.add('open');
-      if (telnyxClient && phone) setTimeout(() => makeCall(), 400);
+      
+      if (mode === 'manual' && telnyxClient && phone) {
+        setTimeout(() => makeCall(), 400);
+      } else if (mode === 'coach' && phone) {
+        setTimeout(() => {
+          window.open('https://voice.google.com/u/0/calls?a=nc,%2B' + formatGVoice(phone), '_blank');
+          setPanelStatus('active', 'Google Voice call');
+          document.getElementById('panelTimer').style.display = 'block';
+          startManualTimer();
+        }, 100);
+      }
     }
 
     function closePhonePanel() {
@@ -745,9 +755,12 @@
                 data-leadid="${esc(b.id)}">
                 📞 Call
               </button>
-              <a href="https://voice.google.com/u/0/calls?a=nc,%2B${formatGVoice(b.phone)}" target="_blank" class="btn btn-gvoice">
+              <button class="btn btn-gvoice"
+                data-phone="${esc(String(b.phone))}" data-name="${esc(b.name)}"
+                data-category="${esc(b.category||'')}" data-address="${esc(b.address||b.location||'')}"
+                data-leadid="${esc(b.id)}">
                 🎙️ Call Coach
-              </a>
+              </button>
             ` : ''}
             <span class="status-badge ${b.status}">${b.status}</span>
             <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
@@ -773,7 +786,10 @@
         </div>`).join('');
 
       el.querySelectorAll('.btn-manual').forEach(btn => {
-        btn.addEventListener('click', () => openPhonePanel(btn.dataset.phone, btn.dataset.name, btn.dataset.category, btn.dataset.address, btn.dataset.leadid));
+        btn.addEventListener('click', () => openPhonePanel(btn.dataset.phone, btn.dataset.name, btn.dataset.category, btn.dataset.address, btn.dataset.leadid, 'manual'));
+      });
+      el.querySelectorAll('.btn-gvoice').forEach(btn => {
+        btn.addEventListener('click', () => openPhonePanel(btn.dataset.phone, btn.dataset.name, btn.dataset.category, btn.dataset.address, btn.dataset.leadid, 'coach'));
       });
       el.querySelectorAll('.btn-aicall').forEach(btn => {
         btn.addEventListener('click', () => callLead(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.address, btn.dataset.category));
