@@ -184,6 +184,8 @@
     .btn-aicall:hover  { background: var(--accent-2); }
     .btn-manual  { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; font-weight: 700; }
     .btn-manual:hover  { background: #bbf7d0; }
+    .btn-gvoice  { background: #e8f0fe; color: #1a73e8; border: 1px solid #d2e3fc; font-weight: 700; }
+    .btn-gvoice:hover  { background: #d2e3fc; }
     .empty { text-align: center; padding: 4rem 2rem; color: var(--ink-3); }
     .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .empty h3 { font-family: var(--font-head); font-size: 1.4rem; letter-spacing: 0.04em; color: var(--ink); margin-bottom: 0.4rem; }
@@ -743,6 +745,9 @@
                 data-leadid="${esc(b.id)}">
                 📞 Call
               </button>
+              <a href="https://voice.google.com/u/0/calls?a=nc,%2B${formatGVoice(b.phone)}" target="_blank" class="btn btn-gvoice">
+                🎙️ Call Coach
+              </a>
             ` : ''}
             <span class="status-badge ${b.status}">${b.status}</span>
             <a href="/pages/business?id=${esc(b.id)}" target="_blank" class="btn btn-view">View →</a>
@@ -975,6 +980,11 @@
     }
     function esc(s) {
       return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    function formatGVoice(phone) {
+      if (!phone) return '';
+      const digits = String(phone).replace(/\D/g, '');
+      return digits.length === 10 ? '1' + digits : digits;
     }
 
     init();
