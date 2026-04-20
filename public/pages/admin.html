@@ -495,10 +495,14 @@
       
       currentMode = mode;   // remember mode so closePhonePanel can signal the bridge
 
+      // Update panel header to reflect mode
+      document.querySelector('.panel-header-title').textContent =
+        mode === 'coach' ? '🎙️ Call Coach' : '📞 Dialer';
+
       if (mode === 'manual' && telnyxClient && phone) {
         setTimeout(() => makeCall(), 400);
       } else if (mode === 'coach' && phone) {
-        // 1. Notify call coach bridge — loads lead into Jake + starts overlay
+        // Notify call coach bridge — loads lead into Jake + starts overlay
         fetch('http://localhost:5050/lead', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -511,35 +515,54 @@
           })
         }).catch(e => console.warn("Call Coach not running on port 5050 — start it with start.sh"));
 
-        // 2. Open Google Voice in a new tab pre-filled with the number
-        setTimeout(() => {
-          window.open('https://voice.google.com/u/0/calls?a=nc,%2B' + formatGVoice(phone), '_blank');
-          setPanelStatus('active', 'Google Voice + Call Coach');
-          document.getElementById('panelTimer').style.display = 'block';
-          startManualTimer();
-        }, 100);
+        // Show ready state — user clicks the dial button to open Google Voice popup
+        setPanelStatus('ready', 'Ready — press Dial to start');
+        addTranscript('system', '🎙️ Call Coach loaded · Press Dial to open Google Voice');
       }
     }
 
     function closePhonePanel() {
       if (currentCall) hangUp();
       document.getElementById('phonePanel').classList.remove('open');
+      document.getElementById('liveDot').classList.remove('show');
       stopManualTimer();
       stopSpeechRecognition();
 
       // If this was a Call Coach session, tell the bridge the call ended
-      // so it saves the log, runs analysis, and resets the overlay to standby
       if (currentMode === 'coach') {
         fetch('http://localhost:5050/end', { method: 'POST' })
           .catch(() => {});  // silently ignore if coach isn't running
-        currentMode = null;
       }
+
+      // Reset panel header + mode
+      document.querySelector('.panel-header-title').textContent = '📞 Dialer';
+      currentMode = null;
     }
 
     function makeCall() {
-      if (!telnyxClient) { showToast('Dialer not connected', true); return; }
       const number = document.getElementById('panelNumber').textContent.trim();
       if (!number || number === '+1') { showToast('No number to dial', true); return; }
+
+      if (currentMode === 'coach') {
+        // Open Google Voice as a popup — stays on the admin page
+        const gvUrl = 'https://voice.google.com/u/0/calls?a=nc,%2B' + formatGVoice(number);
+        const popup = window.open(gvUrl, 'gvoice_popup',
+          'width=420,height=660,left=80,top=80,resizable=yes,scrollbars=yes');
+        if (!popup) {
+          // Fallback if popups are blocked — open in new tab
+          window.open(gvUrl, '_blank');
+          showToast('Tip: allow popups for this site to stay on this page', false);
+        }
+        setPanelStatus('active', 'Google Voice + Call Coach');
+        document.getElementById('panelTimer').style.display = 'block';
+        startManualTimer();
+        document.getElementById('liveDot').classList.add('show');
+        addTranscript('system', 'Dialing ' + number + ' via Google Voice…');
+        return;
+      }
+
+      // Telnyx / manual mode
+      if (!telnyxClient) { showToast('Dialer not connected', true); return; }
       transcript = [];
       document.getElementById('transcriptEntries').innerHTML = '';
       currentCall = telnyxClient.newCall({ destinationNumber: number, callerNumber: '+14485875551' });
