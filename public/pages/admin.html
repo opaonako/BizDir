@@ -386,6 +386,7 @@
     let recognition    = null;
     let currentLeadId  = null;
     let transcript     = [];
+    let currentMode    = null;   // 'coach' | 'manual' — tracks active call mode
 
     // ── INIT ──────────────────────────────────────────────────
     async function init() {
@@ -492,25 +493,28 @@
       document.getElementById('callNotes').value = '';
       document.getElementById('phonePanel').classList.add('open');
       
+      currentMode = mode;   // remember mode so closePhonePanel can signal the bridge
+
       if (mode === 'manual' && telnyxClient && phone) {
         setTimeout(() => makeCall(), 400);
       } else if (mode === 'coach' && phone) {
-        // Ping local bridge (Jake) to sync lead context
+        // 1. Notify call coach bridge — loads lead into Jake + starts overlay
         fetch('http://localhost:5050/lead', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            name: name || "Unknown Business", 
-            phone: phone, 
-            category: category || "", 
-            address: address || "", 
-            id: leadId 
+          body: JSON.stringify({
+            name: name || "Unknown Business",
+            phone: phone,
+            category: category || "",
+            address: address || "",
+            id: leadId
           })
-        }).catch(e => console.warn("Local coach bridge not running on port 5050"));
+        }).catch(e => console.warn("Call Coach not running on port 5050 — start it with start.sh"));
 
+        // 2. Open Google Voice in a new tab pre-filled with the number
         setTimeout(() => {
           window.open('https://voice.google.com/u/0/calls?a=nc,%2B' + formatGVoice(phone), '_blank');
-          setPanelStatus('active', 'Google Voice call');
+          setPanelStatus('active', 'Google Voice + Call Coach');
           document.getElementById('panelTimer').style.display = 'block';
           startManualTimer();
         }, 100);
@@ -522,6 +526,14 @@
       document.getElementById('phonePanel').classList.remove('open');
       stopManualTimer();
       stopSpeechRecognition();
+
+      // If this was a Call Coach session, tell the bridge the call ended
+      // so it saves the log, runs analysis, and resets the overlay to standby
+      if (currentMode === 'coach') {
+        fetch('http://localhost:5050/end', { method: 'POST' })
+          .catch(() => {});  // silently ignore if coach isn't running
+        currentMode = null;
+      }
     }
 
     function makeCall() {
