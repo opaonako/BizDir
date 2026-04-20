@@ -1,7 +1,8 @@
 // api/voice/webhook.js
 // BizDir AI Sales Agent — ElevenLabs voice + Cloudflare R2 storage
-export const config = { runtime: 'nodejs' };
+// Vercel runtime config set via module.exports.config below
 
+const { getAIResponse } = require("./_ai-brain.js");  // defaults to "sales" mode (Sarah, haiku)
 const TELNYX_API_KEY      = process.env.TELNYX_API_KEY;
 const ELEVENLABS_API_KEY  = process.env.ELEVENLABS_API_KEY;
 const ANTHROPIC_API_KEY   = process.env.ANTHROPIC_API_KEY;
@@ -247,37 +248,13 @@ async function uploadToR2(audioBuffer) {
   // Return public URL
   const publicUrl = `${R2_PUBLIC_URL}/${filename}`;
 
-  // Schedule deletion after 1 hour to save storage
-  setTimeout(() => deleteFromR2(filename).catch(console.error), 60 * 60 * 1000);
+  // R2 cleanup: files are deleted by /api/voice/cleanup-r2.js (called via cron)
+  // Old setTimeout was unreliable in serverless environments
 
   return publicUrl;
 }
 
-async function deleteFromR2(filename) {
-  const endpoint  = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-  const deleteUrl = `${endpoint}/${R2_BUCKET_NAME}/${filename}`;
-
-  const { signedHeaders, signature, dateStamp, amzDate } = await signR2Request({
-    method:   "DELETE",
-    bucket:   R2_BUCKET_NAME,
-    key:      filename,
-    region:   "auto",
-    service:  "s3",
-    endpoint,
-    body:     new ArrayBuffer(0),
-  });
-
-  await fetch(deleteUrl, {
-    method:  "DELETE",
-    headers: {
-      "x-amz-date":          amzDate,
-      "x-amz-content-sha256":signedHeaders["x-amz-content-sha256"],
-      "Authorization":       `AWS4-HMAC-SHA256 Credential=${R2_ACCESS_KEY_ID}/${dateStamp}/auto/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=${signature}`,
-      "Host":                `${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-    },
-  });
-  console.log("Deleted audio file:", filename);
-}
+// deleteFromR2 moved to cleanup-r2.js (called via cron)
 
 // Full pipeline: ElevenLabs → R2 → public URL
 async function generateAndUploadAudio(text) {
@@ -373,93 +350,8 @@ async function startListening(callControlId, encodedState) {
 }
 
 // ── AI BRAIN ───────────────────────────────────────────────────
-async function getAIResponse(state) {
-  const { stage, speech, businessName, address, phone,
-          email, website, hasWebsite, transcript, category } = state;
+// getAIResponse is now imported from _ai-brain.js (shared with gather.js)
 
-  const recentTranscript = (transcript || [])
-    .slice(-6)
-    .map(t => `${t.role === "customer" ? "Customer" : "Sarah"}: ${t.text}`)
-    .join("\n");
-
-  const prompt = `You are Sarah, a friendly AI agent for Yellow Pages — a free local business directory.
-You called ${businessName || "a local business"} to verify their info and offer a free listing.
-
-INFO WE HAVE:
-- Business: ${businessName || "unknown"}
-- Address:  ${address || "unknown"}
-- Phone:    ${phone || "unknown"}
-- Category: ${category || "unknown"}
-- Email:    ${email || "not collected yet"}
-- Website:  ${hasWebsite === null ? "not asked yet" : hasWebsite ? "yes — " + (website || "url not collected") : "no"}
-
-CURRENT STAGE: ${stage}
-RECENT CONVERSATION:
-${recentTranscript}
-CUSTOMER JUST SAID: "${speech}"
-
-STAGE FLOW (follow in order):
-1. verify_name    — Confirm speaking with someone from the business. If yes → verify_address.
-2. verify_address — Confirm their address is "${address}". If different collect correct one.
-3. ask_website    — Ask if they have a website. If yes ask for URL.
-4. ask_email      — Ask for their email for the free listing confirmation.
-5. approve        — All info collected. Thank them and tell them listing is live on Yellow Pages.
-6. upsell         — IF NO WEBSITE: Offer free pre-built website. IF HAS WEBSITE: Offer web app $599, AI automation $499, SEO $199/mo.
-7. followup_email — They want to think about it. Confirm we will email them details.
-8. goodbye        — Warm closing. "Have a great day!"
-
-RULES:
-- MAX 2 sentences per response. Be natural and conversational.
-- If they seem busy: offer to email details and end call politely.
-- If wrong number or not interested: endCall immediately.
-- Extract email carefully — reconstruct if spelled out letter by letter.
-- Once you have email and address confirmed → nextStage must be "approve".
-
-RESPOND IN JSON ONLY — no markdown, no extra text:
-{
-  "message":    "Sarah spoken response max 2 sentences",
-  "nextStage":  "verify_name|verify_address|ask_website|ask_email|approve|upsell|followup_email|goodbye",
-  "endCall":    false,
-  "email":      "extracted email or null",
-  "website":    "extracted URL or null",
-  "hasWebsite": true,
-  "address":    "corrected address or null",
-  "verified":   true,
-  "outcome":    "approved|not_interested|busy|wrong_number|followup|null"
-}`;
-
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method:  "POST",
-      headers: {
-        "Content-Type":      "application/json",
-        "x-api-key":         ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model:      "claude-haiku-4-5-20251001",
-        max_tokens: 400,
-        messages:   [{ role: "user", content: prompt }],
-      }),
-    });
-    const data  = await res.json();
-    const text  = data.content?.[0]?.text || "";
-    const clean = text.replace(/```json|```/g, "").trim();
-    return JSON.parse(clean);
-  } catch(e) {
-    console.error("Claude error:", e.message);
-    return {
-      message:    "Could you repeat that? I want to make sure I have your details right.",
-      nextStage:  stage,
-      endCall:    false,
-      email:      null,
-      website:    null,
-      hasWebsite: null,
-      address:    null,
-      verified:   false,
-    };
-  }
-}
 
 // ── SYNC TO SHEET ──────────────────────────────────────────────
 async function syncToSheet(state) {
@@ -550,4 +442,4 @@ function decodeState(str) {
   try { return JSON.parse(Buffer.from(str, "base64").toString("utf8")); }
   catch { return {}; }
 }
-module.exports.config = { maxDuration: 60 };
+module.exports.config = { runtime: 'nodejs', maxDuration: 60 };

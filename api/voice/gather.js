@@ -2,10 +2,9 @@
 // Handles speech recognition results from Telnyx
 // Called after business owner speaks
 
+const { getAIResponse } = require("./_ai-brain.js");
 const TELNYX_API_KEY = process.env.TELNYX_API_KEY;
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
-const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 const VOICES = {
   us: "21m00Tcm4TlvDq8ikWAM",
@@ -28,7 +27,7 @@ module.exports = async (req, res) => {
   transcript.push({ role: "business", text: speechResult });
 
   try {
-    // Use Claude to determine next action
+    // Use Claude to determine next action (verify mode for this flow)
     const aiResponse = await getAIResponse({
       stage: clientState.stage,
       speech: speechResult,
@@ -38,7 +37,7 @@ module.exports = async (req, res) => {
       phone: clientState.phone,
       isUS: clientState.isUS,
       transcript,
-    });
+    }, "verify");  // <-- verify mode (sonnet, 6 stages)
 
     console.log("AI response:", aiResponse);
 
@@ -86,78 +85,6 @@ module.exports = async (req, res) => {
     res.status(200).json({ received: true });
   }
 };
-
-// ── Claude AI conversation logic ──────────────────────────
-async function getAIResponse({ stage, speech, businessName, address, category, phone, isUS, transcript }) {
-  const systemPrompt = `You are an AI assistant making verification calls for BizDir, a free business directory.
-Your job is to collect and verify business information through a natural phone conversation.
-
-Current business info:
-- Name: ${businessName}
-- Address: ${address || "unknown"}
-- Category: ${category || "unknown"}
-- Phone: ${phone || "unknown"}
-
-Conversation stages:
-1. confirm_name - Confirm the business name
-2. confirm_address - Confirm the address
-3. confirm_category - Ask what type of business they are
-4. confirm_phone - Confirm their phone number
-5. get_description - Ask for a brief description
-6. farewell - Thank them and end call
-
-Current stage: ${stage}
-Latest response: "${speech}"
-
-Respond with a JSON object:
-{
-  "message": "what to say next (keep it short and natural)",
-  "nextStage": "next stage name",
-  "endCall": false,
-  "verified": false,
-  "businessName": "extracted or confirmed name",
-  "address": "extracted or confirmed address",
-  "category": "extracted category",
-  "phone": "extracted phone",
-  "description": "extracted description"
-}
-
-Rules:
-- Keep responses SHORT (1-2 sentences max)
-- Be friendly and professional
-- If they say no, wrong number, or not interested - set endCall: true
-- After getting all info (farewell stage) - set endCall: true and verified: true
-- ${isUS ? "Use American English" : "Use clear English, Filipino-friendly"}
-- Extract any business info mentioned in their response`;
-
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 500,
-      messages: [{ role: "user", content: systemPrompt }],
-    }),
-  });
-
-  const data = await response.json();
-  const text = data.content[0].text;
-
-  try {
-    const clean = text.replace(/```json|```/g, "").trim();
-    return JSON.parse(clean);
-  } catch {
-    return {
-      message: "I'm sorry, could you repeat that?",
-      nextStage: stage,
-      endCall: false,
-    };
-  }
-}
 
 // ── Telnyx action ─────────────────────────────────────────
 async function telnyxAction(callControlId, action, params = {}) {
