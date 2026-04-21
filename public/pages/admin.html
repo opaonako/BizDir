@@ -544,15 +544,17 @@
       if (!number || number === '+1') { showToast('No number to dial', true); return; }
 
       if (currentMode === 'coach') {
-        // Open Google Voice as a popup — stays on the admin page
+        // Ask the Call Coach bridge to open Google Voice in app-mode popup
+        // (no new tab — Chrome launches a clean frameless dialer window)
         const gvUrl = 'https://voice.google.com/u/0/calls?a=nc,%2B' + formatGVoice(number);
-        const popup = window.open(gvUrl, 'gvoice_popup',
-          'width=420,height=660,left=80,top=80,resizable=yes,scrollbars=yes');
-        if (!popup) {
-          // Fallback if popups are blocked — open in new tab
-          window.open(gvUrl, '_blank');
-          showToast('Tip: allow popups for this site to stay on this page', false);
-        }
+        fetch('http://localhost:5050/dial', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: number })
+        }).catch(() => {
+          // Bridge not running — fall back to tel: link directly
+          window.location.href = 'tel:' + number;
+        });
         setPanelStatus('active', 'Google Voice + Call Coach');
         document.getElementById('panelTimer').style.display = 'block';
         startManualTimer();
