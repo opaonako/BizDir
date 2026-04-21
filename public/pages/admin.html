@@ -330,6 +330,7 @@
             <div>
               <button class="btn-action btn-green" id="callBtn" onclick="makeCall()">📞</button>
               <button class="btn-action btn-red"   id="hangupBtn" onclick="hangUp()">📵</button>
+              <button class="btn-action btn-red"   id="endCoachBtn" onclick="endCoachCall()" style="display:none">⏹️</button>
               <div class="btn-label" id="callBtnLabel">Call</div>
             </div>
             <div>
@@ -389,6 +390,18 @@
     let currentMode    = null;   // 'coach' | 'manual' — tracks active call mode
 
     // ── INIT ──────────────────────────────────────────────────
+
+    // Google Voice window reference for Call Coach
+    let gvWindow = null;
+
+    function endCoachCall() {
+      if (gvWindow) {
+        gvWindow.close();
+        gvWindow = null;
+      }
+      closePhonePanel();
+    }
+
     async function init() {
       const token = localStorage.getItem('bizdir_token');
       if (!token) { window.location.href = '/pages/login'; return; }
@@ -499,12 +512,23 @@
       document.querySelector('.panel-header-title').textContent =
         mode === 'coach' ? '🎙️ Call Coach' : '📞 Dialer';
 
+      // Show appropriate call button based on mode
+      if (mode === 'coach') {
+        document.getElementById('callBtn').style.display = 'none';
+        document.getElementById('endCoachBtn').style.display = 'flex';
+        document.getElementById('callBtnLabel').textContent = 'End Call';
+      } else {
+        document.getElementById('callBtn').style.display = 'flex';
+        document.getElementById('endCoachBtn').style.display = 'none';
+        document.getElementById('callBtnLabel').textContent = 'Call';
+      }
+
       if (mode === 'manual' && telnyxClient && phone) {
         setTimeout(() => makeCall(), 400);
       } else if (mode === 'coach' && phone) {
         // Open Google Voice in a new tab
         const gvUrl = 'https://voice.google.com/u/0/call/' + formatGVoice(phone);
-        window.open(gvUrl, '_blank');
+        gvWindow = window.open(gvUrl, '_blank');
         addTranscript('system', 'Opening Google Voice for ' + phone + '…');
         return;
       }
@@ -512,6 +536,7 @@
 
     function closePhonePanel() {
       if (currentCall) hangUp();
+      if (gvWindow) { gvWindow.close(); gvWindow = null; }
       document.getElementById('phonePanel').classList.remove('open');
       document.getElementById('liveDot').classList.remove('show');
       stopManualTimer();
