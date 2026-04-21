@@ -502,22 +502,11 @@
       if (mode === 'manual' && telnyxClient && phone) {
         setTimeout(() => makeCall(), 400);
       } else if (mode === 'coach' && phone) {
-        // Notify call coach bridge — loads lead into Jake + starts overlay
-        fetch('http://localhost:5050/lead', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: name || "Unknown Business",
-            phone: phone,
-            category: category || "",
-            address: address || "",
-            id: leadId
-          })
-        }).catch(e => console.warn("Call Coach not running on port 5050 — start it with start.sh"));
-
-        // Show ready state — user clicks the dial button to open Google Voice popup
-        setPanelStatus('ready', 'Ready — press Dial to start');
-        addTranscript('system', '🎙️ Call Coach loaded · Press Dial to open Google Voice');
+        // Open Google Voice in a new tab
+        const gvUrl = 'https://voice.google.com/u/0/call/' + formatGVoice(phone);
+        window.open(gvUrl, '_blank');
+        addTranscript('system', 'Opening Google Voice for ' + phone + '…');
+        return;
       }
     }
 
@@ -546,15 +535,6 @@
       if (currentMode === 'coach') {
         // Ask the Call Coach bridge to open Google Voice in app-mode popup
         // (no new tab — Chrome launches a clean frameless dialer window)
-        const gvUrl = 'https://voice.google.com/u/0/calls?a=nc,%2B' + formatGVoice(number);
-        fetch('http://localhost:5050/dial', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: number })
-        }).catch(() => {
-          // Bridge not running — fall back to tel: link directly
-          window.location.href = 'tel:' + number;
-        });
         setPanelStatus('active', 'Google Voice + Call Coach');
         document.getElementById('panelTimer').style.display = 'block';
         startManualTimer();
